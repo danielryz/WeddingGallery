@@ -38,6 +38,11 @@ public class PhotoService {
         return photoRepository.findAll();
     }
 
+    public org.springframework.data.domain.Page<Photo> getPhotos(org.springframework.data.domain.Pageable pageable, org.springframework.data.domain.Sort sort) {
+        org.springframework.data.domain.PageRequest pageRequest = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        return photoRepository.findAll(org.springframework.data.jpa.domain.Specification.where(null), pageRequest);
+    }
+
     public Photo savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
         Device device = getRequestingDevice(request);
         String filename = storageService.store(file);
@@ -46,6 +51,8 @@ public class PhotoService {
                 .device(device)
                 .uploader(device.getUser())
                 .description(description)
+                .commentCount(0)
+                .reactionCount(0)
                 .uploadTime(LocalDateTime.now())
                 .build();
         return photoRepository.save(photo);

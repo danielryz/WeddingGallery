@@ -35,4 +35,10 @@ public class Photo {
 
     @Column(name = "upload_time", nullable = false)
     private LocalDateTime uploadTime;
+
+    @Column(name = "comment_count", nullable = false)
+    private int commentCount;
+
+    @Column(name = "reaction_count", nullable = false)
+    private int reactionCount;
 }

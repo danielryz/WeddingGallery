@@ -1,0 +1,5 @@
+ALTER TABLE photos
+    ADD COLUMN comment_count INTEGER NOT NULL DEFAULT 0;
+
+ALTER TABLE photos
+    ADD COLUMN reaction_count INTEGER NOT NULL DEFAULT 0;

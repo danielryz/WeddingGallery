@@ -31,7 +31,10 @@ public class ReactionService {
                 .device(device)
                 .type(type)
                 .build();
-        return reactionRepository.save(reaction);
+        Reaction saved = reactionRepository.save(reaction);
+        photo.setReactionCount(photo.getReactionCount() + 1);
+        photoRepository.save(photo);
+        return saved;
     }
 
     public void deleteReaction(Long id, HttpServletRequest request) {
@@ -48,6 +51,9 @@ public class ReactionService {
         }
 
         reactionRepository.delete(reaction);
+        Photo photo = reaction.getPhoto();
+        photo.setReactionCount(Math.max(0, photo.getReactionCount() - 1));
+        photoRepository.save(photo);
     }
 
     private Device getRequestingDevice(HttpServletRequest request) {
