@@ -34,7 +34,7 @@ public class AuthService {
     @Transactional
     public AuthResponse login(LoginRequest req, HttpServletRequest httpReq) {
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(req.getName(),req.getPassword())
+                new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword())
         );
 
 
