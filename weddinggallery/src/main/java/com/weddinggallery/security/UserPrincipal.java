@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class UserPrincipal implements UserDetails {
 
-    private final String clientId;
+    private final String username;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -24,7 +24,7 @@ public class UserPrincipal implements UserDetails {
                 .collect(Collectors.toList());
 
         return new UserPrincipal(
-                user.getClientId(),
+                user.getUsername(),
                 user.getPassword(),
                 auths
         );
@@ -32,7 +32,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return clientId;
+        return username;
     }
     @Override public String getPassword() { return password; }
     @Override public Collection<? extends GrantedAuthority> getAuthorities() { return authorities; }

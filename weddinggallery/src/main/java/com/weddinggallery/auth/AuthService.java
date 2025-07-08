@@ -38,7 +38,9 @@ public class AuthService {
         );
 
 
-        Device device = Optional.ofNullable(req.getClientId())
+        String headerClientId = httpReq.getHeader("X-ClientId");
+
+        Device device = Optional.ofNullable(headerClientId)
                 .flatMap(id -> deviceRepository.findByClientId(UUID.fromString(id)))
                 .map(d -> {
                     if (req.getName() != null) {
