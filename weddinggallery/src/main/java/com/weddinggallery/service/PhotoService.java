@@ -12,7 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import com.weddinggallery.service.FileStorageService;
+import com.weddinggallery.service.StorageService;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -20,9 +20,7 @@ import java.time.LocalDateTime;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.List;
@@ -34,7 +32,7 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final DeviceRepository deviceRepository;
     private final JwtTokenProvider tokenProvider;
-    private final FileStorageService storageService;
+    private final StorageService storageService;
 
     public List<Photo> getAllPhotos(){
         return photoRepository.findAll();
@@ -98,11 +96,12 @@ public class PhotoService {
         try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
             for (Photo photo : photos) {
                 if (StringUtils.hasText(photo.getFileName())) {
-                    Path path = Paths.get("photos").resolve(photo.getFileName());
-                    if (Files.exists(path)) {
+                    try (InputStream in = storageService.open(photo.getFileName())) {
                         zos.putNextEntry(new ZipEntry(photo.getFileName()));
-                        Files.copy(path, zos);
+                        in.transferTo(zos);
                         zos.closeEntry();
+                    } catch (IOException ex) {
+                        // ignore missing files
                     }
                 }
             }

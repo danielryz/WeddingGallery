@@ -67,3 +67,22 @@ Include this token in the `Authorization: Bearer <token>` header when calling se
 
 Default users are created by Flyway migrations (e.g. `Ania_Kamil_2025` and `admin`).
 
+## Storage configuration
+
+The application stores uploaded files either on the local filesystem or in
+Google Cloud Storage (GCS). The default profile uses local storage. To switch to
+GCS provide the `gcs` Spring profile:
+
+```bash
+SPRING_PROFILES_ACTIVE=gcs ./mvnw spring-boot:run
+```
+
+The bucket name is configured in `src/main/resources/application-gcs.properties`.
+GCS credentials are resolved from the environment by the Google Cloud SDK. Set
+the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to the path of a
+service account JSON key file with access to the bucket:
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
+```
+
