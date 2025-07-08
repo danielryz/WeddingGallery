@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -35,10 +36,11 @@ class CustomUserDetailsServiceTest {
 
     @BeforeEach
     void setUp() {
+        String enc = new BCryptPasswordEncoder().encode("pass");
         user = User.builder()
                 .id(1L)
                 .username("john")
-                .password("pass")
+                .password(enc)
                 .roles(Set.of())
                 .build();
         device = Device.builder()
@@ -54,7 +56,7 @@ class CustomUserDetailsServiceTest {
 
         var details = service.loadUserByUsername("john");
 
-        assertThat(details.getPassword()).isEqualTo("pass");
+        assertThat(new BCryptPasswordEncoder().matches("pass", details.getPassword())).isTrue();
         verify(userRepository).findByUsername("john");
         verifyNoInteractions(deviceRepository);
     }
@@ -68,7 +70,7 @@ class CustomUserDetailsServiceTest {
 
         var details = service.loadUserByUsername(device.getClientId().toString());
 
-        assertThat(details.getPassword()).isEqualTo("pass");
+        assertThat(new BCryptPasswordEncoder().matches("pass", details.getPassword())).isTrue();
         verify(deviceRepository).findByClientId(device.getClientId());
     }
 
