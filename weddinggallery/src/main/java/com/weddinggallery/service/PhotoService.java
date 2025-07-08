@@ -11,6 +11,11 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+import com.weddinggallery.service.FileStorageService;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,14 +34,22 @@ public class PhotoService {
     private final PhotoRepository photoRepository;
     private final DeviceRepository deviceRepository;
     private final JwtTokenProvider tokenProvider;
+    private final FileStorageService storageService;
 
     public List<Photo> getAllPhotos(){
         return photoRepository.findAll();
     }
 
-    public Photo savePhoto(Photo photo, HttpServletRequest request){
+    public Photo savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
         Device device = getRequestingDevice(request);
-        photo.setDevice(device);
+        String filename = storageService.store(file);
+        Photo photo = Photo.builder()
+                .fileName(filename)
+                .device(device)
+                .uploader(device.getUser())
+                .description(description)
+                .uploadTime(LocalDateTime.now())
+                .build();
         return photoRepository.save(photo);
     }
 
@@ -53,6 +66,11 @@ public class PhotoService {
             throw new AccessDeniedException("Not authorized to delete this photo");
         }
 
+        try {
+            storageService.delete(photo.getFileName());
+        } catch (IOException e) {
+            // log and continue deletion
+        }
         photoRepository.delete(photo);
     }
 
