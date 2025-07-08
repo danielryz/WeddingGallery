@@ -46,10 +46,13 @@ The application reads its settings from the following environment variables:
 | `JWT_SECRET` | Secret key used to sign JWT tokens | *(none)* |
 | `JWT_EXPIRATION_MS` | Token validity in milliseconds | `3600000` |
 | `SPRING_SECURITY_LOG_LEVEL` | Security logging level | `DEBUG` |
+| `LOCAL_STORAGE_PATH` | Directory for images when using the `local` profile | `photos` |
 | `GCS_BUCKET` | Google Cloud Storage bucket name for the `gcs` profile | *(none)* |
 
 The `SPRING_PROFILES_ACTIVE` variable controls which profile is active. Use `local` for filesystem storage or `gcs` to store images in Google Cloud Storage.
 For more complex setups you can define additional profiles such as `dev` or `prod` and place the configuration in `src/main/resources/application-<profile>.properties`.
+
+For convenience a `.env.dev` file is provided with sample values for local development. You can source this file or copy it to `.env` to quickly configure the application when running locally.
 
 ## Building and running
 
