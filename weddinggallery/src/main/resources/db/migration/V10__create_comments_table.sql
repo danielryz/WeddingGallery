@@ -1,0 +1,7 @@
+CREATE TABLE comments (
+    id BIGSERIAL PRIMARY KEY,
+    photo_id BIGINT NOT NULL REFERENCES photos(id) ON DELETE CASCADE,
+    device_id BIGINT REFERENCES devices(id) ON DELETE SET NULL,
+    text TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT now()
+);
