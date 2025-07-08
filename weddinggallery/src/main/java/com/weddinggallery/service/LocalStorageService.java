@@ -1,18 +1,21 @@
 package com.weddinggallery.service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class FileStorageService {
+@Profile("local")
+public class LocalStorageService implements StorageService {
     private final Path root = Paths.get("photos");
 
     @PostConstruct
@@ -24,6 +27,7 @@ public class FileStorageService {
         }
     }
 
+    @Override
     public String store(MultipartFile file) throws IOException {
         String original = file.getOriginalFilename();
         String ext = StringUtils.getFilenameExtension(original);
@@ -36,6 +40,7 @@ public class FileStorageService {
         return filename;
     }
 
+    @Override
     public void delete(String filename) throws IOException {
         if (!StringUtils.hasText(filename)) {
             return;
@@ -44,7 +49,12 @@ public class FileStorageService {
         Files.deleteIfExists(path);
     }
 
-    public Path load(String filename) {
-        return root.resolve(filename);
+    @Override
+    public InputStream open(String filename) throws IOException {
+        Path path = root.resolve(filename);
+        if (!Files.exists(path)) {
+            throw new IOException("File not found: " + filename);
+        }
+        return Files.newInputStream(path);
     }
 }
