@@ -1,3 +1,12 @@
 # IDE-specific files
 .idea/
 *.iml
+
+# Maven build directories
+/weddinggallery/target/
+/weddinggallery/build/
+/weddinggallery/nbbuild/
+/weddinggallery/nbdist/
+/weddinggallery/dist/
+/weddinggallery/.nb-gradle/
+
