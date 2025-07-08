@@ -13,7 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("api/photos")
@@ -25,8 +24,15 @@ public class PhotoController {
 
     @GetMapping
     @Operation(summary = "Get all photos")
-    public List<Photo> getAllPhotos(){
-        return photoService.getAllPhotos();
+    public org.springframework.data.domain.Page<Photo> getPhotos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "uploadTime") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction
+    ){
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        org.springframework.data.domain.Sort sort = com.weddinggallery.util.SortUtil.from(sortBy, direction);
+        return photoService.getPhotos(pageable, sort);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

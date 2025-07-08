@@ -34,7 +34,10 @@ public class CommentService {
                 .text(text)
                 .createdAt(LocalDateTime.now())
                 .build();
-        return commentRepository.save(comment);
+        Comment saved = commentRepository.save(comment);
+        photo.setCommentCount(photo.getCommentCount() + 1);
+        photoRepository.save(photo);
+        return saved;
     }
 
     public void deleteComment(Long id, HttpServletRequest request) {
@@ -51,6 +54,9 @@ public class CommentService {
         }
 
         commentRepository.delete(comment);
+        Photo photo = comment.getPhoto();
+        photo.setCommentCount(Math.max(0, photo.getCommentCount() - 1));
+        photoRepository.save(photo);
     }
 
     private Device getRequestingDevice(HttpServletRequest request) {
