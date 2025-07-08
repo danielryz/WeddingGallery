@@ -25,6 +25,32 @@ This project is a Spring Boot application for managing wedding photos with JWT-b
    ```
    Flyway will run the SQL scripts from `src/main/resources/db/migration` on startup.
 
+## Configuration via environment variables
+
+The application reads its settings from the following environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DB_URL` | JDBC URL for the PostgreSQL database | `jdbc:postgresql://localhost:5432/weddinggallery` |
+| `DB_USERNAME` | Database username | `wedding_user` |
+| `DB_PASSWORD` | Database password | `kamisania` |
+| `HIBERNATE_DDL_AUTO` | Value for `spring.jpa.hibernate.ddl-auto` | `update` |
+| `JPA_SHOW_SQL` | Enable SQL logging | `true` |
+| `HIBERNATE_FORMAT_SQL` | Pretty print SQL | `true` |
+| `JPA_OPEN_IN_VIEW` | Open session in view | `false` |
+| `FLYWAY_ENABLED` | Enable Flyway migrations | `true` |
+| `FLYWAY_LOCATIONS` | Location of migration scripts | `classpath:db/migration` |
+| `FLYWAY_BASELINE_ON_MIGRATE` | Allow baseline on migrate | `true` |
+| `FLYWAY_BASELINE_VERSION` | Baseline version | `0` |
+| `SPRING_PROFILES_ACTIVE` | Active Spring profiles | `local` |
+| `JWT_SECRET` | Secret key used to sign JWT tokens | *(none)* |
+| `JWT_EXPIRATION_MS` | Token validity in milliseconds | `3600000` |
+| `SPRING_SECURITY_LOG_LEVEL` | Security logging level | `DEBUG` |
+| `GCS_BUCKET` | Google Cloud Storage bucket name for the `gcs` profile | *(none)* |
+
+The `SPRING_PROFILES_ACTIVE` variable controls which profile is active. Use `local` for filesystem storage or `gcs` to store images in Google Cloud Storage.
+For more complex setups you can define additional profiles such as `dev` or `prod` and place the configuration in `src/main/resources/application-<profile>.properties`.
+
 ## Building and running
 
 From the `weddinggallery` directory run:
