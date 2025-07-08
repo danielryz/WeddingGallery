@@ -65,9 +65,10 @@ class AuthServiceTest {
 
     @Test
     void loginWithValidCredentials() {
-        LoginRequest request = new LoginRequest("john", "pass", "myDevice", null);
+        LoginRequest request = new LoginRequest("john", "pass", "myDevice");
         HttpServletRequest httpReq = mock(HttpServletRequest.class);
         when(httpReq.getHeader("User-Agent")).thenReturn("JUnit");
+        when(httpReq.getHeader("X-ClientId")).thenReturn(null);
 
         when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
         when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
