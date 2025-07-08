@@ -26,6 +26,10 @@ public class Photo {
     @JoinColumn(name = "uploader_id")
     private User uploader;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "device_id")
+    private Device device;
+
     @Column(name = "upload_time", nullable = false)
     private LocalDateTime uploadTime;
 }
