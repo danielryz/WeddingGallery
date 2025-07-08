@@ -1,0 +1,6 @@
+CREATE TABLE reactions (
+    id BIGSERIAL PRIMARY KEY,
+    type VARCHAR(50) NOT NULL,
+    device_id BIGINT NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
+    photo_id BIGINT NOT NULL REFERENCES photos(id) ON DELETE CASCADE
+);
