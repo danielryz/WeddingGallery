@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -16,11 +17,15 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Profile("local")
 public class LocalStorageService implements StorageService {
-    private final Path root = Paths.get("photos");
+    @Value("${storage.local.path:photos}")
+    private String rootDir;
+
+    private Path root;
 
     @PostConstruct
     public void init() {
         try {
+            root = Paths.get(rootDir);
             Files.createDirectories(root);
         } catch (IOException e) {
             throw new RuntimeException("Could not create storage directory", e);
