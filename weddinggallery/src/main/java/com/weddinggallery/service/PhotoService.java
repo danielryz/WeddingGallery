@@ -10,9 +10,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,6 +71,24 @@ public class PhotoService {
 
         photo.setDescription(description);
         return photoRepository.save(photo);
+    }
+
+    public void streamAllPhotosZip(HttpServletResponse response) throws java.io.IOException {
+        List<Photo> photos = photoRepository.findAll();
+        response.setContentType("application/zip");
+        response.setHeader("Content-Disposition", "attachment; filename=photos.zip");
+        try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
+            for (Photo photo : photos) {
+                if (StringUtils.hasText(photo.getFileName())) {
+                    Path path = Paths.get("photos").resolve(photo.getFileName());
+                    if (Files.exists(path)) {
+                        zos.putNextEntry(new ZipEntry(photo.getFileName()));
+                        Files.copy(path, zos);
+                        zos.closeEntry();
+                    }
+                }
+            }
+        }
     }
 
     private Device getRequestingDevice(HttpServletRequest request) {

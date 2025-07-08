@@ -4,9 +4,11 @@ import com.weddinggallery.model.Photo;
 import com.weddinggallery.service.PhotoService;
 import com.weddinggallery.dto.photo.PhotoDescriptionUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,6 +37,20 @@ public class PhotoController {
     @Operation(summary = "Delete photo by id")
     public void deletePhoto(@PathVariable Long id, HttpServletRequest request){
         photoService.deletePhoto(id, request);
+    }
+
+    @DeleteMapping("/admin/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Admin delete photo by id")
+    public void adminDeletePhoto(@PathVariable Long id, HttpServletRequest request){
+        photoService.deletePhoto(id, request);
+    }
+
+    @GetMapping("/archive")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Download all photos as zip")
+    public void downloadAllPhotos(HttpServletResponse response) throws java.io.IOException {
+        photoService.streamAllPhotosZip(response);
     }
 
     @PutMapping("/{id}/description")
