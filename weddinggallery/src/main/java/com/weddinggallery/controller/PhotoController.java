@@ -2,6 +2,7 @@ package com.weddinggallery.controller;
 
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.service.PhotoService;
+import com.weddinggallery.dto.photo.PhotoDescriptionUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,6 +35,16 @@ public class PhotoController {
     @Operation(summary = "Delete photo by id")
     public void deletePhoto(@PathVariable Long id, HttpServletRequest request){
         photoService.deletePhoto(id, request);
+    }
+
+    @PutMapping("/{id}/description")
+    @Operation(summary = "Update photo description")
+    public Photo updateDescription(
+            @PathVariable Long id,
+            @RequestBody PhotoDescriptionUpdateRequest updateRequest,
+            HttpServletRequest request
+    ) {
+        return photoService.updatePhotoDescription(id, updateRequest.getDescription(), request);
     }
 
 
