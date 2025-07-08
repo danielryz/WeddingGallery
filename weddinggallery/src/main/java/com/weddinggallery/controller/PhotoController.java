@@ -2,6 +2,7 @@ package com.weddinggallery.controller;
 
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.service.PhotoService;
+import jakarta.servlet.http.HttpServletRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +26,14 @@ public class PhotoController {
 
     @PostMapping
     @Operation(summary = "Save a photo")
-    public Photo savePhoto(@RequestBody Photo photo){
-        return photoService.savePhoto(photo);
+    public Photo savePhoto(@RequestBody Photo photo, HttpServletRequest request){
+        return photoService.savePhoto(photo, request);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete photo by id")
-    public void deletePhoto(@PathVariable Long id){
-        photoService.deletePhoto(id);
+    public void deletePhoto(@PathVariable Long id, HttpServletRequest request){
+        photoService.deletePhoto(id, request);
     }
 
 
