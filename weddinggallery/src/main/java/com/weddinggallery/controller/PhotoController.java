@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,10 +29,14 @@ public class PhotoController {
         return photoService.getAllPhotos();
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save a photo")
-    public Photo savePhoto(@RequestBody Photo photo, HttpServletRequest request){
-        return photoService.savePhoto(photo, request);
+    public Photo savePhoto(
+            @RequestPart("file") MultipartFile file,
+            @RequestPart(value = "description", required = false) String description,
+            HttpServletRequest request
+    ) throws java.io.IOException {
+        return photoService.savePhoto(file, description, request);
     }
 
     @DeleteMapping("/{id}")
