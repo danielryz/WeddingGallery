@@ -7,7 +7,7 @@ ALTER TABLE users
 INSERT INTO users (username, password, client_id, name, device_info, created_at)
 VALUES (
            'Ania_Kamil_2025',
-           '23sierpnia',
+           '$2b$12$KvG8IxvWTNo2p8XBL7sgzOr8xLrVWsiJ503Me7UGJ0w3mN9G4v4Z6',
            '00000000-0000-0000-0000-000000000003'::UUID,
            NULL,
            NULL,
@@ -27,7 +27,7 @@ WHERE u.username = 'Ania_Kamil_2025'
 INSERT INTO users (username, password, client_id, name, device_info, created_at)
 VALUES (
            'admin',
-           'Ania_Kamil@2308',
+           '$2b$12$/9IAnS2OAKCXX0itw5VCeO2wwKyATuUOFWRHnwuOKudXyOxtEQ.CW',
            '00000000-0000-0000-0000-000000000004'::UUID,
            NULL,
            NULL,
@@ -39,5 +39,4 @@ INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id
 FROM users u
          JOIN roles r ON r.name = 'ROLE_ADMIN'
-WHERE u.username = 'admin'
-    ON CONFLICT DO NOTHING;
+WHERE u.username = 'admin'    ON CONFLICT DO NOTHING;

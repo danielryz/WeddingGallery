@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,10 +50,11 @@ class AuthServiceTest {
 
     @BeforeEach
     void setUp() {
+        String enc = new BCryptPasswordEncoder().encode("pass");
         user = User.builder()
                 .id(1L)
                 .username("john")
-                .password("pass")
+                .password(enc)
                 .roles(Set.of())
                 .build();
         role = Role.builder()
