@@ -49,6 +49,23 @@ public class PhotoService {
         photoRepository.delete(photo);
     }
 
+    public Photo updatePhotoDescription(Long id, String description, HttpServletRequest request){
+        Device device = getRequestingDevice(request);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new AccessDeniedException("Photo not found"));
+
+        if(!isAdmin && (photo.getDevice() == null || !photo.getDevice().getId().equals(device.getId()))){
+            throw new AccessDeniedException("Not authorized to update this photo");
+        }
+
+        photo.setDescription(description);
+        return photoRepository.save(photo);
+    }
+
     private Device getRequestingDevice(HttpServletRequest request) {
         String header = request.getHeader("Authorization");
         if (header == null || !header.startsWith("Bearer ")) {

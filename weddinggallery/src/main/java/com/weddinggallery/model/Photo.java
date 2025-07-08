@@ -30,6 +30,9 @@ public class Photo {
     @JoinColumn(name = "device_id")
     private Device device;
 
+    @Column(name = "description")
+    private String description;
+
     @Column(name = "upload_time", nullable = false)
     private LocalDateTime uploadTime;
 }
