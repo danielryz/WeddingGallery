@@ -68,7 +68,6 @@ class AuthServiceTest {
         LoginRequest request = new LoginRequest("john", "pass", "myDevice");
         HttpServletRequest httpReq = mock(HttpServletRequest.class);
         when(httpReq.getHeader("User-Agent")).thenReturn("JUnit");
-        when(httpReq.getHeader("X-ClientId")).thenReturn(null);
 
         when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
         when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
@@ -84,7 +83,7 @@ class AuthServiceTest {
             return d;
         });
 
-        var response = authService.login(request, httpReq);
+        var response = authService.login(request, null, httpReq);
 
         verify(authenticationManager).authenticate(argThat(auth ->
                 auth instanceof UsernamePasswordAuthenticationToken &&
@@ -93,6 +92,31 @@ class AuthServiceTest {
         ));
         assertThat(response.getToken()).isEqualTo("jwt");
         assertThat(response.getClientId()).isNotBlank();
+        verify(deviceRepository).save(any(Device.class));
+    }
+
+    @Test
+    void loginWithProvidedClientId() {
+        UUID providedId = UUID.randomUUID();
+        LoginRequest request = new LoginRequest("john", "pass", "phone");
+        HttpServletRequest httpReq = mock(HttpServletRequest.class);
+        when(httpReq.getHeader("User-Agent")).thenReturn("JUnit");
+
+        when(deviceRepository.findByClientId(providedId)).thenReturn(Optional.empty());
+        when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
+        when(jwtTokenProvider.createToken(any(), any())).thenReturn("jwt");
+        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(mock(Authentication.class));
+        when(deviceRepository.save(any(Device.class))).thenAnswer(invocation -> {
+            Device d = invocation.getArgument(0);
+            d.setId(2L);
+            d.setCreatedAt(LocalDateTime.now());
+            return d;
+        });
+
+        var response = authService.login(request, providedId.toString(), httpReq);
+
+        assertThat(response.getClientId()).isEqualTo(providedId.toString());
         verify(deviceRepository).save(any(Device.class));
     }
 }

@@ -86,10 +86,10 @@ Request body:
 {
   "username": "your username",
   "password": "your password",
-  "name": "optional device name",
-  "clientId": "existing device id or null"
+  "name": "optional device name"
 }
 ```
+Optional header `X-client-Id` can be used to reuse an existing device identifier.
 
 On success the response contains the device identifier and a JWT token:
 ```json
