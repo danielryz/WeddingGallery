@@ -77,7 +77,6 @@ class CustomUserDetailsServiceTest {
     @Test
     void unknownPrincipalThrows() {
         when(userRepository.findByUsername("none")).thenReturn(Optional.empty());
-        when(deviceRepository.findByClientId(any())).thenReturn(Optional.empty());
 
         assertThrows(UsernameNotFoundException.class, () -> service.loadUserByUsername("none"));
     }
