@@ -43,7 +43,7 @@ The application reads its settings from the following environment variables:
 | `FLYWAY_BASELINE_ON_MIGRATE` | Allow baseline on migrate | `true` |
 | `FLYWAY_BASELINE_VERSION` | Baseline version | `0` |
 | `SPRING_PROFILES_ACTIVE` | Active Spring profiles | `local` |
-| `JWT_SECRET` | Secret key used to sign JWT tokens (must be at least 32 characters for HMAC-SHA algorithms) | *(none)* |
+| `JWT_SECRET` | Secret key used to sign JWT tokens (must be at least 32 characters for HMAC-SHA algorithms) | `43389e49495b043d50528eb5f7b208a597f0f3c44e7fc4add06196fc09e7a9b8` |
 | `JWT_EXPIRATION_MS` | Token validity in milliseconds | `3600000` |
 | `SPRING_SECURITY_LOG_LEVEL` | Security logging level | `DEBUG` |
 | `LOCAL_STORAGE_PATH` | Directory for images when using the `local` profile | `photos` |
