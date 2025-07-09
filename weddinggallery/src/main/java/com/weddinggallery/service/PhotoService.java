@@ -47,8 +47,19 @@ public class PhotoService {
     private final JwtTokenProvider tokenProvider;
     private final StorageService storageService;
 
-    static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+    static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of(
             "jpg", "jpeg", "png", "gif", "bmp", "webp", "heic"
+    );
+
+    static final Set<String> ALLOWED_VIDEO_EXTENSIONS = Set.of(
+            "mp4", "mov", "avi", "mkv", "webm"
+    );
+
+    static final Set<String> ALLOWED_EXTENSIONS = Set.copyOf(
+            java.util.stream.Stream.concat(
+                    ALLOWED_IMAGE_EXTENSIONS.stream(),
+                    ALLOWED_VIDEO_EXTENSIONS.stream()
+            ).collect(java.util.stream.Collectors.toSet())
     );
 
     public List<Photo> getAllPhotos(){
