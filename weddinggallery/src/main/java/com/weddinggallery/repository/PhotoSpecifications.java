@@ -17,5 +17,17 @@ public class PhotoSpecifications {
   public static Specification<Photo> isVisible(boolean visible) {
     return (root, query, cb) -> cb.equal(root.get("visible"), visible);
   }
+
+  public static Specification<Photo> withExtensions(java.util.Set<String> extensions) {
+    return (root, query, cb) -> {
+      if (extensions == null || extensions.isEmpty()) {
+        return null;
+      }
+      var predicates = extensions.stream()
+          .map(ext -> cb.like(cb.lower(root.get("fileName")), "%." + ext.toLowerCase()))
+          .toArray(jakarta.persistence.criteria.Predicate[]::new);
+      return cb.or(predicates);
+    };
+  }
 }
 

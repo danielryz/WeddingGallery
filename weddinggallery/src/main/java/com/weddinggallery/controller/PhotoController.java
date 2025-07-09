@@ -34,11 +34,12 @@ public class PhotoController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "uploadTime") String sortBy,
-            @RequestParam(defaultValue = "desc") String direction
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(required = false) String type
     ){
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
         org.springframework.data.domain.Sort sort = com.weddinggallery.util.SortUtil.from(sortBy, direction);
-        var result = photoService.getPhotos(pageable, sort);
+        var result = photoService.getPhotos(pageable, sort, type);
         return ResponseEntity.ok(result);
     }
 
