@@ -56,8 +56,8 @@ public class PhotoController {
     @Operation(summary = "Save multiple photos")
     public ResponseEntity<java.util.List<com.weddinggallery.model.Photo>> savePhotos(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
-            @RequestPart("files") java.util.List<MultipartFile> files,
-            @RequestPart(value = "descriptions", required = false) java.util.List<String> descriptions,
+            @RequestParam("files") java.util.List<MultipartFile> files,
+            @RequestParam(value = "descriptions", required = false) java.util.List<String> descriptions,
             HttpServletRequest request
     ) throws java.io.IOException {
         var photos = photoService.savePhotos(files, descriptions, request);
