@@ -121,3 +121,41 @@ service account JSON key file with access to the bucket:
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
 ```
 
+
+## Photo upload API
+
+Two endpoints allow uploading photos after authenticating via JWT.
+
+### POST `/api/photos`
+Upload a single file using `multipart/form-data`.
+
+Fields:
+- `file` – the image to upload
+- `description` – optional description
+
+### POST `/api/photos/batch`
+Upload several files at once. The request must use `multipart/form-data` with:
+- `files` – one or more image files
+- `descriptions` – optional descriptions matching file order
+
+Supported file extensions: `jpg`, `jpeg`, `png`, `gif`, `bmp`, `webp`, `heic`.
+
+Include the JWT obtained from the login endpoint in the `Authorization: Bearer <token>` header.
+
+Example single upload:
+```bash
+curl -X POST http://localhost:8080/api/photos \
+  -H "Authorization: Bearer <token>" \
+  -F "file=@/path/to/photo.jpg" \
+  -F "description=Our photo"
+```
+
+Batch upload example:
+```bash
+curl -X POST http://localhost:8080/api/photos/batch \
+  -H "Authorization: Bearer <token>" \
+  -F "files=@/path/to/photo1.jpg" \
+  -F "files=@/path/to/photo2.jpg" \
+  -F "descriptions=First photo" \
+  -F "descriptions=Second photo"
+```
