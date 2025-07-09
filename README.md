@@ -142,7 +142,7 @@ Upload several files at once. The request must use `multipart/form-data` with:
 - `files` – one or more image files
 - `descriptions` – optional descriptions matching file order
 
-Supported file extensions: `jpg`, `jpeg`, `png`, `gif`, `bmp`, `webp`, `heic`.
+Supported file extensions: `jpg`, `jpeg`, `png`, `gif`, `bmp`, `webp`, `heic`, `mp4`, `mov`, `avi`, `mkv`, `webm`.
 
 Include the JWT obtained from the login endpoint in the `Authorization: Bearer <token>` header.
 

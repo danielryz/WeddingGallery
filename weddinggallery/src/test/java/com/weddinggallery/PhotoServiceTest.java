@@ -59,7 +59,7 @@ class PhotoServiceTest {
     @Test
     void savesAllPhotosWhenExtensionsAllowed() throws Exception {
         MockMultipartFile file1 = new MockMultipartFile("files", "img1.jpg", "image/jpeg", new byte[0]);
-        MockMultipartFile file2 = new MockMultipartFile("files", "img2.png", "image/png", new byte[0]);
+        MockMultipartFile file2 = new MockMultipartFile("files", "video.mp4", "video/mp4", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
         when(req.getHeader("Authorization")).thenReturn("Bearer token");
         when(req.getHeader("X-client-Id")).thenReturn(device.getClientId().toString());

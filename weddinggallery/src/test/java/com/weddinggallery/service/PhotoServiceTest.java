@@ -56,13 +56,13 @@ class PhotoServiceTest {
 
     @Test
     void savesPhotoWhenExtensionAllowed() throws Exception {
-        MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", new byte[0]);
+        MockMultipartFile file = new MockMultipartFile("file", "video.mp4", "video/mp4", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
         when(req.getHeader("Authorization")).thenReturn("Bearer token");
         when(req.getHeader("X-client-Id")).thenReturn(device.getClientId().toString());
         when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
         when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
-        when(storageService.store(file)).thenReturn("stored.jpg");
+        when(storageService.store(file)).thenReturn("stored.mp4");
         when(photoRepository.save(any(Photo.class))).thenAnswer(invocation -> {
             Photo p = invocation.getArgument(0);
             p.setId(3L);
@@ -71,7 +71,7 @@ class PhotoServiceTest {
 
         var response = photoService.savePhoto(file, null, req);
 
-        assertThat(response.getFileName()).isEqualTo("stored.jpg");
+        assertThat(response.getFileName()).isEqualTo("stored.mp4");
         verify(storageService).store(file);
         verify(photoRepository).save(any(Photo.class));
     }
