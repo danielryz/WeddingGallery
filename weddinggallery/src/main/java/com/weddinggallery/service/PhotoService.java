@@ -63,10 +63,19 @@ public class PhotoService {
         if (files == null || files.isEmpty()) {
             return java.util.Collections.emptyList();
         }
-        java.util.List<Photo> saved = new java.util.ArrayList<>();
         if (descriptions == null) {
             descriptions = java.util.Collections.emptyList();
         }
+
+        // Validate all files first so none are stored when an invalid extension is present
+        for (MultipartFile file : files) {
+            String ext = org.springframework.util.StringUtils.getFilenameExtension(file.getOriginalFilename());
+            if (!org.springframework.util.StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
+                throw new IllegalArgumentException("Unsupported file extension: " + ext);
+            }
+        }
+
+        java.util.List<Photo> saved = new java.util.ArrayList<>();
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             String description = descriptions.size() > i ? descriptions.get(i) : null;
