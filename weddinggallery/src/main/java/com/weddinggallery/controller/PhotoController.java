@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
-@RequestMapping("api/photos")
+@RequestMapping("/api/photos")
 @RequiredArgsConstructor
 @Tag(name = "Photos", description = "Operations related to photos")
 public class PhotoController {
