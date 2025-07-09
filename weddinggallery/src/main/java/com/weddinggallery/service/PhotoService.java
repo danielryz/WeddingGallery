@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
@@ -85,9 +86,14 @@ public class PhotoService {
                 sort
         );
 
+        Specification<Photo> spec = PhotoSpecifications.isVisible(true);
+        if (extensions != null) {
+            spec = spec.and(PhotoSpecifications.withExtensions(extensions));
+        }
+
+        // 4. Wykonaj zapytanie
         return photoRepository
-                .findAll(org.springframework.data.jpa.domain.Specification.where(PhotoSpecifications.isVisible(true))
-                        .and(PhotoSpecifications.withExtensions(extensions)), pageRequest)
+                .findAll(spec, pageRequest)
                 .map(this::toResponse);
     }
 
