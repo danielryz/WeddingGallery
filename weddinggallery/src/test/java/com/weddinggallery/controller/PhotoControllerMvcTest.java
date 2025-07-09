@@ -32,10 +32,10 @@ class PhotoControllerMvcTest {
 
     @Test
     void getPhotosReturnsOk() throws Exception {
-        Mockito.when(photoService.getPhotos(any(Pageable.class), any(Sort.class)))
+        Mockito.when(photoService.getPhotos(any(Pageable.class), any(Sort.class), any()))
                 .thenReturn(Page.empty());
 
-        mockMvc.perform(get("/api/photos"))
+        mockMvc.perform(get("/api/photos").param("type", "image"))
                 .andExpect(status().isOk());
     }
 }

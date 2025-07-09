@@ -69,7 +69,16 @@ public class PhotoService {
         return photoRepository.findAll();
     }
 
-    public Page<PhotoResponse> getPhotos(Pageable pageable, Sort sort) {
+    public Page<PhotoResponse> getPhotos(Pageable pageable, Sort sort, String type) {
+        Set<String> extensions = null;
+        if (type != null) {
+            if ("image".equalsIgnoreCase(type)) {
+                extensions = ALLOWED_IMAGE_EXTENSIONS;
+            } else if ("video".equalsIgnoreCase(type)) {
+                extensions = ALLOWED_VIDEO_EXTENSIONS;
+            }
+        }
+
         PageRequest pageRequest = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
@@ -77,7 +86,8 @@ public class PhotoService {
         );
 
         return photoRepository
-                .findAll(PhotoSpecifications.isVisible(true), pageRequest)
+                .findAll(org.springframework.data.jpa.domain.Specification.where(PhotoSpecifications.isVisible(true))
+                        .and(PhotoSpecifications.withExtensions(extensions)), pageRequest)
                 .map(this::toResponse);
     }
 
