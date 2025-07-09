@@ -41,4 +41,8 @@ public class Photo {
 
     @Column(name = "reaction_count", nullable = false)
     private int reactionCount;
+
+    @Column(name = "visible", nullable = false)
+    @Builder.Default
+    private boolean visible = true;
 }

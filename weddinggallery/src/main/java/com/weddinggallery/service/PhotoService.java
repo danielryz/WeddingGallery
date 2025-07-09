@@ -4,6 +4,7 @@ import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.DeviceRepository;
+import com.weddinggallery.repository.PhotoSpecifications;
 import com.weddinggallery.dto.photo.PhotoResponse;
 import com.weddinggallery.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +48,8 @@ public class PhotoService {
     public org.springframework.data.domain.Page<PhotoResponse> getPhotos(org.springframework.data.domain.Pageable pageable, org.springframework.data.domain.Sort sort) {
         org.springframework.data.domain.PageRequest pageRequest = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
         return photoRepository
-                .findAll(org.springframework.data.jpa.domain.Specification.where(null), pageRequest)
+                .findAll(org.springframework.data.jpa.domain.Specification.where(
+                        com.weddinggallery.repository.PhotoSpecifications.isVisible(true)), pageRequest)
                 .map(this::toResponse);
     }
 
@@ -111,6 +113,23 @@ public class PhotoService {
         return toResponse(photoRepository.save(photo));
     }
 
+    public PhotoResponse updatePhotoVisibility(Long id, boolean visible, HttpServletRequest request){
+        Device device = getRequestingDevice(request);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new AccessDeniedException("Photo not found"));
+
+        if(!isAdmin && (photo.getDevice() == null || !photo.getDevice().getId().equals(device.getId()))){
+            throw new AccessDeniedException("Not authorized to update this photo");
+        }
+
+        photo.setVisible(visible);
+        return toResponse(photoRepository.save(photo));
+    }
+
     public void streamAllPhotosZip(HttpServletResponse response) throws java.io.IOException {
         List<Photo> photos = photoRepository.findAll();
         response.setContentType("application/zip");
@@ -154,6 +173,7 @@ public class PhotoService {
                 .device(device)
                 .uploader(device.getUser())
                 .description(description)
+                .visible(true)
                 .commentCount(0)
                 .reactionCount(0)
                 .uploadTime(LocalDateTime.now())
@@ -170,7 +190,8 @@ public class PhotoService {
                 photo.getCommentCount(),
                 photo.getReactionCount(),
                 photo.getUploader() != null ? photo.getUploader().getUsername() : null,
-                photo.getDevice() != null ? photo.getDevice().getId() : null
+                photo.getDevice() != null ? photo.getDevice().getId() : null,
+                photo.isVisible()
         );
     }
 

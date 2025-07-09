@@ -3,6 +3,7 @@ package com.weddinggallery.controller;
 import com.weddinggallery.dto.photo.PhotoResponse;
 import com.weddinggallery.service.PhotoService;
 import com.weddinggallery.dto.photo.PhotoDescriptionUpdateRequest;
+import com.weddinggallery.dto.photo.PhotoVisibilityUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -60,15 +61,6 @@ public class PhotoController {
         return ResponseEntity.ok(photos);
     }
 
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete photo by id",
-            description = "Deletes the specified photo if the requesting device is authorized")
-    @ApiResponse(responseCode = "204", description = "Photo deleted")
-    public ResponseEntity<Void> deletePhoto(@PathVariable Long id, HttpServletRequest request){
-        photoService.deletePhoto(id, request);
-        return ResponseEntity.noContent().build();
-    }
-
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Admin delete photo by id",
@@ -94,6 +86,17 @@ public class PhotoController {
             HttpServletRequest request
     ) {
         PhotoResponse response = photoService.updatePhotoDescription(id, updateRequest.getDescription(), request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/{id}/visibility")
+    @Operation(summary = "Update photo visibility")
+    public ResponseEntity<PhotoResponse> updateVisibility(
+            @PathVariable Long id,
+            @RequestBody PhotoVisibilityUpdateRequest updateRequest,
+            HttpServletRequest request
+    ) {
+        PhotoResponse response = photoService.updatePhotoVisibility(id, updateRequest.isVisible(), request);
         return ResponseEntity.ok(response);
     }
 

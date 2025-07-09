@@ -122,9 +122,12 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
 ```
 
 
-## Photo upload API
+## Photo API
 
-Two endpoints allow uploading photos after authenticating via JWT.
+Endpoints related to photo management require authentication via JWT.
+
+### GET `/api/photos`
+Retrieve all visible photos. Results are paged and sorted by upload time in descending order by default.
 
 ### POST `/api/photos`
 Upload a single file using `multipart/form-data`.
@@ -158,6 +161,17 @@ curl -X POST http://localhost:8080/api/photos/batch \
   -F "files=@/path/to/photo2.jpg" \
   -F "descriptions=First photo" \
   -F "descriptions=Second photo"
+```
+
+### PUT `/api/photos/{id}/visibility`
+Update the visibility flag of a photo. A regular user may change only their own
+photos, while an administrator can update any photo.
+
+Request:
+```json
+{
+  "visible": false
+}
 ```
 
 ## Comment API
