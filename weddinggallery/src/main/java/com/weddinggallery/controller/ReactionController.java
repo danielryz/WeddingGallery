@@ -5,6 +5,7 @@ import com.weddinggallery.dto.reaction.ReactionResponse;
 import com.weddinggallery.service.ReactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,9 @@ public class ReactionController {
     private final ReactionService reactionService;
 
     @PostMapping("/photos/{photoId}/reactions")
-    @Operation(summary = "Add reaction to photo")
+    @Operation(summary = "Add reaction to photo",
+            description = "Adds a reaction to the specified photo and returns it")
+    @ApiResponse(responseCode = "200", description = "Reaction added")
     public ResponseEntity<ReactionResponse> addReaction(@PathVariable Long photoId,
                                 @RequestBody ReactionRequest requestBody,
                                 HttpServletRequest request) {
@@ -28,7 +31,9 @@ public class ReactionController {
     }
 
     @DeleteMapping("/reactions/{id}")
-    @Operation(summary = "Delete reaction")
+    @Operation(summary = "Delete reaction",
+            description = "Deletes the reaction if the requesting device is authorized")
+    @ApiResponse(responseCode = "204", description = "Reaction deleted")
     public ResponseEntity<Void> deleteReaction(@PathVariable Long id, HttpServletRequest request) {
         reactionService.deleteReaction(id, request);
         return ResponseEntity.noContent().build();

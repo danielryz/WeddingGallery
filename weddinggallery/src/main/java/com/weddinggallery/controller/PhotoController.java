@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.MediaType;
@@ -60,7 +61,9 @@ public class PhotoController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete photo by id")
+    @Operation(summary = "Delete photo by id",
+            description = "Deletes the specified photo if the requesting device is authorized")
+    @ApiResponse(responseCode = "204", description = "Photo deleted")
     public ResponseEntity<Void> deletePhoto(@PathVariable Long id, HttpServletRequest request){
         photoService.deletePhoto(id, request);
         return ResponseEntity.noContent().build();
@@ -68,7 +71,9 @@ public class PhotoController {
 
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    @Operation(summary = "Admin delete photo by id")
+    @Operation(summary = "Admin delete photo by id",
+            description = "Deletes the specified photo as an administrator")
+    @ApiResponse(responseCode = "204", description = "Photo deleted")
     public ResponseEntity<Void> adminDeletePhoto(@PathVariable Long id, HttpServletRequest request){
         photoService.deletePhoto(id, request);
         return ResponseEntity.noContent().build();
