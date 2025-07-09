@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.weddinggallery.service.StorageService;
+import java.util.Set;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -34,6 +35,10 @@ public class PhotoService {
     private final DeviceRepository deviceRepository;
     private final JwtTokenProvider tokenProvider;
     private final StorageService storageService;
+
+    static final Set<String> ALLOWED_EXTENSIONS = Set.of(
+            "jpg", "jpeg", "png", "gif", "bmp", "webp", "heic"
+    );
 
     public List<Photo> getAllPhotos(){
         return photoRepository.findAll();
@@ -138,6 +143,11 @@ public class PhotoService {
 
     private Photo savePhotoEntity(MultipartFile file, String description, HttpServletRequest request) throws IOException {
         Device device = getRequestingDevice(request);
+        String original = file.getOriginalFilename();
+        String ext = StringUtils.getFilenameExtension(original);
+        if (!StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
+            throw new IllegalArgumentException("Unsupported file extension: " + ext);
+        }
         String filename = storageService.store(file);
         Photo photo = Photo.builder()
                 .fileName(filename)
