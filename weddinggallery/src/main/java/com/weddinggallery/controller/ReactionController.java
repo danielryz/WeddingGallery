@@ -29,7 +29,8 @@ public class ReactionController {
 
     @DeleteMapping("/reactions/{id}")
     @Operation(summary = "Delete reaction")
-    public void deleteReaction(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteReaction(@PathVariable Long id, HttpServletRequest request) {
         reactionService.deleteReaction(id, request);
+        return ResponseEntity.noContent().build();
     }
 }
