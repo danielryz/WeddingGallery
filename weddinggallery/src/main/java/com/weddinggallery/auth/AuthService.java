@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,12 +82,9 @@ public class AuthService {
             device = deviceRepository.save(device);
         }
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new IllegalStateException("Brak roli ROLE_USER"));
-
         String token = jwtTokenProvider.createToken(
                 device.getClientId().toString(),
-                Collections.singleton(userRole)
+                shared.getRoles()
         );
         return new AuthResponse(device.getClientId().toString(), token);
     }

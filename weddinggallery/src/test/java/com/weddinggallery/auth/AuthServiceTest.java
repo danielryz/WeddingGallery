@@ -53,15 +53,15 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         String enc = new BCryptPasswordEncoder().encode("pass");
+        role = Role.builder()
+                .id(2L)
+                .name("ROLE_USER")
+                .build();
         user = User.builder()
                 .id(1L)
                 .username("john")
                 .password(enc)
-                .roles(Set.of())
-                .build();
-        role = Role.builder()
-                .id(2L)
-                .name("ROLE_USER")
+                .roles(Set.of(role))
                 .build();
     }
 
@@ -72,7 +72,6 @@ class AuthServiceTest {
         when(httpReq.getHeader("User-Agent")).thenReturn("JUnit");
 
         when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
-        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
         when(jwtTokenProvider.createToken(any(), any())).thenReturn("jwt");
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(mock(Authentication.class));
         when(deviceRepository.save(any(Device.class))).thenAnswer(invocation -> {
@@ -106,7 +105,6 @@ class AuthServiceTest {
 
         when(deviceRepository.findByClientId(providedId)).thenReturn(Optional.empty());
         when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
-        when(roleRepository.findByName("ROLE_USER")).thenReturn(Optional.of(role));
         when(jwtTokenProvider.createToken(any(), any())).thenReturn("jwt");
         when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(mock(Authentication.class));
         when(deviceRepository.save(any(Device.class))).thenAnswer(invocation -> {
