@@ -74,6 +74,19 @@ public class PhotoController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete photo by id",
+            description = "Deletes the specified photo if the requesting device is authorized")
+    @ApiResponse(responseCode = "204", description = "Photo deleted")
+    public ResponseEntity<Void> deletePhoto(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @PathVariable Long id,
+            HttpServletRequest request
+    ){
+        photoService.deletePhoto(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/archive")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Download all photos as zip")
