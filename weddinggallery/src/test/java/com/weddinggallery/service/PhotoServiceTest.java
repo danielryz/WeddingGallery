@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -88,6 +89,36 @@ class PhotoServiceTest {
 
         verifyNoInteractions(storageService);
         verify(photoRepository, never()).save(any(Photo.class));
+    }
+
+    @Test
+    void missingAuthorizationHeaderThrows() {
+        MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", new byte[0]);
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeader("Authorization")).thenReturn(null);
+
+        assertThrows(AccessDeniedException.class, () -> photoService.savePhoto(file, null, req));
+    }
+
+    @Test
+    void missingClientIdHeaderThrows() {
+        MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", new byte[0]);
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeader("Authorization")).thenReturn("Bearer token");
+        when(req.getHeader("X-client-Id")).thenReturn(null);
+
+        assertThrows(AccessDeniedException.class, () -> photoService.savePhoto(file, null, req));
+    }
+
+    @Test
+    void clientIdMismatchThrows() {
+        MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", new byte[0]);
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        when(req.getHeader("Authorization")).thenReturn("Bearer token");
+        when(req.getHeader("X-client-Id")).thenReturn("other");
+        when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
+
+        assertThrows(AccessDeniedException.class, () -> photoService.savePhoto(file, null, req));
     }
 }
 
