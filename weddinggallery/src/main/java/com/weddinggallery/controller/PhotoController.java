@@ -45,6 +45,16 @@ public class PhotoController {
         return photoService.savePhoto(file, description, request);
     }
 
+    @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @Operation(summary = "Save multiple photos")
+    public java.util.List<com.weddinggallery.model.Photo> savePhotos(
+            @RequestPart("files") java.util.List<MultipartFile> files,
+            @RequestPart(value = "descriptions", required = false) java.util.List<String> descriptions,
+            HttpServletRequest request
+    ) throws java.io.IOException {
+        return photoService.savePhotos(files, descriptions, request);
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete photo by id")
     public void deletePhoto(@PathVariable Long id, HttpServletRequest request){

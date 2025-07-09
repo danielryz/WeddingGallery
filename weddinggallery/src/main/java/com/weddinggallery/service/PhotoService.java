@@ -47,18 +47,25 @@ public class PhotoService {
     }
 
     public PhotoResponse savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
-        Device device = getRequestingDevice(request);
-        String filename = storageService.store(file);
-        Photo photo = Photo.builder()
-                .fileName(filename)
-                .device(device)
-                .uploader(device.getUser())
-                .description(description)
-                .commentCount(0)
-                .reactionCount(0)
-                .uploadTime(LocalDateTime.now())
-                .build();
-        return toResponse(photoRepository.save(photo));
+        return toResponse(savePhotoEntity(file, description, request));
+    }
+
+    public java.util.List<Photo> savePhotos(java.util.List<MultipartFile> files,
+                                            java.util.List<String> descriptions,
+                                            HttpServletRequest request) throws IOException {
+        if (files == null || files.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+        java.util.List<Photo> saved = new java.util.ArrayList<>();
+        if (descriptions == null) {
+            descriptions = java.util.Collections.emptyList();
+        }
+        for (int i = 0; i < files.size(); i++) {
+            MultipartFile file = files.get(i);
+            String description = descriptions.size() > i ? descriptions.get(i) : null;
+            saved.add(savePhotoEntity(file, description, request));
+        }
+        return saved;
     }
 
     public void deletePhoto(Long id, HttpServletRequest request){
@@ -127,6 +134,21 @@ public class PhotoService {
         String clientId = tokenProvider.getClientIdFromToken(token);
         return deviceRepository.findByClientIdWithUser(UUID.fromString(clientId))
                 .orElseThrow(() -> new AccessDeniedException("Device not found"));
+    }
+
+    private Photo savePhotoEntity(MultipartFile file, String description, HttpServletRequest request) throws IOException {
+        Device device = getRequestingDevice(request);
+        String filename = storageService.store(file);
+        Photo photo = Photo.builder()
+                .fileName(filename)
+                .device(device)
+                .uploader(device.getUser())
+                .description(description)
+                .commentCount(0)
+                .reactionCount(0)
+                .uploadTime(LocalDateTime.now())
+                .build();
+        return photoRepository.save(photo);
     }
 
     private PhotoResponse toResponse(Photo photo) {
