@@ -93,15 +93,6 @@ public class AuthService {
         return new AuthResponse(device.getClientId().toString(), token);
     }
 
-    @Transactional
-    public void registerUser(RegisterRequest req) {
-        createAccount(req, false);
-    }
-
-    @Transactional
-    public void registerAdmin(RegisterRequest req) {
-        createAccount(req, true);
-    }
 
     private void createAccount(RegisterRequest req, boolean admin) {
         if (userRepository.findByUsername(req.getUsername()).isPresent()) {

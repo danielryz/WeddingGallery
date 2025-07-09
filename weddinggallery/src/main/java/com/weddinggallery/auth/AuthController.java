@@ -2,7 +2,6 @@ package com.weddinggallery.auth;
 
 import com.weddinggallery.dto.auth.AuthResponse;
 import com.weddinggallery.dto.auth.LoginRequest;
-import com.weddinggallery.dto.auth.RegisterRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,18 +34,5 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/register/user")
-    @Operation(summary = "Create standard user account")
-    public ResponseEntity<Void> registerUser(@Valid @RequestBody RegisterRequest request) {
-        authService.registerUser(request);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/register/admin")
-    @Operation(summary = "Create admin account")
-    public ResponseEntity<Void> registerAdmin(@Valid @RequestBody RegisterRequest request) {
-        authService.registerAdmin(request);
-        return ResponseEntity.ok().build();
-    }
 }
 
