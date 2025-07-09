@@ -12,3 +12,4 @@ public interface DeviceRepository extends JpaRepository<Device, Long> {
       "select d from Device d join fetch d.user where d.clientId = :clientId")
   Optional<Device> findByClientIdWithUser(UUID clientId);
 }
+

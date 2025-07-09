@@ -9,3 +9,4 @@ public interface StorageService {
     void delete(String filename) throws IOException;
     InputStream open(String filename) throws IOException;
 }
+

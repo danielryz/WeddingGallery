@@ -85,5 +85,4 @@ public class JwtTokenProvider {
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token);
-    }
-}
+    }}

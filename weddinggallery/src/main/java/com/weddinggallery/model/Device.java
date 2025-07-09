@@ -21,5 +21,4 @@ public class Device {
     private User user;
     private String name;
     private String deviceInfo;
-    private LocalDateTime createdAt;
-}
+    private LocalDateTime createdAt;}

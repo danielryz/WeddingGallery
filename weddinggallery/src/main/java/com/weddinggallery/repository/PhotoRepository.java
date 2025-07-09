@@ -16,3 +16,4 @@ public interface PhotoRepository
       org.springframework.data.jpa.domain.Specification<Photo> spec,
       org.springframework.data.domain.Pageable pageable);
 }
+

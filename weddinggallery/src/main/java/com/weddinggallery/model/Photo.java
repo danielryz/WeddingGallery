@@ -46,3 +46,4 @@ public class Photo {
     @Builder.Default
     private boolean visible = true;
 }
+

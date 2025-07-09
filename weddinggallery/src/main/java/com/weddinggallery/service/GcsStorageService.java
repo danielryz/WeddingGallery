@@ -68,3 +68,4 @@ public class GcsStorageService implements StorageService {
         return Channels.newInputStream(reader);
     }
 }
+
