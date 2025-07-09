@@ -25,7 +25,7 @@ public class PhotoController {
 
     @GetMapping
     @Operation(summary = "Get all photos")
-    public org.springframework.data.domain.Page<PhotoResponse> getPhotos(
+    public ResponseEntity<org.springframework.data.domain.Page<PhotoResponse>> getPhotos(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "uploadTime") String sortBy,
@@ -33,27 +33,30 @@ public class PhotoController {
     ){
         org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
         org.springframework.data.domain.Sort sort = com.weddinggallery.util.SortUtil.from(sortBy, direction);
-        return photoService.getPhotos(pageable, sort);
+        var result = photoService.getPhotos(pageable, sort);
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save a photo")
-    public PhotoResponse savePhoto(
+    public ResponseEntity<PhotoResponse> savePhoto(
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "description", required = false) String description,
             HttpServletRequest request
     ) throws java.io.IOException {
-        return photoService.savePhoto(file, description, request);
+        PhotoResponse response = photoService.savePhoto(file, description, request);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save multiple photos")
-    public java.util.List<com.weddinggallery.model.Photo> savePhotos(
+    public ResponseEntity<java.util.List<com.weddinggallery.model.Photo>> savePhotos(
             @RequestPart("files") java.util.List<MultipartFile> files,
             @RequestPart(value = "descriptions", required = false) java.util.List<String> descriptions,
             HttpServletRequest request
     ) throws java.io.IOException {
-        return photoService.savePhotos(files, descriptions, request);
+        var photos = photoService.savePhotos(files, descriptions, request);
+        return ResponseEntity.ok(photos);
     }
 
     @DeleteMapping("/{id}")
@@ -80,12 +83,13 @@ public class PhotoController {
 
     @PutMapping("/{id}/description")
     @Operation(summary = "Update photo description")
-    public PhotoResponse updateDescription(
+    public ResponseEntity<PhotoResponse> updateDescription(
             @PathVariable Long id,
             @RequestBody PhotoDescriptionUpdateRequest updateRequest,
             HttpServletRequest request
     ) {
-        return photoService.updatePhotoDescription(id, updateRequest.getDescription(), request);
+        PhotoResponse response = photoService.updatePhotoDescription(id, updateRequest.getDescription(), request);
+        return ResponseEntity.ok(response);
     }
 
 
