@@ -3,18 +3,21 @@ package com.weddinggallery.service;
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.repository.PhotoRepository;
-import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.repository.PhotoSpecifications;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.dto.photo.PhotoResponse;
 import com.weddinggallery.security.JwtTokenProvider;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import com.weddinggallery.service.StorageService;
 import java.util.Set;
 
 import java.io.IOException;
@@ -45,11 +48,15 @@ public class PhotoService {
         return photoRepository.findAll();
     }
 
-    public org.springframework.data.domain.Page<PhotoResponse> getPhotos(org.springframework.data.domain.Pageable pageable, org.springframework.data.domain.Sort sort) {
-        org.springframework.data.domain.PageRequest pageRequest = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+    public Page<PhotoResponse> getPhotos(Pageable pageable, Sort sort) {
+        PageRequest pageRequest = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sort
+        );
+
         return photoRepository
-                .findAll(org.springframework.data.jpa.domain.Specification.where(
-                        com.weddinggallery.repository.PhotoSpecifications.isVisible(true)), pageRequest)
+                .findAll(PhotoSpecifications.isVisible(true), pageRequest)
                 .map(this::toResponse);
     }
 
