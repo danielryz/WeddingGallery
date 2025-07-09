@@ -43,11 +43,17 @@ The application reads its settings from the following environment variables:
 | `FLYWAY_BASELINE_ON_MIGRATE` | Allow baseline on migrate | `true` |
 | `FLYWAY_BASELINE_VERSION` | Baseline version | `0` |
 | `SPRING_PROFILES_ACTIVE` | Active Spring profiles | `local` |
-| `JWT_SECRET` | Secret key used to sign JWT tokens | *(none)* |
+| `JWT_SECRET` | Secret key used to sign JWT tokens (must be at least 32 characters for HMAC-SHA algorithms) | *(none)* |
 | `JWT_EXPIRATION_MS` | Token validity in milliseconds | `3600000` |
 | `SPRING_SECURITY_LOG_LEVEL` | Security logging level | `DEBUG` |
 | `LOCAL_STORAGE_PATH` | Directory for images when using the `local` profile | `photos` |
 | `GCS_BUCKET` | Google Cloud Storage bucket name for the `gcs` profile | *(none)* |
+
+The `JWT_SECRET` value should be a cryptographically secure string with at least 32 characters (256 bits) when using HMAC-SHA signing. You can generate a suitable secret with:
+
+```bash
+openssl rand -hex 32
+```
 
 The `SPRING_PROFILES_ACTIVE` variable controls which profile is active. Use `local` for filesystem storage or `gcs` to store images in Google Cloud Storage.
 For more complex setups you can define additional profiles such as `dev` or `prod` and place the configuration in `src/main/resources/application-<profile>.properties`.
