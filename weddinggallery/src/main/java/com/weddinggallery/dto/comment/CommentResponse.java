@@ -16,3 +16,4 @@ public class CommentResponse {
     private Long photoId;
     private Long deviceId;
 }
+

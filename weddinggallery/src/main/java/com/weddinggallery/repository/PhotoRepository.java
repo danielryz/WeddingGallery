@@ -15,3 +15,4 @@ public interface PhotoRepository  extends JpaRepository<Photo, Long>, JpaSpecifi
     org.springframework.data.domain.Page<Photo> findAll(org.springframework.data.jpa.domain.Specification<Photo> spec,
                                                        org.springframework.data.domain.Pageable pageable);
 }
+

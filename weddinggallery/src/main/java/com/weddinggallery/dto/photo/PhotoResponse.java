@@ -20,3 +20,4 @@ public class PhotoResponse {
     private Long deviceId;
     private boolean visible;
 }
+

@@ -12,3 +12,4 @@ public interface DeviceRepository extends JpaRepository<Device,Long> {
     @org.springframework.data.jpa.repository.Query("select d from Device d join fetch d.user where d.clientId = :clientId")
     Optional<Device> findByClientIdWithUser(UUID clientId);
 }
+
