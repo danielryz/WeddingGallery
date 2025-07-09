@@ -18,4 +18,5 @@ public class PhotoResponse {
     private int reactionCount;
     private String uploaderUsername;
     private Long deviceId;
+    private boolean visible;
 }

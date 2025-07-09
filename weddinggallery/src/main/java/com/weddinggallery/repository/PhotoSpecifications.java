@@ -11,4 +11,8 @@ public class PhotoSpecifications {
     public static Specification<Photo> withDeviceId(Long deviceId) {
         return (root, query, cb) -> deviceId == null ? null : cb.equal(root.get("device").get("id"), deviceId);
     }
+
+    public static Specification<Photo> isVisible(boolean visible) {
+        return (root, query, cb) -> cb.equal(root.get("visible"), visible);
+    }
 }
