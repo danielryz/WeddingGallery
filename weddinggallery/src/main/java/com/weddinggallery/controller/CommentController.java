@@ -25,7 +25,8 @@ public class CommentController {
             summary = "Add comment to photo",
             description = "Creates a comment for the specified photo and returns the created comment")
     @ApiResponse(responseCode = "200", description = "Comment added")
-    public ResponseEntity<CommentResponse> addComment(@PathVariable Long photoId,
+    public ResponseEntity<CommentResponse> addComment(@RequestHeader(value = "X-client-Id", required = false) String clientId,
+                              @PathVariable Long photoId,
                               @RequestBody CommentRequest requestBody,
                               HttpServletRequest request) {
         CommentResponse response = commentService.addComment(photoId, requestBody.getText(), request);
@@ -36,7 +37,8 @@ public class CommentController {
     @Operation(summary = "Delete comment",
             description = "Deletes the comment if the requesting device is authorized")
     @ApiResponse(responseCode = "204", description = "Comment deleted")
-    public ResponseEntity<Void> deleteComment(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteComment(@RequestHeader(value = "X-client-Id", required = false) String clientId,
+                              @PathVariable Long id, HttpServletRequest request) {
         commentService.deleteComment(id, request);
         return ResponseEntity.noContent().build();
     }
