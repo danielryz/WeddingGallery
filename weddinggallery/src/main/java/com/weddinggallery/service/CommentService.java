@@ -14,6 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -25,6 +26,7 @@ public class CommentService {
     private final DeviceRepository deviceRepository;
     private final JwtTokenProvider tokenProvider;
 
+    @Transactional
     public CommentResponse addComment(Long photoId, String text, HttpServletRequest request) {
         Device device = getRequestingDevice(request);
         Photo photo = photoRepository.findById(photoId)
@@ -41,6 +43,7 @@ public class CommentService {
         return toResponse(saved);
     }
 
+    @Transactional
     public void deleteComment(Long id, HttpServletRequest request) {
         Device device = getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

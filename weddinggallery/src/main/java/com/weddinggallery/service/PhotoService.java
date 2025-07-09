@@ -9,6 +9,7 @@ import com.weddinggallery.dto.photo.PhotoResponse;
 import com.weddinggallery.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -53,10 +54,12 @@ public class PhotoService {
                 .map(this::toResponse);
     }
 
+    @Transactional
     public PhotoResponse savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
         return toResponse(savePhotoEntity(file, description, request));
     }
 
+    @Transactional
     public java.util.List<Photo> savePhotos(java.util.List<MultipartFile> files,
                                             java.util.List<String> descriptions,
                                             HttpServletRequest request) throws IOException {
@@ -84,6 +87,7 @@ public class PhotoService {
         return saved;
     }
 
+    @Transactional
     public void deletePhoto(Long id, HttpServletRequest request){
         Device device = getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -105,6 +109,7 @@ public class PhotoService {
         photoRepository.delete(photo);
     }
 
+    @Transactional
     public PhotoResponse updatePhotoDescription(Long id, String description, HttpServletRequest request){
         Device device = getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -122,6 +127,7 @@ public class PhotoService {
         return toResponse(photoRepository.save(photo));
     }
 
+    @Transactional
     public PhotoResponse updatePhotoVisibility(Long id, boolean visible, HttpServletRequest request){
         Device device = getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
