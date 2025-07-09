@@ -3,6 +3,7 @@ package com.weddinggallery.service;
 import com.weddinggallery.model.Comment;
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Device;
+import com.weddinggallery.dto.comment.CommentResponse;
 import com.weddinggallery.repository.CommentRepository;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.DeviceRepository;
@@ -24,7 +25,7 @@ public class CommentService {
     private final DeviceRepository deviceRepository;
     private final JwtTokenProvider tokenProvider;
 
-    public Comment addComment(Long photoId, String text, HttpServletRequest request) {
+    public CommentResponse addComment(Long photoId, String text, HttpServletRequest request) {
         Device device = getRequestingDevice(request);
         Photo photo = photoRepository.findById(photoId)
                 .orElseThrow(() -> new AccessDeniedException("Photo not found"));
@@ -37,7 +38,7 @@ public class CommentService {
         Comment saved = commentRepository.save(comment);
         photo.setCommentCount(photo.getCommentCount() + 1);
         photoRepository.save(photo);
-        return saved;
+        return toResponse(saved);
     }
 
     public void deleteComment(Long id, HttpServletRequest request) {
@@ -57,6 +58,16 @@ public class CommentService {
         Photo photo = comment.getPhoto();
         photo.setCommentCount(Math.max(0, photo.getCommentCount() - 1));
         photoRepository.save(photo);
+    }
+
+    private CommentResponse toResponse(Comment comment) {
+        return new CommentResponse(
+                comment.getId(),
+                comment.getText(),
+                comment.getCreatedAt(),
+                comment.getPhoto() != null ? comment.getPhoto().getId() : null,
+                comment.getAuthor() != null ? comment.getAuthor().getId() : null
+        );
     }
 
     private Device getRequestingDevice(HttpServletRequest request) {
