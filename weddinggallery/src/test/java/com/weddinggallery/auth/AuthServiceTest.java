@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.access.AccessDeniedException;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -118,5 +120,31 @@ class AuthServiceTest {
 
         assertThat(response.getClientId()).isEqualTo(providedId.toString());
         verify(deviceRepository).save(any(Device.class));
+    }
+
+    @Test
+    void loginRejectsWhenClientIdForDifferentUser() {
+        UUID providedId = UUID.randomUUID();
+        LoginRequest request = new LoginRequest("john", "pass", "phone");
+        HttpServletRequest httpReq = mock(HttpServletRequest.class);
+        when(httpReq.getHeader("User-Agent")).thenReturn("JUnit");
+
+        User other = User.builder()
+                .id(99L)
+                .username("doe")
+                .build();
+        Device existing = Device.builder()
+                .id(5L)
+                .clientId(providedId)
+                .user(other)
+                .build();
+
+        when(deviceRepository.findByClientId(providedId)).thenReturn(Optional.of(existing));
+        when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
+        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(mock(Authentication.class));
+
+        assertThrows(AccessDeniedException.class,
+                () -> authService.login(request, providedId.toString(), httpReq));
+        verify(deviceRepository, never()).save(any());
     }
 }

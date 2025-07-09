@@ -47,9 +47,15 @@ public class AuthService {
                 .map(UUID::fromString)
                 .orElse(null);
 
+        User shared = userRepository.findByUsername(req.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("Brak konta: " + req.getUsername()));
+
         if (providedId != null) {
             device = deviceRepository.findByClientId(providedId)
                     .map(d -> {
+                        if (!d.getUser().getId().equals(shared.getId())) {
+                            throw new org.springframework.security.access.AccessDeniedException("Device already assigned to different user");
+                        }
                         if (req.getName() != null) {
                             d.setName(req.getName());
                         }
@@ -57,8 +63,6 @@ public class AuthService {
                         return deviceRepository.save(d);
                     })
                     .orElseGet(() -> {
-                        User shared = userRepository.findByUsername(req.getUsername())
-                                .orElseThrow(() -> new UsernameNotFoundException("Brak konta: " + req.getUsername()));
                         Device d = Device.builder()
                                 .clientId(providedId)
                                 .user(shared)
@@ -69,8 +73,6 @@ public class AuthService {
                         return deviceRepository.save(d);
                     });
         } else {
-            User shared = userRepository.findByUsername(req.getUsername())
-                    .orElseThrow(() -> new UsernameNotFoundException("Brak konta: " + req.getUsername()));
             device = Device.builder()
                     .clientId(UUID.randomUUID())
                     .user(shared)
