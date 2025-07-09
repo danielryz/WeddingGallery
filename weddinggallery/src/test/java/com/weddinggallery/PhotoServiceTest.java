@@ -62,6 +62,7 @@ class PhotoServiceTest {
         MockMultipartFile file2 = new MockMultipartFile("files", "img2.png", "image/png", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
         when(req.getHeader("Authorization")).thenReturn("Bearer token");
+        when(req.getHeader("X-client-Id")).thenReturn(device.getClientId().toString());
         when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
         when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
         when(storageService.store(any(MultipartFile.class))).thenAnswer(inv -> ((MultipartFile) inv.getArgument(0)).getOriginalFilename());
@@ -85,6 +86,7 @@ class PhotoServiceTest {
         MockMultipartFile file2 = new MockMultipartFile("files", "doc.txt", "text/plain", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
         when(req.getHeader("Authorization")).thenReturn("Bearer token");
+        when(req.getHeader("X-client-Id")).thenReturn(device.getClientId().toString());
         when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
         when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
 
