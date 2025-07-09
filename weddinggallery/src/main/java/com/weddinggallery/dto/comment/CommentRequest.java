@@ -10,3 +10,4 @@ import lombok.NoArgsConstructor;
 public class CommentRequest {
     private String text;
 }
+

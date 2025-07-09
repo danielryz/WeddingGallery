@@ -13,3 +13,4 @@ public class ReactionResponse {
     private Long photoId;
     private Long deviceId;
 }
+

@@ -16,3 +16,4 @@ public class PhotoSpecifications {
         return (root, query, cb) -> cb.equal(root.get("visible"), visible);
     }
 }
+

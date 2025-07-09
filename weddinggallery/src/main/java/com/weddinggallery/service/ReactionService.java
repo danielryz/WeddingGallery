@@ -77,3 +77,4 @@ public class ReactionService {
                 .orElseThrow(() -> new AccessDeniedException("Device not found"));
     }
 }
+
