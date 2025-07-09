@@ -3,6 +3,7 @@ package com.weddinggallery.service;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Reaction;
+import com.weddinggallery.dto.reaction.ReactionResponse;
 import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.ReactionRepository;
@@ -22,7 +23,7 @@ public class ReactionService {
     private final DeviceRepository deviceRepository;
     private final JwtTokenProvider tokenProvider;
 
-    public Reaction addReaction(Long photoId, String type, HttpServletRequest request) {
+    public ReactionResponse addReaction(Long photoId, String type, HttpServletRequest request) {
         Device device = getRequestingDevice(request);
         Photo photo = photoRepository.findById(photoId)
                 .orElseThrow(() -> new AccessDeniedException("Photo not found"));
@@ -34,7 +35,7 @@ public class ReactionService {
         Reaction saved = reactionRepository.save(reaction);
         photo.setReactionCount(photo.getReactionCount() + 1);
         photoRepository.save(photo);
-        return saved;
+        return toResponse(saved);
     }
 
     public void deleteReaction(Long id, HttpServletRequest request) {
@@ -54,6 +55,15 @@ public class ReactionService {
         Photo photo = reaction.getPhoto();
         photo.setReactionCount(Math.max(0, photo.getReactionCount() - 1));
         photoRepository.save(photo);
+    }
+
+    private ReactionResponse toResponse(Reaction reaction) {
+        return new ReactionResponse(
+                reaction.getId(),
+                reaction.getType(),
+                reaction.getPhoto() != null ? reaction.getPhoto().getId() : null,
+                reaction.getDevice() != null ? reaction.getDevice().getId() : null
+        );
     }
 
     private Device getRequestingDevice(HttpServletRequest request) {
