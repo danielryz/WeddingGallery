@@ -23,7 +23,8 @@ public class ReactionController {
     @Operation(summary = "Add reaction to photo",
             description = "Adds a reaction to the specified photo and returns it")
     @ApiResponse(responseCode = "200", description = "Reaction added")
-    public ResponseEntity<ReactionResponse> addReaction(@PathVariable Long photoId,
+    public ResponseEntity<ReactionResponse> addReaction(@RequestHeader(value = "X-client-Id", required = false) String clientId,
+                                @PathVariable Long photoId,
                                 @RequestBody ReactionRequest requestBody,
                                 HttpServletRequest request) {
         ReactionResponse response = reactionService.addReaction(photoId, requestBody.getType(), request);
@@ -34,7 +35,8 @@ public class ReactionController {
     @Operation(summary = "Delete reaction",
             description = "Deletes the reaction if the requesting device is authorized")
     @ApiResponse(responseCode = "204", description = "Reaction deleted")
-    public ResponseEntity<Void> deleteReaction(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteReaction(@RequestHeader(value = "X-client-Id", required = false) String clientId,
+                                @PathVariable Long id, HttpServletRequest request) {
         reactionService.deleteReaction(id, request);
         return ResponseEntity.noContent().build();
     }

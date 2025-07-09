@@ -67,13 +67,23 @@ public class ReactionService {
     }
 
     private Device getRequestingDevice(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header == null || !header.startsWith("Bearer ")) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             throw new AccessDeniedException("Missing token");
         }
-        String token = header.substring(7);
-        String clientId = tokenProvider.getClientIdFromToken(token);
-        return deviceRepository.findByClientId(java.util.UUID.fromString(clientId))
+
+        String headerClientId = request.getHeader("X-client-Id");
+        if (headerClientId == null || headerClientId.isBlank()) {
+            throw new AccessDeniedException("Missing client id header");
+        }
+
+        String token = authHeader.substring(7);
+        String tokenClientId = tokenProvider.getClientIdFromToken(token);
+        if (!headerClientId.equals(tokenClientId)) {
+            throw new AccessDeniedException("Client id mismatch");
+        }
+
+        return deviceRepository.findByClientId(java.util.UUID.fromString(tokenClientId))
                 .orElseThrow(() -> new AccessDeniedException("Device not found"));
     }
 }

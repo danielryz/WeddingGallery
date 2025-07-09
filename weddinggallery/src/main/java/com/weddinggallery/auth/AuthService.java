@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,9 +46,15 @@ public class AuthService {
                 .map(UUID::fromString)
                 .orElse(null);
 
+        User shared = userRepository.findByUsername(req.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("Brak konta: " + req.getUsername()));
+
         if (providedId != null) {
             device = deviceRepository.findByClientId(providedId)
                     .map(d -> {
+                        if (!d.getUser().getId().equals(shared.getId())) {
+                            throw new org.springframework.security.access.AccessDeniedException("Device already assigned to different user");
+                        }
                         if (req.getName() != null) {
                             d.setName(req.getName());
                         }
@@ -57,8 +62,6 @@ public class AuthService {
                         return deviceRepository.save(d);
                     })
                     .orElseGet(() -> {
-                        User shared = userRepository.findByUsername(req.getUsername())
-                                .orElseThrow(() -> new UsernameNotFoundException("Brak konta: " + req.getUsername()));
                         Device d = Device.builder()
                                 .clientId(providedId)
                                 .user(shared)
@@ -69,8 +72,6 @@ public class AuthService {
                         return deviceRepository.save(d);
                     });
         } else {
-            User shared = userRepository.findByUsername(req.getUsername())
-                    .orElseThrow(() -> new UsernameNotFoundException("Brak konta: " + req.getUsername()));
             device = Device.builder()
                     .clientId(UUID.randomUUID())
                     .user(shared)
@@ -81,25 +82,13 @@ public class AuthService {
             device = deviceRepository.save(device);
         }
 
-        Role userRole = roleRepository.findByName("ROLE_USER")
-                .orElseThrow(() -> new IllegalStateException("Brak roli ROLE_USER"));
-
         String token = jwtTokenProvider.createToken(
                 device.getClientId().toString(),
-                Collections.singleton(userRole)
+                shared.getRoles()
         );
         return new AuthResponse(device.getClientId().toString(), token);
     }
 
-    @Transactional
-    public void registerUser(RegisterRequest req) {
-        createAccount(req, false);
-    }
-
-    @Transactional
-    public void registerAdmin(RegisterRequest req) {
-        createAccount(req, true);
-    }
 
     private void createAccount(RegisterRequest req, boolean admin) {
         if (userRepository.findByUsername(req.getUsername()).isPresent()) {

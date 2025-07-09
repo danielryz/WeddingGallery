@@ -100,7 +100,7 @@ On success the response contains the device identifier and a JWT token:
 ```
 Include this token in the `Authorization: Bearer <token>` header when calling secured endpoints.
 
-Default users are created by Flyway migrations (e.g. `Ania_Kamil_2025` and `admin`).
+All subsequent user endpoints require this token and the `X-Client-Id` header with the returned device identifier.
 
 ## Storage configuration
 
@@ -125,6 +125,7 @@ export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
 ## Photo API
 
 Endpoints related to photo management require authentication via JWT.
+The `X-Client-Id` header from the login response must also be included.
 
 ### GET `/api/photos`
 Retrieve all visible photos. Results are paged and sorted by upload time in descending order by default.
@@ -176,6 +177,8 @@ Request:
 
 ## Comment API
 
+User comment endpoints require the `X-Client-Id` header in addition to the JWT token.
+
 ### POST `/api/photos/{photoId}/comments`
 Create a comment for a photo.
 
@@ -203,6 +206,8 @@ Deletes the comment. Returns **204 No Content** on success.
 Administrative deletion of any comment. Also returns **204 No Content**.
 
 ## Reaction API
+
+Reaction endpoints also require the `X-Client-Id` header along with the JWT token.
 
 ### POST `/api/photos/{photoId}/reactions`
 Add a reaction to a photo.

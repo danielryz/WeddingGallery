@@ -28,6 +28,7 @@ public class PhotoController {
     @GetMapping
     @Operation(summary = "Get all photos")
     public ResponseEntity<org.springframework.data.domain.Page<PhotoResponse>> getPhotos(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "uploadTime") String sortBy,
@@ -42,6 +43,7 @@ public class PhotoController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save a photo")
     public ResponseEntity<PhotoResponse> savePhoto(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "description", required = false) String description,
             HttpServletRequest request
@@ -53,6 +55,7 @@ public class PhotoController {
     @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save multiple photos")
     public ResponseEntity<java.util.List<com.weddinggallery.model.Photo>> savePhotos(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @RequestPart("files") java.util.List<MultipartFile> files,
             @RequestPart(value = "descriptions", required = false) java.util.List<String> descriptions,
             HttpServletRequest request
@@ -71,6 +74,19 @@ public class PhotoController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete photo by id",
+            description = "Deletes the specified photo if the requesting device is authorized")
+    @ApiResponse(responseCode = "204", description = "Photo deleted")
+    public ResponseEntity<Void> deletePhoto(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @PathVariable Long id,
+            HttpServletRequest request
+    ){
+        photoService.deletePhoto(id, request);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/archive")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Download all photos as zip")
@@ -81,6 +97,7 @@ public class PhotoController {
     @PutMapping("/{id}/description")
     @Operation(summary = "Update photo description")
     public ResponseEntity<PhotoResponse> updateDescription(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @PathVariable Long id,
             @RequestBody PhotoDescriptionUpdateRequest updateRequest,
             HttpServletRequest request
@@ -92,6 +109,7 @@ public class PhotoController {
     @PutMapping("/{id}/visibility")
     @Operation(summary = "Update photo visibility")
     public ResponseEntity<PhotoResponse> updateVisibility(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @PathVariable Long id,
             @RequestBody PhotoVisibilityUpdateRequest updateRequest,
             HttpServletRequest request
