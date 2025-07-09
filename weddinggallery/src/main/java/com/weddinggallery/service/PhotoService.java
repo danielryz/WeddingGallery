@@ -4,6 +4,7 @@ import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.DeviceRepository;
+import com.weddinggallery.dto.photo.PhotoResponse;
 import com.weddinggallery.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,12 +39,14 @@ public class PhotoService {
         return photoRepository.findAll();
     }
 
-    public org.springframework.data.domain.Page<Photo> getPhotos(org.springframework.data.domain.Pageable pageable, org.springframework.data.domain.Sort sort) {
+    public org.springframework.data.domain.Page<PhotoResponse> getPhotos(org.springframework.data.domain.Pageable pageable, org.springframework.data.domain.Sort sort) {
         org.springframework.data.domain.PageRequest pageRequest = org.springframework.data.domain.PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
-        return photoRepository.findAll(org.springframework.data.jpa.domain.Specification.where(null), pageRequest);
+        return photoRepository
+                .findAll(org.springframework.data.jpa.domain.Specification.where(null), pageRequest)
+                .map(this::toResponse);
     }
 
-    public Photo savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
+    public PhotoResponse savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
         Device device = getRequestingDevice(request);
         String filename = storageService.store(file);
         Photo photo = Photo.builder()
@@ -55,7 +58,7 @@ public class PhotoService {
                 .reactionCount(0)
                 .uploadTime(LocalDateTime.now())
                 .build();
-        return photoRepository.save(photo);
+        return toResponse(photoRepository.save(photo));
     }
 
     public void deletePhoto(Long id, HttpServletRequest request){
@@ -79,7 +82,7 @@ public class PhotoService {
         photoRepository.delete(photo);
     }
 
-    public Photo updatePhotoDescription(Long id, String description, HttpServletRequest request){
+    public PhotoResponse updatePhotoDescription(Long id, String description, HttpServletRequest request){
         Device device = getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
@@ -93,7 +96,7 @@ public class PhotoService {
         }
 
         photo.setDescription(description);
-        return photoRepository.save(photo);
+        return toResponse(photoRepository.save(photo));
     }
 
     public void streamAllPhotosZip(HttpServletResponse response) throws java.io.IOException {
@@ -124,6 +127,19 @@ public class PhotoService {
         String clientId = tokenProvider.getClientIdFromToken(token);
         return deviceRepository.findByClientIdWithUser(UUID.fromString(clientId))
                 .orElseThrow(() -> new AccessDeniedException("Device not found"));
+    }
+
+    private PhotoResponse toResponse(Photo photo) {
+        return new PhotoResponse(
+                photo.getId(),
+                photo.getFileName(),
+                photo.getDescription(),
+                photo.getUploadTime(),
+                photo.getCommentCount(),
+                photo.getReactionCount(),
+                photo.getUploader() != null ? photo.getUploader().getUsername() : null,
+                photo.getDevice() != null ? photo.getDevice().getId() : null
+        );
     }
 
 }

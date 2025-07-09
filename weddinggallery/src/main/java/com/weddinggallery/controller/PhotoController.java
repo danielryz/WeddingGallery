@@ -1,6 +1,6 @@
 package com.weddinggallery.controller;
 
-import com.weddinggallery.model.Photo;
+import com.weddinggallery.dto.photo.PhotoResponse;
 import com.weddinggallery.service.PhotoService;
 import com.weddinggallery.dto.photo.PhotoDescriptionUpdateRequest;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,7 +24,7 @@ public class PhotoController {
 
     @GetMapping
     @Operation(summary = "Get all photos")
-    public org.springframework.data.domain.Page<Photo> getPhotos(
+    public org.springframework.data.domain.Page<PhotoResponse> getPhotos(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "uploadTime") String sortBy,
@@ -37,7 +37,7 @@ public class PhotoController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save a photo")
-    public Photo savePhoto(
+    public PhotoResponse savePhoto(
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "description", required = false) String description,
             HttpServletRequest request
@@ -67,7 +67,7 @@ public class PhotoController {
 
     @PutMapping("/{id}/description")
     @Operation(summary = "Update photo description")
-    public Photo updateDescription(
+    public PhotoResponse updateDescription(
             @PathVariable Long id,
             @RequestBody PhotoDescriptionUpdateRequest updateRequest,
             HttpServletRequest request
