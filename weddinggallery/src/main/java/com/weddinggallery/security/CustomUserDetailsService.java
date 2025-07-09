@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private Optional<User> findByDevice(String principal) {
         try {
-            return deviceRepository.findByClientId(UUID.fromString(principal))
+            return deviceRepository.findByClientIdWithUser(UUID.fromString(principal))
                     .map(Device::getUser);
         } catch (IllegalArgumentException e) {
             return Optional.empty();

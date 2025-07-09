@@ -65,13 +65,13 @@ class CustomUserDetailsServiceTest {
     void loadsByDeviceId() {
         when(userRepository.findByUsername(device.getClientId().toString()))
                 .thenReturn(Optional.empty());
-        when(deviceRepository.findByClientId(device.getClientId()))
+        when(deviceRepository.findByClientIdWithUser(device.getClientId()))
                 .thenReturn(Optional.of(device));
 
         var details = service.loadUserByUsername(device.getClientId().toString());
 
         assertThat(new BCryptPasswordEncoder().matches("pass", details.getPassword())).isTrue();
-        verify(deviceRepository).findByClientId(device.getClientId());
+        verify(deviceRepository).findByClientIdWithUser(device.getClientId());
     }
 
     @Test

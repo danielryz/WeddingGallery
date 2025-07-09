@@ -122,7 +122,7 @@ public class PhotoService {
         }
         String token = header.substring(7);
         String clientId = tokenProvider.getClientIdFromToken(token);
-        return deviceRepository.findByClientId(UUID.fromString(clientId))
+        return deviceRepository.findByClientIdWithUser(UUID.fromString(clientId))
                 .orElseThrow(() -> new AccessDeniedException("Device not found"));
     }
 
