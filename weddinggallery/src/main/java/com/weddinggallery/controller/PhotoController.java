@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/photos")
@@ -54,10 +56,10 @@ public class PhotoController {
 
     @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save multiple photos")
-    public ResponseEntity<java.util.List<com.weddinggallery.model.Photo>> savePhotos(
+    public ResponseEntity<List<PhotoResponse>> savePhotos(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
-            @RequestParam("files") java.util.List<MultipartFile> files,
-            @RequestParam(value = "descriptions", required = false) java.util.List<String> descriptions,
+            @RequestParam("files") List<MultipartFile> files,
+            @RequestParam(value = "descriptions", required = false) List<String> descriptions,
             HttpServletRequest request
     ) throws java.io.IOException {
         var photos = photoService.savePhotos(files, descriptions, request);

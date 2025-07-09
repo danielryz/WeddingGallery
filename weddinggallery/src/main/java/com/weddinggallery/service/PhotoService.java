@@ -23,6 +23,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.weddinggallery.service.StorageService;
+
+import java.util.Collections;
 import java.util.Set;
 
 import java.io.IOException;
@@ -71,31 +73,31 @@ public class PhotoService {
     }
 
     @Transactional
-    public java.util.List<Photo> savePhotos(java.util.List<MultipartFile> files,
-                                            java.util.List<String> descriptions,
+    public List<PhotoResponse> savePhotos(List<MultipartFile> files,
+                                            List<String> descriptions,
                                             HttpServletRequest request) throws IOException {
         if (files == null || files.isEmpty()) {
             return java.util.Collections.emptyList();
         }
         if (descriptions == null) {
-            descriptions = java.util.Collections.emptyList();
+            descriptions = Collections.emptyList();
         }
 
         // Validate all files first so none are stored when an invalid extension is present
         for (MultipartFile file : files) {
-            String ext = org.springframework.util.StringUtils.getFilenameExtension(file.getOriginalFilename());
-            if (!org.springframework.util.StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
+            String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
+            if (!StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
                 throw new IllegalArgumentException("Unsupported file extension: " + ext);
             }
         }
 
-        java.util.List<Photo> saved = new java.util.ArrayList<>();
+        List<Photo> saved = new java.util.ArrayList<>();
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             String description = descriptions.size() > i ? descriptions.get(i) : null;
             saved.add(savePhotoEntity(file, description, request));
         }
-        return saved;
+        return saved.stream().map(this::toResponse).toList();
     }
 
     @Transactional
