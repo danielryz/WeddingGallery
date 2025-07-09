@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -57,15 +58,17 @@ public class PhotoController {
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete photo by id")
-    public void deletePhoto(@PathVariable Long id, HttpServletRequest request){
+    public ResponseEntity<Void> deletePhoto(@PathVariable Long id, HttpServletRequest request){
         photoService.deletePhoto(id, request);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/admin/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Admin delete photo by id")
-    public void adminDeletePhoto(@PathVariable Long id, HttpServletRequest request){
+    public ResponseEntity<Void> adminDeletePhoto(@PathVariable Long id, HttpServletRequest request){
         photoService.deletePhoto(id, request);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/archive")

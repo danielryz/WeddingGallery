@@ -30,14 +30,16 @@ public class CommentController {
 
     @DeleteMapping("/comments/{id}")
     @Operation(summary = "Delete comment")
-    public void deleteComment(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Void> deleteComment(@PathVariable Long id, HttpServletRequest request) {
         commentService.deleteComment(id, request);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/admin/comments/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Admin delete comment")
-    public void adminDeleteComment(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<Void> adminDeleteComment(@PathVariable Long id, HttpServletRequest request) {
         commentService.deleteComment(id, request);
+        return ResponseEntity.noContent().build();
     }
 }
