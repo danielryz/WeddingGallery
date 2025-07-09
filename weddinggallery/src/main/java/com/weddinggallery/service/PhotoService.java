@@ -13,16 +13,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import com.weddinggallery.repository.DeviceRepository;
-import com.weddinggallery.dto.photo.PhotoResponse;
-import com.weddinggallery.security.JwtTokenProvider;
 import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-import com.weddinggallery.service.StorageService;
 
 import java.util.Collections;
 import java.util.Set;
@@ -48,11 +44,18 @@ public class PhotoService {
     private final StorageService storageService;
 
     static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of(
-            "jpg", "jpeg", "png", "gif", "bmp", "webp", "heic"
+            "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "webp",
+            "heic", "heif", "raw", "cr2", "nef", "arw", "orf", "raf",
+            "dng", "rw2", "sr2", "srf", "pef", "avif", "jxl", "ppm",
+            "pgm", "pbm", "sgi", "rgb", "ico", "icns", "svg", "eps",
+            "psd", "xcf", "tga", "exr"
     );
 
     static final Set<String> ALLOWED_VIDEO_EXTENSIONS = Set.of(
-            "mp4", "mov", "avi", "mkv", "webm"
+            "mp4", "mov", "avi", "mkv", "flv", "f4v", "wmv", "asf",
+            "webm", "mpg", "mpeg", "3gp", "3g2", "m4v", "mts", "m2ts",
+            "ts", "vob", "divx", "xvid", "ogv", "rm", "rmvb", "amv",
+            "f4p", "dat", "dv", "mod", "tod"
     );
 
     static final Set<String> ALLOWED_EXTENSIONS = Set.copyOf(
