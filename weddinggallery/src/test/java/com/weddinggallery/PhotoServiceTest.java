@@ -84,16 +84,16 @@ class PhotoServiceTest {
     void unsupportedExtensionThrowsInSavePhotos() {
         MockMultipartFile file1 = new MockMultipartFile("files", "img1.jpg", "image/jpeg", new byte[0]);
         MockMultipartFile file2 = new MockMultipartFile("files", "doc.txt", "text/plain", new byte[0]);
-        HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(req.getHeader("X-client-Id")).thenReturn(device.getClientId().toString());
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
-        when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
 
         assertThrows(IllegalArgumentException.class,
-                () -> photoService.savePhotos(List.of(file1, file2), List.of("d1", "d2"), req));
+                () -> photoService.savePhotos(
+                        List.of(file1, file2),
+                        List.of("d1", "d2"),
+                        mock(HttpServletRequest.class)
+                )
+        );
 
         verifyNoInteractions(storageService);
-        verify(photoRepository, never()).save(any(Photo.class));
+        verify(photoRepository, never()).save(any());
     }
 }

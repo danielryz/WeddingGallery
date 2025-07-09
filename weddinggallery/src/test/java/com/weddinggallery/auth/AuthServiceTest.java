@@ -5,7 +5,6 @@ import com.weddinggallery.model.Device;
 import com.weddinggallery.model.Role;
 import com.weddinggallery.model.User;
 import com.weddinggallery.repository.DeviceRepository;
-import com.weddinggallery.repository.RoleRepository;
 import com.weddinggallery.repository.UserRepository;
 import com.weddinggallery.security.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,8 +37,6 @@ class AuthServiceTest {
     @Mock
     private UserRepository userRepository;
     @Mock
-    private RoleRepository roleRepository;
-    @Mock
     private JwtTokenProvider jwtTokenProvider;
     @Mock
     private DeviceRepository deviceRepository;
@@ -48,12 +45,11 @@ class AuthServiceTest {
     private AuthService authService;
 
     private User user;
-    private Role role;
 
     @BeforeEach
     void setUp() {
         String enc = new BCryptPasswordEncoder().encode("pass");
-        role = Role.builder()
+        Role role = Role.builder()
                 .id(2L)
                 .name("ROLE_USER")
                 .build();
@@ -125,7 +121,6 @@ class AuthServiceTest {
         UUID providedId = UUID.randomUUID();
         LoginRequest request = new LoginRequest("john", "pass", "phone");
         HttpServletRequest httpReq = mock(HttpServletRequest.class);
-        when(httpReq.getHeader("User-Agent")).thenReturn("JUnit");
 
         User other = User.builder()
                 .id(99L)
@@ -137,12 +132,14 @@ class AuthServiceTest {
                 .user(other)
                 .build();
 
-        when(deviceRepository.findByClientId(providedId)).thenReturn(Optional.of(existing));
-        when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
-        when(authenticationManager.authenticate(any(Authentication.class))).thenReturn(mock(Authentication.class));
+        when(deviceRepository.findByClientId(providedId))
+                .thenReturn(Optional.of(existing));
+        when(userRepository.findByUsername("john"))
+                .thenReturn(Optional.of(user));
 
         assertThrows(AccessDeniedException.class,
                 () -> authService.login(request, providedId.toString(), httpReq));
         verify(deviceRepository, never()).save(any());
     }
+
 }

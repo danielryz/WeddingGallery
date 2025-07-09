@@ -90,7 +90,7 @@ public class PhotoController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/archive")
+    @GetMapping("/admin/archive")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Download all photos as zip")
     public void downloadAllPhotos(HttpServletResponse response) throws java.io.IOException {
