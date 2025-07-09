@@ -61,9 +61,6 @@ class PhotoServiceTest {
         MockMultipartFile file1 = new MockMultipartFile("files", "img1.jpg", "image/jpeg", new byte[0]);
         MockMultipartFile file2 = new MockMultipartFile("files", "img2.png", "image/png", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
-        when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
         when(storageService.store(any(MultipartFile.class))).thenAnswer(inv -> ((MultipartFile) inv.getArgument(0)).getOriginalFilename());
         when(photoRepository.save(any(Photo.class))).thenAnswer(inv -> {
             Photo p = inv.getArgument(0);
@@ -84,9 +81,6 @@ class PhotoServiceTest {
         MockMultipartFile file1 = new MockMultipartFile("files", "img1.jpg", "image/jpeg", new byte[0]);
         MockMultipartFile file2 = new MockMultipartFile("files", "doc.txt", "text/plain", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
-        when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
 
         assertThrows(IllegalArgumentException.class,
                 () -> photoService.savePhotos(List.of(file1, file2), List.of("d1", "d2"), req));
