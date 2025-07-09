@@ -159,3 +159,66 @@ curl -X POST http://localhost:8080/api/photos/batch \
   -F "descriptions=First photo" \
   -F "descriptions=Second photo"
 ```
+
+## Comment API
+
+### POST `/api/photos/{photoId}/comments`
+Create a comment for a photo.
+
+Request:
+```json
+{
+  "text": "Beautiful photo!"
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "text": "Beautiful photo!",
+  "createdAt": "2025-01-01T12:00:00",
+  "photoId": 1,
+  "deviceId": 1
+}
+```
+
+### DELETE `/api/comments/{id}`
+Deletes the comment. Returns **204 No Content** on success.
+
+### DELETE `/api/admin/comments/{id}`
+Administrative deletion of any comment. Also returns **204 No Content**.
+
+## Reaction API
+
+### POST `/api/photos/{photoId}/reactions`
+Add a reaction to a photo.
+
+Request:
+```json
+{
+  "type": "heart"
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "type": "heart",
+  "photoId": 1,
+  "deviceId": 1
+}
+```
+
+### DELETE `/api/reactions/{id}`
+Deletes the reaction. Returns **204 No Content** on success.
+
+## Error responses
+
+Errors are returned in JSON format by `GlobalExceptionHandler`:
+```json
+{
+  "timestamp": "2025-01-01T12:34:56.789",
+  "message": "Photo not found"
+}
+```
+Access denied results in HTTP 403, invalid input returns HTTP 400 and other errors return HTTP 500.
