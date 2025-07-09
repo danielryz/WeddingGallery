@@ -14,6 +14,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +24,7 @@ public class ReactionService {
     private final DeviceRepository deviceRepository;
     private final JwtTokenProvider tokenProvider;
 
+    @Transactional
     public ReactionResponse addReaction(Long photoId, String type, HttpServletRequest request) {
         Device device = getRequestingDevice(request);
         Photo photo = photoRepository.findById(photoId)
@@ -38,6 +40,7 @@ public class ReactionService {
         return toResponse(saved);
     }
 
+    @Transactional
     public void deleteReaction(Long id, HttpServletRequest request) {
         Device device = getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
