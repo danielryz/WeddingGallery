@@ -37,3 +37,11 @@ or copy it to `.env` so that Vite picks it up automatically:
 ```bash
 cp .env.dev .env
 ```
+
+## Troubleshooting
+
+### SockJS requires `global`
+
+The `sockjs-client` library expects a `global` variable to exist. Vite provides
+this by defining `global: 'globalThis'` in `vite.config.ts`. If you see errors
+mentioning an undefined `global`, ensure this line is present in the config.
