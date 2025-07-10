@@ -112,4 +112,26 @@ class ChatReactionServiceTest {
         assertThat(responses.get(0).getId()).isEqualTo(10L);
         verify(reactionRepository).findByMessageIdOrderByCreatedAt(5L);
     }
+
+    @Test
+    void addReactionUpdatesExisting() {
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        ChatMessage message = ChatMessage.builder().id(5L).build();
+        ChatMessageReaction existing = ChatMessageReaction.builder()
+                .id(7L)
+                .message(message)
+                .device(adminDevice)
+                .emoji("a")
+                .build();
+
+        when(deviceService.getRequestingDevice(req)).thenReturn(adminDevice);
+        when(messageRepository.findById(5L)).thenReturn(Optional.of(message));
+        when(reactionRepository.findByMessageIdAndDeviceId(5L, 1L)).thenReturn(Optional.of(existing));
+        when(reactionRepository.save(existing)).thenReturn(existing);
+
+        chatReactionService.addReaction(5L, "b", req);
+
+        verify(reactionRepository).save(existing);
+        assertThat(existing.getEmoji()).isEqualTo("b");
+    }
 }

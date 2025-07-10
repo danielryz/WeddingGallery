@@ -11,6 +11,8 @@ import java.util.List;
 public interface ChatMessageReactionRepository extends JpaRepository<ChatMessageReaction, Long> {
     List<ChatMessageReaction> findByMessageIdOrderByCreatedAt(Long messageId);
 
+    java.util.Optional<ChatMessageReaction> findByMessageIdAndDeviceId(Long messageId, Long deviceId);
+
     @Query("SELECT new com.weddinggallery.dto.chat.ChatReactionCountResponse(r.emoji, COUNT(r)) " +
            "FROM ChatMessageReaction r WHERE r.message.id = :messageId GROUP BY r.emoji")
     List<ChatReactionCountResponse> countByMessageIdGroupByEmoji(@Param("messageId") Long messageId);

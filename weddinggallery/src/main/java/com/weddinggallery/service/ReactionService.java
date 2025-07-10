@@ -27,14 +27,22 @@ public class ReactionService {
         Device device = deviceService.getRequestingDevice(request);
         Photo photo = photoRepository.findById(photoId)
                 .orElseThrow(() -> new AccessDeniedException("Photo not found"));
-        Reaction reaction = Reaction.builder()
-                .photo(photo)
-                .device(device)
-                .type(type)
-                .build();
+        var existing = reactionRepository.findByPhotoIdAndDeviceId(photoId, device.getId());
+        Reaction reaction;
+        if (existing.isPresent()) {
+            reaction = existing.get();
+            reaction.setType(type);
+        } else {
+            reaction = Reaction.builder()
+                    .photo(photo)
+                    .device(device)
+                    .type(type)
+                    .build();
+            photo.setReactionCount(photo.getReactionCount() + 1);
+            photoRepository.save(photo);
+        }
+
         Reaction saved = reactionRepository.save(reaction);
-        photo.setReactionCount(photo.getReactionCount() + 1);
-        photoRepository.save(photo);
         return toResponse(saved);
     }
 

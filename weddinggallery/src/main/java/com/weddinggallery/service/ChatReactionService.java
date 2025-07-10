@@ -30,12 +30,20 @@ public class ChatReactionService {
         Device device = deviceService.getRequestingDevice(request);
         ChatMessage message = messageRepository.findById(messageId)
                 .orElseThrow(() -> new AccessDeniedException("Message not found"));
-        ChatMessageReaction reaction = ChatMessageReaction.builder()
-                .message(message)
-                .device(device)
-                .emoji(emoji)
-                .createdAt(LocalDateTime.now())
-                .build();
+        var existing = reactionRepository.findByMessageIdAndDeviceId(messageId, device.getId());
+        ChatMessageReaction reaction;
+        if (existing.isPresent()) {
+            reaction = existing.get();
+            reaction.setEmoji(emoji);
+            reaction.setCreatedAt(LocalDateTime.now());
+        } else {
+            reaction = ChatMessageReaction.builder()
+                    .message(message)
+                    .device(device)
+                    .emoji(emoji)
+                    .createdAt(LocalDateTime.now())
+                    .build();
+        }
         ChatMessageReaction saved = reactionRepository.save(reaction);
         return toResponse(saved);
     }
