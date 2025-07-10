@@ -45,7 +45,7 @@ public class GcsStorageService implements StorageService {
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
                 .setContentType(file.getContentType())
                 .build();
-        storage.create(blobInfo, file.getBytes());
+        storage.createFrom(blobInfo, file.getInputStream());
         return filename;
     }
 
