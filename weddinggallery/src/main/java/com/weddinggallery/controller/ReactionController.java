@@ -2,6 +2,7 @@ package com.weddinggallery.controller;
 
 import com.weddinggallery.dto.reaction.ReactionRequest;
 import com.weddinggallery.dto.reaction.ReactionResponse;
+import com.weddinggallery.dto.reaction.ReactionCountResponse;
 import com.weddinggallery.service.ReactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,6 +19,15 @@ import org.springframework.web.bind.annotation.*;
 public class ReactionController {
 
     private final ReactionService reactionService;
+
+    @GetMapping("/photos/{photoId}/reactions")
+    @Operation(summary = "Get reaction counts for photo")
+    public ResponseEntity<java.util.List<ReactionCountResponse>> getReactions(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @PathVariable Long photoId) {
+        var responses = reactionService.getReactionSummary(photoId);
+        return ResponseEntity.ok(responses);
+    }
 
     @PostMapping("/photos/{photoId}/reactions")
     @Operation(summary = "Add reaction to photo",
