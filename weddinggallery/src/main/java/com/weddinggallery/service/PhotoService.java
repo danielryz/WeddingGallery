@@ -132,6 +132,8 @@ public class PhotoService {
     }
 
     public void savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
+        // validate requesting device before queuing the upload
+        deviceService.getRequestingDevice(request);
         String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
         if (!StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
             throw new IllegalArgumentException("Unsupported file extension: " + ext);
@@ -151,6 +153,8 @@ public class PhotoService {
     public void savePhotos(List<MultipartFile> files,
                                             List<String> descriptions,
                                             HttpServletRequest request) throws IOException {
+        // validate requesting device before queuing the uploads
+        deviceService.getRequestingDevice(request);
         if (files == null || files.isEmpty()) {
             return;
         }

@@ -74,6 +74,9 @@ To execute the tests:
 ```bash
 ./mvnw test
 ```
+If your environment requires a proxy to reach Maven Central, copy
+`.mvn/settings.xml.example` to `~/.m2/settings.xml` and update the host
+and port so Maven can download dependencies.
 
 ## Frontend development
 
