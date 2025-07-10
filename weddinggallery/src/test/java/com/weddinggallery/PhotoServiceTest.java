@@ -3,9 +3,8 @@ package com.weddinggallery;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.User;
-import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.repository.PhotoRepository;
-import com.weddinggallery.security.JwtTokenProvider;
+import com.weddinggallery.service.DeviceService;
 import com.weddinggallery.service.PhotoService;
 import com.weddinggallery.service.StorageService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,9 +31,7 @@ class PhotoServiceTest {
     @Mock
     private PhotoRepository photoRepository;
     @Mock
-    private DeviceRepository deviceRepository;
-    @Mock
-    private JwtTokenProvider tokenProvider;
+    private DeviceService deviceService;
     @Mock
     private StorageService storageService;
 
@@ -61,10 +58,7 @@ class PhotoServiceTest {
         MockMultipartFile file1 = new MockMultipartFile("files", "img1.jpg", "image/jpeg", new byte[0]);
         MockMultipartFile file2 = new MockMultipartFile("files", "video.mp4", "video/mp4", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(req.getHeader("X-client-Id")).thenReturn(device.getClientId().toString());
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
-        when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
+        when(deviceService.getRequestingDevice(req)).thenReturn(device);
         when(storageService.store(any(MultipartFile.class))).thenAnswer(inv -> ((MultipartFile) inv.getArgument(0)).getOriginalFilename());
         when(photoRepository.save(any(Photo.class))).thenAnswer(inv -> {
             Photo p = inv.getArgument(0);
