@@ -1,4 +1,22 @@
+:root {
+  --main-bg: #DEDAA4;
+  --accent-gold: #C2BD67;
+  --soft-bg: #DBD6A1;
+  --text-main: #4E491B;
+  --accent-green: #96962D;
+  --cream-bg: #FDFBF5;
+}
+
 body {
   margin: 0;
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background-image: url('../assets/pagebackground.png');
+  background-size: cover;
+  background-position: center;
+}
+
+@media (max-width: 360px) {
+  body {
+    font-size: 14px;
+  }
 }
