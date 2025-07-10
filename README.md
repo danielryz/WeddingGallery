@@ -287,6 +287,29 @@ Response:
 }
 ```
 
+### POST `/api/chat/messages/{messageId}/reactions`
+Add an emoji reaction to a chat message.
+
+Request:
+```json
+{
+  "emoji": "\uD83D\uDE0A"
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "emoji": "\uD83D\uDE0A",
+  "messageId": 1,
+  "deviceId": 1,
+  "deviceName": "Phone"
+}
+```
+
+### DELETE `/api/chat/reactions/{id}`
+Deletes the reaction. Returns **204 No Content** on success.
+
 ## Error responses
 
 Errors are returned in JSON format by `GlobalExceptionHandler`:
