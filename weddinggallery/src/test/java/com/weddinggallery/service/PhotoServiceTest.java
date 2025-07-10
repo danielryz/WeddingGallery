@@ -13,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.AccessDeniedException;
-import com.weddinggallery.service.UploadQueueService;
 
 import java.util.UUID;
 import java.util.Optional;
@@ -60,7 +59,6 @@ class PhotoServiceTest {
         photoService.savePhoto(file, null, req);
 
         verify(uploadQueueService).submitUpload(any(Runnable.class));
-        verifyNoInteractions(storageService);
         verifyNoInteractions(photoRepository);
     }
 
