@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
-import { useChat } from '../context/ChatContext'
-import { addChatReaction, getChatReactionSummary } from '../api/chat'
+import { useState, useEffect, useRef } from 'react'
+import { Client, type StompSubscription } from '@stomp/stompjs'
+import SockJS from 'sockjs-client'
+import { addChatReaction, getChatReactionSummary, sendChatMessage } from '../api/chat'
 import type { ChatMessageResponse, ChatReactionCountResponse } from '../types/chat'
 
 function ChatMessage({ message }: { message: ChatMessageResponse }) {
@@ -39,12 +40,51 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
   )
 }
 
+let stompClient: Client | null = null
+
 function ChatPage() {
-  const { messages, sendMessage } = useChat()
+  const [messages, setMessages] = useState<ChatMessageResponse[]>([])
   const [text, setText] = useState('')
+  const subRef = useRef<StompSubscription | null>(null)
+
+  useEffect(() => {
+    if (!stompClient) {
+      stompClient = new Client({
+        webSocketFactory: () => new SockJS('/ws'),
+        reconnectDelay: 5000,
+      })
+    }
+
+    const client = stompClient
+
+    const subscribe = () => {
+      subRef.current = client.subscribe('/topic/chat', (frame) => {
+        try {
+          const msg: ChatMessageResponse = JSON.parse(frame.body)
+          setMessages((prev) => [...prev, msg])
+        } catch (err) {
+          console.error('Error parsing message', err)
+        }
+      })
+    }
+
+    if (client.connected) {
+      subscribe()
+    } else {
+      client.onConnect = subscribe
+      if (!client.active) {
+        client.activate()
+      }
+    }
+
+    return () => {
+      subRef.current?.unsubscribe()
+    }
+  }, [])
 
   const handleSend = async () => {
-    await sendMessage(text)
+    if (!text.trim()) return
+    await sendChatMessage({ text })
     setText('')
   }
 
