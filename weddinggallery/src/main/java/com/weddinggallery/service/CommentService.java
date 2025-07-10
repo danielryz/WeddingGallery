@@ -8,6 +8,9 @@ import com.weddinggallery.repository.CommentRepository;
 import com.weddinggallery.repository.PhotoRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -58,6 +61,18 @@ public class CommentService {
         Photo photo = comment.getPhoto();
         photo.setCommentCount(Math.max(0, photo.getCommentCount() - 1));
         photoRepository.save(photo);
+    }
+
+    @Transactional
+    public Page<CommentResponse> getComments(Long photoId, Pageable pageable) {
+        java.util.List<Comment> comments = commentRepository.findByPhotoIdOrderByCreatedAt(photoId);
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), comments.size());
+        java.util.List<CommentResponse> content = comments.subList(Math.min(start, end), end)
+                .stream()
+                .map(this::toResponse)
+                .toList();
+        return new PageImpl<>(content, pageable, comments.size());
     }
 
     private CommentResponse toResponse(Comment comment) {

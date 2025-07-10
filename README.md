@@ -219,6 +219,26 @@ Response:
 }
 ```
 
+### GET `/api/photos/{photoId}/comments`
+Return a page of comments for the photo ordered by creation time. Optional `page`
+and `size` parameters control pagination.
+
+Response:
+```json
+{
+  "content": [
+    {
+      "id": 1,
+      "text": "Beautiful photo!",
+      "createdAt": "2025-01-01T12:00:00",
+      "photoId": 1,
+      "deviceId": 1,
+      "deviceName": "Phone"
+    }
+  ]
+}
+```
+
 ### DELETE `/api/comments/{id}`
 Deletes the comment. Returns **204 No Content** on success.
 
