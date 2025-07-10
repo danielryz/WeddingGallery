@@ -5,7 +5,6 @@ import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Reaction;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.ReactionRepository;
-import com.weddinggallery.service.DeviceService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ class ReactionServiceTest {
     private ReactionService reactionService;
 
     private Device adminDevice;
-    private Device ownerDevice;
     private Reaction reaction;
 
     @BeforeEach
@@ -47,7 +45,7 @@ class ReactionServiceTest {
                 .id(1L)
                 .clientId(UUID.randomUUID())
                 .build();
-        ownerDevice = Device.builder()
+        Device ownerDevice = Device.builder()
                 .id(2L)
                 .clientId(UUID.randomUUID())
                 .build();

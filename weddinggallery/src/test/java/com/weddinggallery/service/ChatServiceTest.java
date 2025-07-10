@@ -1,10 +1,10 @@
 package com.weddinggallery.service;
 
+import com.weddinggallery.dto.chat.ChatMessageResponse;
 import com.weddinggallery.model.ChatMessage;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.model.User;
 import com.weddinggallery.repository.ChatMessageRepository;
-import com.weddinggallery.service.DeviceService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,7 +68,10 @@ class ChatServiceTest {
         assertThat(response.getId()).isEqualTo(3L);
         assertThat(response.getText()).isEqualTo("hello");
         verify(chatMessageRepository).save(any(ChatMessage.class));
-        verify(messagingTemplate).convertAndSend(eq("/topic/chat"), any());
+        verify(messagingTemplate).convertAndSend(
+                eq("/topic/chat"),
+                any(ChatMessageResponse.class)
+        );
     }
 
     @Test

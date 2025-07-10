@@ -6,7 +6,6 @@ import com.weddinggallery.model.Device;
 import com.weddinggallery.dto.comment.CommentResponse;
 import com.weddinggallery.repository.CommentRepository;
 import com.weddinggallery.repository.PhotoRepository;
-import com.weddinggallery.service.DeviceService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;

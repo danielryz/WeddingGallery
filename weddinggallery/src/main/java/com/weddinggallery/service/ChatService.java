@@ -4,7 +4,7 @@ import com.weddinggallery.dto.chat.ChatMessageResponse;
 import com.weddinggallery.model.ChatMessage;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.repository.ChatMessageRepository;
-import com.weddinggallery.service.DeviceService;
+import jakarta.transaction.Transactional;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +23,7 @@ public class ChatService {
     private final DeviceService deviceService;
     private final SimpMessagingTemplate messagingTemplate;
 
+    @Transactional
     public ChatMessageResponse sendMessage(String text, HttpServletRequest request) {
         Device device = deviceService.getRequestingDevice(request);
         ChatMessage message = ChatMessage.builder()
@@ -36,6 +37,7 @@ public class ChatService {
         return response;
     }
 
+    @Transactional
     public Page<ChatMessageResponse> getMessages(Pageable pageable) {
         PageRequest pageRequest = PageRequest.of(
                 pageable.getPageNumber(),

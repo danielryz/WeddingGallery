@@ -5,7 +5,6 @@ import com.weddinggallery.model.Device;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.PhotoSpecifications;
 import com.weddinggallery.dto.photo.PhotoResponse;
-import com.weddinggallery.service.DeviceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
