@@ -234,8 +234,53 @@ Deletes the reaction. Returns **204 No Content** on success.
 ## WebSocket chat
 
 Clients connect to the `/ws` STOMP endpoint. Subscribing to `/topic/chat` will
-receive chat messages as they are posted. The `POST /api/chat/messages` endpoint
-stores the message and broadcasts it to this topic.
+receive chat messages as they are posted. The following REST endpoints manage
+chat messages. Both require the `Authorization` and `X-Client-Id` headers unless
+noted otherwise.
+
+### POST `/api/chat/messages`
+Send a message that will be broadcast to `/topic/chat`.
+
+Headers:
+- `Authorization: Bearer <token>`
+- `X-Client-Id: <device uuid>`
+
+Request:
+```json
+{
+  "text": "Hello there"
+}
+```
+Response:
+```json
+{
+  "id": 1,
+  "username": "alice",
+  "text": "Hello there",
+  "createdAt": "2025-01-01T12:00:00",
+  "deviceId": 1
+}
+```
+
+### GET `/api/chat/messages`
+Return a page of recent chat messages ordered by creation time. Optional query
+parameters `page` and `size` control pagination. This endpoint does not require
+authentication.
+
+Response:
+```json
+{
+  "content": [
+    {
+      "id": 1,
+      "username": "alice",
+      "text": "Hello there",
+      "createdAt": "2025-01-01T12:00:00",
+      "deviceId": 1
+    }
+  ]
+}
+```
 
 ## Error responses
 
