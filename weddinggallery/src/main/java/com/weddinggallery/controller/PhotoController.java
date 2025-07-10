@@ -78,26 +78,26 @@ public class PhotoController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save a photo")
-    public ResponseEntity<PhotoResponse> savePhoto(
+    public ResponseEntity<Void> savePhoto(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @RequestPart("file") MultipartFile file,
             @RequestPart(value = "description", required = false) String description,
             HttpServletRequest request
     ) throws java.io.IOException {
-        PhotoResponse response = photoService.savePhoto(file, description, request);
-        return ResponseEntity.ok(response);
+        photoService.savePhoto(file, description, request);
+        return ResponseEntity.accepted().build();
     }
 
     @PostMapping(value = "/batch", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save multiple photos")
-    public ResponseEntity<List<PhotoResponse>> savePhotos(
+    public ResponseEntity<Void> savePhotos(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @RequestParam("files") List<MultipartFile> files,
             @RequestParam(value = "descriptions", required = false) List<String> descriptions,
             HttpServletRequest request
     ) throws java.io.IOException {
-        var photos = photoService.savePhotos(files, descriptions, request);
-        return ResponseEntity.ok(photos);
+        photoService.savePhotos(files, descriptions, request);
+        return ResponseEntity.accepted().build();
     }
 
     @DeleteMapping("/admin/{id}")

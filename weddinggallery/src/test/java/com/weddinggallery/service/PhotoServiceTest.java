@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.AccessDeniedException;
+import com.weddinggallery.service.UploadQueueService;
 
 import java.util.UUID;
 import java.util.Optional;
@@ -31,7 +32,7 @@ class PhotoServiceTest {
     @Mock
     private DeviceService deviceService;
     @Mock
-    private StorageService storageService;
+    private UploadQueueService uploadQueueService;
 
     @InjectMocks
     private PhotoService photoService;
@@ -56,18 +57,11 @@ class PhotoServiceTest {
         MockMultipartFile file = new MockMultipartFile("file", "video.mp4", "video/mp4", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
         when(deviceService.getRequestingDevice(req)).thenReturn(device);
-        when(storageService.store(file)).thenReturn("stored.mp4");
-        when(photoRepository.save(any(Photo.class))).thenAnswer(invocation -> {
-            Photo p = invocation.getArgument(0);
-            p.setId(3L);
-            return p;
-        });
+        photoService.savePhoto(file, null, req);
 
-        var response = photoService.savePhoto(file, null, req);
-
-        assertThat(response.getFileName()).isEqualTo("stored.mp4");
-        verify(storageService).store(file);
-        verify(photoRepository).save(any(Photo.class));
+        verify(uploadQueueService).submitUpload(any(Runnable.class));
+        verifyNoInteractions(storageService);
+        verifyNoInteractions(photoRepository);
     }
 
     @Test
@@ -78,8 +72,7 @@ class PhotoServiceTest {
 
         assertThrows(IllegalArgumentException.class, () -> photoService.savePhoto(file, null, req));
 
-        verifyNoInteractions(storageService);
-        verify(photoRepository, never()).save(any(Photo.class));
+        verifyNoInteractions(uploadQueueService);
     }
 
     @Test

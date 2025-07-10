@@ -13,13 +13,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
@@ -38,10 +38,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PhotoService {
     private final PhotoRepository photoRepository;
     private final DeviceService deviceService;
     private final StorageService storageService;
+    private final UploadQueueService uploadQueueService;
 
     static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of(
             "jpg", "jpeg", "png", "gif", "bmp", "tif", "tiff", "webp",
@@ -128,17 +130,25 @@ public class PhotoService {
         return toResponse(photo);
     }
 
-    @Transactional
-    public PhotoResponse savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
-        return toResponse(savePhotoEntity(file, description, request));
+    public void savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
+        String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        if (!StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
+            throw new IllegalArgumentException("Unsupported file extension: " + ext);
+        }
+        uploadQueueService.submitUpload(() -> {
+            try {
+                savePhotoEntity(file, description, request);
+            } catch (IOException e) {
+                log.error("Failed to store file", e);
+            }
+        });
     }
 
-    @Transactional
-    public List<PhotoResponse> savePhotos(List<MultipartFile> files,
+    public void savePhotos(List<MultipartFile> files,
                                             List<String> descriptions,
                                             HttpServletRequest request) throws IOException {
         if (files == null || files.isEmpty()) {
-            return Collections.emptyList();
+            return;
         }
         if (descriptions == null) {
             descriptions = Collections.emptyList();
@@ -147,17 +157,21 @@ public class PhotoService {
         for (MultipartFile file : files) {
             String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
             if (!StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
-                throw new IllegalArgumentException("Unsupported file extension: " + ext);
+                throw new IllegalArgumentException("Unsupported file extension:" + ext);
             }
         }
 
-        List<Photo> saved = new ArrayList<>();
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             String description = descriptions.size() > i ? descriptions.get(i) : null;
-            saved.add(savePhotoEntity(file, description, request));
+            uploadQueueService.submitUpload(() -> {
+                try {
+                    savePhotoEntity(file, description, request);
+                } catch (IOException e) {
+                    log.error("Failed to store file", e);
+                }
+            });
         }
-        return saved.stream().map(this::toResponse).toList();
     }
 
     @Transactional

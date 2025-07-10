@@ -122,6 +122,16 @@ service account JSON key file with access to the bucket:
 export GOOGLE_APPLICATION_CREDENTIALS=/path/to/key.json
 ```
 
+## Upload queue
+
+File uploads are processed asynchronously by a configurable thread pool. Queue
+parameters can be tuned in `application.properties` using the following
+properties:
+
+- `upload.executor.core-pool-size`
+- `upload.executor.max-pool-size`
+- `upload.executor.queue-capacity`
+
 
 ## Photo API
 
@@ -156,10 +166,16 @@ Fields:
 - `file` – the image to upload
 - `description` – optional description
 
+Uploads are queued for background processing. The endpoint returns `202 Accepted`
+as soon as the file is placed onto the queue.
+
 ### POST `/api/photos/batch`
 Upload several files at once. The request must use `multipart/form-data` with:
 - `files` – one or more image files
 - `descriptions` – optional descriptions matching file order
+
+Like the single upload, the request is processed asynchronously and returns
+immediately with `202 Accepted`.
 
 Supported file extensions: `jpg`, `jpeg`, `png`, `gif`, `bmp`, `webp`, `heic`, `mp4`, `mov`, `avi`, `mkv`, `webm`.
 
