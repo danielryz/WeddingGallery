@@ -259,6 +259,7 @@ public class PhotoService {
                 photo.getReactionCount(),
                 photo.getUploader() != null ? photo.getUploader().getUsername() : null,
                 photo.getDevice() != null ? photo.getDevice().getId() : null,
+                photo.getDevice() != null ? photo.getDevice().getName() : null,
                 photo.isVisible()
         );
     }

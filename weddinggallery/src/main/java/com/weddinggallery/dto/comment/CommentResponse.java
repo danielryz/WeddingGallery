@@ -15,5 +15,6 @@ public class CommentResponse {
     private LocalDateTime createdAt;
     private Long photoId;
     private Long deviceId;
+    private String deviceName;
 }
 

@@ -15,4 +15,5 @@ public class ChatMessageResponse {
     private String text;
     private LocalDateTime createdAt;
     private Long deviceId;
+    private String deviceName;
 }
