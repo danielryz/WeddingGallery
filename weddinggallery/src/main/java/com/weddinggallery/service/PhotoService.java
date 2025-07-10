@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import com.weddinggallery.util.BufferedMultipartFile;
 
 import java.util.Collections;
 import java.util.Set;
@@ -135,11 +136,14 @@ public class PhotoService {
         if (!StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
             throw new IllegalArgumentException("Unsupported file extension: " + ext);
         }
+        BufferedMultipartFile buffered = new BufferedMultipartFile(file);
         uploadQueueService.submitUpload(() -> {
             try {
-                savePhotoEntity(file, description, request);
+                savePhotoEntity(buffered, description, request);
             } catch (IOException e) {
                 log.error("Failed to store file", e);
+            } finally {
+                buffered.cleanup();
             }
         });
     }
@@ -162,13 +166,16 @@ public class PhotoService {
         }
 
         for (int i = 0; i < files.size(); i++) {
-            MultipartFile file = files.get(i);
+            MultipartFile original = files.get(i);
+            BufferedMultipartFile buffered = new BufferedMultipartFile(original);
             String description = descriptions.size() > i ? descriptions.get(i) : null;
             uploadQueueService.submitUpload(() -> {
                 try {
-                    savePhotoEntity(file, description, request);
+                    savePhotoEntity(buffered, description, request);
                 } catch (IOException e) {
                     log.error("Failed to store file", e);
+                } finally {
+                    buffered.cleanup();
                 }
             });
         }
