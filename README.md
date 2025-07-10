@@ -325,6 +325,22 @@ Response:
 }
 ```
 
+### GET `/api/chat/messages/{messageId}/reactions`
+Return the reactions for the message ordered by creation time.
+
+Response:
+```json
+[
+  {
+    "id": 1,
+    "emoji": "\uD83D\uDE0A",
+    "messageId": 1,
+    "deviceId": 1,
+    "deviceName": "Phone"
+  }
+]
+```
+
 ### DELETE `/api/chat/reactions/{id}`
 Deletes the reaction. Returns **204 No Content** on success.
 

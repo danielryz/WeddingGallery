@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -86,5 +87,29 @@ class ChatReactionServiceTest {
                 () -> chatReactionService.deleteReaction(3L, req));
         verify(reactionRepository, never()).delete(any());
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void getReactionsReturnsMappedResponses() {
+        ChatMessageReaction r1 = ChatMessageReaction.builder()
+                .id(10L)
+                .emoji(":)")
+                .message(ChatMessage.builder().id(5L).build())
+                .device(adminDevice)
+                .build();
+        ChatMessageReaction r2 = ChatMessageReaction.builder()
+                .id(11L)
+                .emoji("(")
+                .message(ChatMessage.builder().id(5L).build())
+                .device(adminDevice)
+                .build();
+        when(reactionRepository.findByMessageIdOrderByCreatedAt(5L))
+                .thenReturn(List.of(r1, r2));
+
+        var responses = chatReactionService.getReactions(5L);
+
+        assertThat(responses).hasSize(2);
+        assertThat(responses.get(0).getId()).isEqualTo(10L);
+        verify(reactionRepository).findByMessageIdOrderByCreatedAt(5L);
     }
 }

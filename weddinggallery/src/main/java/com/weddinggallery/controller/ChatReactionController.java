@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,15 @@ public class ChatReactionController {
             HttpServletRequest request) {
         ChatReactionResponse response = chatReactionService.addReaction(messageId, requestBody.getEmoji(), request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/messages/{messageId}/reactions")
+    @Operation(summary = "Get reactions for chat message")
+    public ResponseEntity<List<ChatReactionResponse>> getReactions(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @PathVariable Long messageId) {
+        var responses = chatReactionService.getReactions(messageId);
+        return ResponseEntity.ok(responses);
     }
 
     @DeleteMapping("/reactions/{id}")
