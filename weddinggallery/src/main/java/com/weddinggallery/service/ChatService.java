@@ -6,6 +6,7 @@ import com.weddinggallery.model.Device;
 import com.weddinggallery.repository.ChatMessageRepository;
 import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.security.JwtTokenProvider;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -24,6 +25,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
     private final DeviceRepository deviceRepository;
     private final JwtTokenProvider tokenProvider;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public ChatMessageResponse sendMessage(String text, HttpServletRequest request) {
         Device device = getRequestingDevice(request);
@@ -33,7 +35,9 @@ public class ChatService {
                 .createdAt(LocalDateTime.now())
                 .build();
         ChatMessage saved = chatMessageRepository.save(message);
-        return toResponse(saved);
+        ChatMessageResponse response = toResponse(saved);
+        messagingTemplate.convertAndSend("/topic/chat", response);
+        return response;
     }
 
     public Page<ChatMessageResponse> getMessages(Pageable pageable) {

@@ -231,6 +231,12 @@ Response:
 ### DELETE `/api/reactions/{id}`
 Deletes the reaction. Returns **204 No Content** on success.
 
+## WebSocket chat
+
+Clients connect to the `/ws` STOMP endpoint. Subscribing to `/topic/chat` will
+receive chat messages as they are posted. The `POST /api/chat/messages` endpoint
+stores the message and broadcasts it to this topic.
+
 ## Error responses
 
 Errors are returned in JSON format by `GlobalExceptionHandler`:
