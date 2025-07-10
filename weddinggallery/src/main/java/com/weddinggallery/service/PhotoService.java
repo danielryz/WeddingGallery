@@ -94,6 +94,13 @@ public class PhotoService {
     }
 
     @Transactional
+    public PhotoResponse getPhoto(Long id) {
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new AccessDeniedException("Photo not found"));
+        return toResponse(photo);
+    }
+
+    @Transactional
     public PhotoResponse savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
         return toResponse(savePhotoEntity(file, description, request));
     }

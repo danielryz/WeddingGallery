@@ -2,6 +2,7 @@ package com.weddinggallery.controller;
 
 import com.weddinggallery.security.JwtTokenProvider;   // <– importujemy
 import com.weddinggallery.service.PhotoService;
+import com.weddinggallery.dto.photo.PhotoResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,15 @@ class PhotoControllerMvcTest {
                 .thenReturn(Page.empty());
 
         mockMvc.perform(get("/api/photos").param("type", "image"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void getPhotoByIdReturnsOk() throws Exception {
+        Mockito.when(photoService.getPhoto(1L))
+                .thenReturn(new PhotoResponse());
+
+        mockMvc.perform(get("/api/photos/1"))
                 .andExpect(status().isOk());
     }
 }

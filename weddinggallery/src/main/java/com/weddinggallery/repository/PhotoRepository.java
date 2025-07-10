@@ -18,6 +18,11 @@ public interface PhotoRepository
   Optional<Photo> findByIdAndDeviceId(@NonNull Long id, @NonNull Long deviceId);
 
   @Override
+  @EntityGraph(attributePaths = {"uploader","device"})
+  @NonNull
+  Optional<Photo> findById(@NonNull Long id);
+
+  @Override
   @EntityGraph(attributePaths = {"uploader", "device"})
   @NonNull
   Page<Photo> findAll(
