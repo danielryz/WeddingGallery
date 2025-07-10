@@ -3,10 +3,9 @@ package com.weddinggallery.service;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Reaction;
-import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.ReactionRepository;
-import com.weddinggallery.security.JwtTokenProvider;
+import com.weddinggallery.service.DeviceService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,9 +32,7 @@ class ReactionServiceTest {
     @Mock
     private PhotoRepository photoRepository;
     @Mock
-    private DeviceRepository deviceRepository;
-    @Mock
-    private JwtTokenProvider tokenProvider;
+    private DeviceService deviceService;
 
     @InjectMocks
     private ReactionService reactionService;
@@ -64,10 +61,7 @@ class ReactionServiceTest {
     @Test
     void adminCanDeleteOthersReaction() {
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(req.getHeader("X-client-Id")).thenReturn(adminDevice.getClientId().toString());
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(adminDevice.getClientId().toString());
-        when(deviceRepository.findByClientId(adminDevice.getClientId())).thenReturn(Optional.of(adminDevice));
+        when(deviceService.getRequestingDevice(req)).thenReturn(adminDevice);
         when(reactionRepository.findById(3L)).thenReturn(Optional.of(reaction));
 
         SecurityContextHolder.getContext().setAuthentication(
@@ -83,10 +77,7 @@ class ReactionServiceTest {
     @Test
     void userCannotDeleteOthersReaction() {
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(req.getHeader("X-client-Id")).thenReturn(adminDevice.getClientId().toString());
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(adminDevice.getClientId().toString());
-        when(deviceRepository.findByClientId(adminDevice.getClientId())).thenReturn(Optional.of(adminDevice));
+        when(deviceService.getRequestingDevice(req)).thenReturn(adminDevice);
         when(reactionRepository.findById(3L)).thenReturn(Optional.of(reaction));
 
         SecurityContextHolder.getContext().setAuthentication(

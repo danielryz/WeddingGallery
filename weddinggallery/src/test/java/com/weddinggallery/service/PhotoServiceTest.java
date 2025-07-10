@@ -3,9 +3,8 @@ package com.weddinggallery.service;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.User;
-import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.repository.PhotoRepository;
-import com.weddinggallery.security.JwtTokenProvider;
+import com.weddinggallery.service.DeviceService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,7 @@ class PhotoServiceTest {
     @Mock
     private PhotoRepository photoRepository;
     @Mock
-    private DeviceRepository deviceRepository;
-    @Mock
-    private JwtTokenProvider tokenProvider;
+    private DeviceService deviceService;
     @Mock
     private StorageService storageService;
 
@@ -58,10 +55,7 @@ class PhotoServiceTest {
     void savesPhotoWhenExtensionAllowed() throws Exception {
         MockMultipartFile file = new MockMultipartFile("file", "video.mp4", "video/mp4", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(req.getHeader("X-client-Id")).thenReturn(device.getClientId().toString());
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
-        when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
+        when(deviceService.getRequestingDevice(req)).thenReturn(device);
         when(storageService.store(file)).thenReturn("stored.mp4");
         when(photoRepository.save(any(Photo.class))).thenAnswer(invocation -> {
             Photo p = invocation.getArgument(0);
@@ -80,10 +74,7 @@ class PhotoServiceTest {
     void rejectsUnsupportedExtension() {
         MockMultipartFile file = new MockMultipartFile("file", "doc.txt", "text/plain", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(req.getHeader("X-client-Id")).thenReturn(device.getClientId().toString());
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
-        when(deviceRepository.findByClientIdWithUser(device.getClientId())).thenReturn(Optional.of(device));
+        when(deviceService.getRequestingDevice(req)).thenReturn(device);
 
         assertThrows(IllegalArgumentException.class, () -> photoService.savePhoto(file, null, req));
 
@@ -95,7 +86,7 @@ class PhotoServiceTest {
     void missingAuthorizationHeaderThrows() {
         MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn(null);
+        when(deviceService.getRequestingDevice(req)).thenThrow(new AccessDeniedException("Missing token"));
 
         assertThrows(AccessDeniedException.class, () -> photoService.savePhoto(file, null, req));
     }
@@ -104,8 +95,7 @@ class PhotoServiceTest {
     void missingClientIdHeaderThrows() {
         MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(req.getHeader("X-client-Id")).thenReturn(null);
+        when(deviceService.getRequestingDevice(req)).thenThrow(new AccessDeniedException("Missing client id header"));
 
         assertThrows(AccessDeniedException.class, () -> photoService.savePhoto(file, null, req));
     }
@@ -114,9 +104,7 @@ class PhotoServiceTest {
     void clientIdMismatchThrows() {
         MockMultipartFile file = new MockMultipartFile("file", "img.jpg", "image/jpeg", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(req.getHeader("Authorization")).thenReturn("Bearer token");
-        when(req.getHeader("X-client-Id")).thenReturn("other");
-        when(tokenProvider.getClientIdFromToken("token")).thenReturn(device.getClientId().toString());
+        when(deviceService.getRequestingDevice(req)).thenThrow(new AccessDeniedException("Client id mismatch"));
 
         assertThrows(AccessDeniedException.class, () -> photoService.savePhoto(file, null, req));
     }

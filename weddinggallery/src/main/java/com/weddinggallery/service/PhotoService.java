@@ -3,10 +3,9 @@ package com.weddinggallery.service;
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Device;
 import com.weddinggallery.repository.PhotoRepository;
-import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.repository.PhotoSpecifications;
 import com.weddinggallery.dto.photo.PhotoResponse;
-import com.weddinggallery.security.JwtTokenProvider;
+import com.weddinggallery.service.DeviceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,14 +33,12 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class PhotoService {
     private final PhotoRepository photoRepository;
-    private final DeviceRepository deviceRepository;
-    private final JwtTokenProvider tokenProvider;
+    private final DeviceService deviceService;
     private final StorageService storageService;
 
     static final Set<String> ALLOWED_IMAGE_EXTENSIONS = Set.of(
@@ -132,7 +129,7 @@ public class PhotoService {
 
     @Transactional
     public void deletePhoto(Long id, HttpServletRequest request){
-        Device device = getRequestingDevice(request);
+        Device device = deviceService.getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
@@ -154,7 +151,7 @@ public class PhotoService {
 
     @Transactional
     public PhotoResponse updatePhotoDescription(Long id, String description, HttpServletRequest request){
-        Device device = getRequestingDevice(request);
+        Device device = deviceService.getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
@@ -172,7 +169,7 @@ public class PhotoService {
 
     @Transactional
     public PhotoResponse updatePhotoVisibility(Long id, boolean visible, HttpServletRequest request){
-        Device device = getRequestingDevice(request);
+        Device device = deviceService.getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
@@ -207,29 +204,8 @@ public class PhotoService {
         }
     }
 
-    private Device getRequestingDevice(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            throw new AccessDeniedException("Missing token");
-        }
-
-        String headerClientId = request.getHeader("X-client-Id");
-        if (headerClientId == null || headerClientId.isBlank()) {
-            throw new AccessDeniedException("Missing client id header");
-        }
-
-        String token = authHeader.substring(7);
-        String tokenClientId = tokenProvider.getClientIdFromToken(token);
-        if (!headerClientId.equals(tokenClientId)) {
-            throw new AccessDeniedException("Client id mismatch");
-        }
-
-        return deviceRepository.findByClientIdWithUser(UUID.fromString(tokenClientId))
-                .orElseThrow(() -> new AccessDeniedException("Device not found"));
-    }
-
     private Photo savePhotoEntity(MultipartFile file, String description, HttpServletRequest request) throws IOException {
-        Device device = getRequestingDevice(request);
+        Device device = deviceService.getRequestingDevice(request);
         String original = file.getOriginalFilename();
         String ext = StringUtils.getFilenameExtension(original);
         if (!StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
