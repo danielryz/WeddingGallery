@@ -1,6 +1,6 @@
 import axiosInstance from './axiosInstance'
-import { CommentRequest, CommentResponse } from '../types/comment'
-import { Page } from '../types/page'
+import type {CommentRequest, CommentResponse} from '../types/comment'
+import type { Page } from '../types/page'
 
 export const addComment = async (
   photoId: number,

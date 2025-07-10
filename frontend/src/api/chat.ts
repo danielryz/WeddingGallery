@@ -1,12 +1,13 @@
 import axiosInstance from './axiosInstance'
-import {
+
+import type {
   ChatMessageRequest,
   ChatMessageResponse,
   ChatReactionRequest,
   ChatReactionResponse,
   ChatReactionCountResponse,
 } from '../types/chat'
-import { Page } from '../types/page'
+import type {Page} from '../types/page'
 
 export const sendChatMessage = async (
   data: ChatMessageRequest,

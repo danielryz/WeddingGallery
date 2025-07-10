@@ -1,18 +1,23 @@
-import axios from 'axios'
+import axios, { AxiosHeaders } from 'axios'
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:8080',
 })
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token')
+  const headers = new AxiosHeaders(config.headers)
+
+  const token    = localStorage.getItem('token')
   const clientId = localStorage.getItem('clientId')
+
   if (token) {
-    config.headers = { ...config.headers, Authorization: `Bearer ${token}` }
+    headers.set('Authorization', `Bearer ${token}`)
   }
   if (clientId) {
-    config.headers = { ...config.headers, 'X-client-Id': clientId }
+    headers.set('X-client-Id', clientId)
   }
+
+  config.headers = headers
   return config
 })
 

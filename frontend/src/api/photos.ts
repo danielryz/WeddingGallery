@@ -1,10 +1,10 @@
 import axiosInstance from './axiosInstance'
-import {
+import type {
   PhotoResponse,
   PhotoDescriptionUpdateRequest,
   PhotoVisibilityUpdateRequest,
 } from '../types/photo'
-import { Page } from '../types/page'
+import type { Page } from '../types/page'
 
 export const getPhotos = async (
   page = 0,
