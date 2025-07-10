@@ -1,6 +1,7 @@
 package com.weddinggallery.service;
 
 import com.weddinggallery.dto.chat.ChatReactionResponse;
+import com.weddinggallery.dto.chat.ChatReactionCountResponse;
 import com.weddinggallery.model.ChatMessage;
 import com.weddinggallery.model.ChatMessageReaction;
 import com.weddinggallery.model.Device;
@@ -62,6 +63,11 @@ public class ChatReactionService {
                 .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    @Transactional
+    public List<ChatReactionCountResponse> getReactionSummary(Long messageId) {
+        return reactionRepository.countByMessageIdGroupByEmoji(messageId);
     }
 
     private ChatReactionResponse toResponse(ChatMessageReaction reaction) {

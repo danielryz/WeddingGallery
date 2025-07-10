@@ -2,6 +2,7 @@ package com.weddinggallery.controller;
 
 import com.weddinggallery.dto.chat.ChatReactionRequest;
 import com.weddinggallery.dto.chat.ChatReactionResponse;
+import com.weddinggallery.dto.chat.ChatReactionCountResponse;
 import com.weddinggallery.service.ChatReactionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,6 +39,15 @@ public class ChatReactionController {
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @PathVariable Long messageId) {
         var responses = chatReactionService.getReactions(messageId);
+        return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/messages/{messageId}/reactions/summary")
+    @Operation(summary = "Get reaction counts for chat message")
+    public ResponseEntity<List<ChatReactionCountResponse>> getReactionSummary(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @PathVariable Long messageId) {
+        var responses = chatReactionService.getReactionSummary(messageId);
         return ResponseEntity.ok(responses);
     }
 

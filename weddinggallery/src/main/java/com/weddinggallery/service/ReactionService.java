@@ -4,6 +4,7 @@ import com.weddinggallery.model.Device;
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Reaction;
 import com.weddinggallery.dto.reaction.ReactionResponse;
+import com.weddinggallery.dto.reaction.ReactionCountResponse;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.ReactionRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -55,6 +56,11 @@ public class ReactionService {
         Photo photo = reaction.getPhoto();
         photo.setReactionCount(Math.max(0, photo.getReactionCount() - 1));
         photoRepository.save(photo);
+    }
+
+    @Transactional
+    public java.util.List<ReactionCountResponse> getReactionSummary(Long photoId) {
+        return reactionRepository.countByPhotoIdGroupByType(photoId);
     }
 
     private ReactionResponse toResponse(Reaction reaction) {

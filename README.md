@@ -269,6 +269,17 @@ Response:
 }
 ```
 
+### GET `/api/photos/{photoId}/reactions`
+Return the reaction counts for the photo grouped by type.
+
+Response:
+```json
+[
+  { "type": "heart", "count": 5 },
+  { "type": "like", "count": 3 }
+]
+```
+
 ### DELETE `/api/reactions/{id}`
 Deletes the reaction. Returns **204 No Content** on success.
 
@@ -358,6 +369,16 @@ Response:
     "deviceId": 1,
     "deviceName": "Phone"
   }
+]
+```
+
+### GET `/api/chat/messages/{messageId}/reactions/summary`
+Return the reaction counts for the message grouped by emoji.
+
+Response:
+```json
+[
+  { "emoji": "\uD83D\uDE0A", "count": 2 }
 ]
 ```
 
