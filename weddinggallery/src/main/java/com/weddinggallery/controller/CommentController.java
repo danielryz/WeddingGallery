@@ -33,6 +33,18 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/photos/{photoId}/comments")
+    @Operation(summary = "Get comments for photo")
+    public ResponseEntity<org.springframework.data.domain.Page<CommentResponse>> getComments(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @PathVariable Long photoId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        org.springframework.data.domain.PageRequest pageRequest = org.springframework.data.domain.PageRequest.of(page, size);
+        var comments = commentService.getComments(photoId, pageRequest);
+        return ResponseEntity.ok(comments);
+    }
+
     @DeleteMapping("/comments/{id}")
     @Operation(summary = "Delete comment",
             description = "Deletes the comment if the requesting device is authorized")
