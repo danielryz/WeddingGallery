@@ -87,6 +87,14 @@ npm run build   # create a production build
 ```
 
 Set the environment variable `VITE_API_URL` to point at the backend API base URL. It defaults to `http://localhost:8080` if not defined.
+For convenience `frontend/.env.dev` contains this default. When running the frontend locally you can:
+
+```bash
+cd frontend
+source .env.dev   # or copy it to .env
+```
+
+so that Vite picks up the setting automatically.
 
 See [`frontend/README.md`](frontend/README.md) for more details.
 
