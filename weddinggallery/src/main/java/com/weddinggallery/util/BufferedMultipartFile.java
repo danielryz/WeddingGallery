@@ -34,7 +34,8 @@ public class BufferedMultipartFile implements MultipartFile {
         if (size <= MEMORY_THRESHOLD) {
             this.bytes = file.getBytes();
         } else {
-            this.tempFile = Files.createTempFile(Paths.get("/tmp"), "upload-", ".tmp");
+            Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
+            this.tempFile = Files.createTempFile(tmpDir, "upload-", ".tmp");
             try (InputStream in = file.getInputStream()) {
                 Files.copy(in, tempFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
             }
