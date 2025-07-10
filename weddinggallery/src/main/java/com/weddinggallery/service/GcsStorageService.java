@@ -31,7 +31,6 @@ public class GcsStorageService implements StorageService {
 
     @PostConstruct
     public void init() {
-        // bucket must already exist and credentials be configured
     }
 
     @Override

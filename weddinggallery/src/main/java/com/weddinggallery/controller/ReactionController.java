@@ -10,9 +10,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
+@PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping("/api")
 @RequiredArgsConstructor
 @Tag(name = "Reactions", description = "Manage photo reactions")
@@ -22,7 +26,7 @@ public class ReactionController {
 
     @GetMapping("/photos/{photoId}/reactions")
     @Operation(summary = "Get reaction counts for photo")
-    public ResponseEntity<java.util.List<ReactionCountResponse>> getReactions(
+    public ResponseEntity<List<ReactionCountResponse>> getReactions(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @PathVariable Long photoId) {
         var responses = reactionService.getReactionSummary(photoId);

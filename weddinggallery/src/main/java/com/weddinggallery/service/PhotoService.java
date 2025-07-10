@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
@@ -29,6 +30,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.InputStream;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.List;
@@ -56,14 +59,41 @@ public class PhotoService {
     );
 
     static final Set<String> ALLOWED_EXTENSIONS = Set.copyOf(
-            java.util.stream.Stream.concat(
+            Stream.concat(
                     ALLOWED_IMAGE_EXTENSIONS.stream(),
                     ALLOWED_VIDEO_EXTENSIONS.stream()
-            ).collect(java.util.stream.Collectors.toSet())
+            ).collect(Collectors.toSet())
     );
 
     public List<Photo> getAllPhotos(){
         return photoRepository.findAll();
+    }
+
+    public Page<PhotoResponse> getPhotosByDeviceId(Pageable pageable, Sort sort, String type, HttpServletRequest request){
+        Device device = deviceService.getRequestingDevice(request);
+
+        Set<String> extensions = null;
+        if (type != null) {
+            if ("image".equalsIgnoreCase(type)) {
+                extensions = ALLOWED_IMAGE_EXTENSIONS;
+            } else if ("video".equalsIgnoreCase(type)) {
+                extensions = ALLOWED_VIDEO_EXTENSIONS;
+            }
+        }
+        PageRequest pageRequest = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sort
+        );
+
+        Specification<Photo> spec = PhotoSpecifications.isVisible(true);
+        spec = spec.and(PhotoSpecifications.withDeviceId(device.getId()));
+        if (extensions != null) {
+            spec = spec.and(PhotoSpecifications.withExtensions(extensions));
+        }
+        return photoRepository
+                .findAll(spec, pageRequest)
+                .map(this::toResponse);
     }
 
     public Page<PhotoResponse> getPhotos(Pageable pageable, Sort sort, String type) {
@@ -86,8 +116,6 @@ public class PhotoService {
         if (extensions != null) {
             spec = spec.and(PhotoSpecifications.withExtensions(extensions));
         }
-
-        // 4. Wykonaj zapytanie
         return photoRepository
                 .findAll(spec, pageRequest)
                 .map(this::toResponse);
@@ -110,13 +138,12 @@ public class PhotoService {
                                             List<String> descriptions,
                                             HttpServletRequest request) throws IOException {
         if (files == null || files.isEmpty()) {
-            return java.util.Collections.emptyList();
+            return Collections.emptyList();
         }
         if (descriptions == null) {
             descriptions = Collections.emptyList();
         }
 
-        // Validate all files first so none are stored when an invalid extension is present
         for (MultipartFile file : files) {
             String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
             if (!StringUtils.hasText(ext) || !ALLOWED_EXTENSIONS.contains(ext.toLowerCase())) {
@@ -124,7 +151,7 @@ public class PhotoService {
             }
         }
 
-        List<Photo> saved = new java.util.ArrayList<>();
+        List<Photo> saved = new ArrayList<>();
         for (int i = 0; i < files.size(); i++) {
             MultipartFile file = files.get(i);
             String description = descriptions.size() > i ? descriptions.get(i) : null;
@@ -191,7 +218,7 @@ public class PhotoService {
         return toResponse(photoRepository.save(photo));
     }
 
-    public void streamAllPhotosZip(HttpServletResponse response) throws java.io.IOException {
+    public void streamAllPhotosZip(HttpServletResponse response) throws IOException {
         List<Photo> photos = photoRepository.findAll();
         response.setContentType("application/zip");
         response.setHeader("Content-Disposition", "attachment; filename=photos.zip");
@@ -203,7 +230,7 @@ public class PhotoService {
                         in.transferTo(zos);
                         zos.closeEntry();
                     } catch (IOException ex) {
-                        // ignore missing files
+                        throw new IOException("Failed to download photos", ex);
                     }
                 }
             }

@@ -4,12 +4,17 @@ import com.weddinggallery.dto.photo.PhotoResponse;
 import com.weddinggallery.service.PhotoService;
 import com.weddinggallery.dto.photo.PhotoDescriptionUpdateRequest;
 import com.weddinggallery.dto.photo.PhotoVisibilityUpdateRequest;
+import com.weddinggallery.util.SortUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +25,7 @@ import java.util.List;
 
 
 @RestController
+@PreAuthorize("hasRole('ROLE_USER')")
 @RequestMapping("/api/photos")
 @RequiredArgsConstructor
 @Tag(name = "Photos", description = "Operations related to photos")
@@ -29,7 +35,7 @@ public class PhotoController {
 
     @GetMapping
     @Operation(summary = "Get all photos")
-    public ResponseEntity<org.springframework.data.domain.Page<PhotoResponse>> getPhotos(
+    public ResponseEntity<Page<PhotoResponse>> getPhotos(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -37,9 +43,26 @@ public class PhotoController {
             @RequestParam(defaultValue = "desc") String direction,
             @RequestParam(required = false) String type
     ){
-        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
-        org.springframework.data.domain.Sort sort = com.weddinggallery.util.SortUtil.from(sortBy, direction);
+        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = SortUtil.from(sortBy, direction);
         var result = photoService.getPhotos(pageable, sort, type);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/device")
+    @Operation(summary = "Get all device photos")
+    public ResponseEntity<Page<PhotoResponse>> getDevicePhotos(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "uploadTime") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            @RequestParam(required = false) String type,
+            HttpServletRequest request
+    ){
+        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = SortUtil.from(sortBy, direction);
+        var result = photoService.getPhotosByDeviceId(pageable, sort, type, request);
         return ResponseEntity.ok(result);
     }
 

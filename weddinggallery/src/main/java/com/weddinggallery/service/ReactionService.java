@@ -15,6 +15,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReactionService {
@@ -67,7 +69,7 @@ public class ReactionService {
     }
 
     @Transactional
-    public java.util.List<ReactionCountResponse> getReactionSummary(Long photoId) {
+    public List<ReactionCountResponse> getReactionSummary(Long photoId) {
         return reactionRepository.countByPhotoIdGroupByType(photoId);
     }
 

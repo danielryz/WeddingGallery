@@ -10,6 +10,7 @@ import com.weddinggallery.repository.DeviceRepository;
 import com.weddinggallery.repository.RoleRepository;
 import com.weddinggallery.repository.UserRepository;
 import com.weddinggallery.security.JwtTokenProvider;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
@@ -20,7 +21,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -47,13 +50,13 @@ public class AuthService {
                 .orElse(null);
 
         User shared = userRepository.findByUsername(req.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("Brak konta: " + req.getUsername()));
+                .orElseThrow(() -> new UsernameNotFoundException("No existing account: " + req.getUsername()));
 
         if (providedId != null) {
             device = deviceRepository.findByClientId(providedId)
                     .map(d -> {
                         if (!d.getUser().getId().equals(shared.getId())) {
-                            throw new org.springframework.security.access.AccessDeniedException("Device already assigned to different user");
+                            throw new AccessDeniedException("Device already registered to another user");
                         }
                         if (req.getName() != null) {
                             d.setName(req.getName());
@@ -98,7 +101,7 @@ public class AuthService {
         Role userRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new IllegalStateException("Brak roli ROLE_USER"));
 
-        java.util.Set<Role> roles = new java.util.HashSet<>();
+        Set<Role> roles = new HashSet<>();
         roles.add(userRole);
 
         if (admin) {

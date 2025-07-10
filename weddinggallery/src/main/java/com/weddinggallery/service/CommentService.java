@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -65,10 +66,10 @@ public class CommentService {
 
     @Transactional
     public Page<CommentResponse> getComments(Long photoId, Pageable pageable) {
-        java.util.List<Comment> comments = commentRepository.findByPhotoIdOrderByCreatedAt(photoId);
+        List<Comment> comments = commentRepository.findByPhotoIdOrderByCreatedAt(photoId);
         int start = (int) pageable.getOffset();
         int end = Math.min(start + pageable.getPageSize(), comments.size());
-        java.util.List<CommentResponse> content = comments.subList(Math.min(start, end), end)
+        List<CommentResponse> content = comments.subList(Math.min(start, end), end)
                 .stream()
                 .map(this::toResponse)
                 .toList();

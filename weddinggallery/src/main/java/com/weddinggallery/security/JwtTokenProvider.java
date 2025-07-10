@@ -41,7 +41,6 @@ public class JwtTokenProvider {
 
     public String createToken(String clientId, Set<Role> roles) {
         Claims claims = Jwts.claims().setSubject(clientId);
-        // Wrzucamy listę nazw ról w claim "roles"
         claims.put("roles", roles.stream()
                 .map(Role::getName)
                 .collect(Collectors.toList())

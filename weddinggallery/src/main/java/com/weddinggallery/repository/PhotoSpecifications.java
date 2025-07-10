@@ -1,7 +1,10 @@
 package com.weddinggallery.repository;
 
 import com.weddinggallery.model.Photo;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
+
+import java.util.Set;
 
 public class PhotoSpecifications {
   public static Specification<Photo> withUploaderId(Long uploaderId) {
@@ -18,14 +21,14 @@ public class PhotoSpecifications {
     return (root, query, cb) -> cb.equal(root.get("visible"), visible);
   }
 
-  public static Specification<Photo> withExtensions(java.util.Set<String> extensions) {
+  public static Specification<Photo> withExtensions(Set<String> extensions) {
     return (root, query, cb) -> {
       if (extensions == null || extensions.isEmpty()) {
         return null;
       }
       var predicates = extensions.stream()
           .map(ext -> cb.like(cb.lower(root.get("fileName")), "%." + ext.toLowerCase()))
-          .toArray(jakarta.persistence.criteria.Predicate[]::new);
+          .toArray(Predicate[]::new);
       return cb.or(predicates);
     };
   }
