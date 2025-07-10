@@ -6,7 +6,7 @@ import com.weddinggallery.model.User;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.service.DeviceService;
 import com.weddinggallery.service.PhotoService;
-import com.weddinggallery.service.StorageService;
+import com.weddinggallery.service.UploadQueueService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,7 @@ class PhotoServiceTest {
     @Mock
     private DeviceService deviceService;
     @Mock
-    private StorageService storageService;
+    private UploadQueueService uploadQueueService;
 
     @InjectMocks
     private PhotoService photoService;
@@ -58,19 +58,11 @@ class PhotoServiceTest {
         MockMultipartFile file2 = new MockMultipartFile("files", "video.mp4", "video/mp4", new byte[0]);
         HttpServletRequest req = mock(HttpServletRequest.class);
         when(deviceService.getRequestingDevice(req)).thenReturn(device);
-        when(storageService.store(any(MultipartFile.class))).thenAnswer(inv -> ((MultipartFile) inv.getArgument(0)).getOriginalFilename());
-        when(photoRepository.save(any(Photo.class))).thenAnswer(inv -> {
-            Photo p = inv.getArgument(0);
-            p.setId(1L);
-            return p;
-        });
 
-        var result = photoService.savePhotos(List.of(file1, file2), List.of("d1", "d2"), req);
+        photoService.savePhotos(List.of(file1, file2), List.of("d1", "d2"), req);
 
-        assertThat(result).hasSize(2);
-        verify(storageService).store(file1);
-        verify(storageService).store(file2);
-        verify(photoRepository, times(2)).save(any(Photo.class));
+        verify(uploadQueueService, times(2)).submitUpload(any(Runnable.class));
+        verifyNoInteractions(photoRepository);
     }
 
     @Test
@@ -86,7 +78,6 @@ class PhotoServiceTest {
                 )
         );
 
-        verifyNoInteractions(storageService);
-        verify(photoRepository, never()).save(any());
+        verifyNoInteractions(uploadQueueService);
     }
 }
