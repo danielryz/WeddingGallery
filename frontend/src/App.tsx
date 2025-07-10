@@ -4,12 +4,14 @@ import { login } from './api/auth'
 function App() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    await login({ username, password })
+    await login({ username, password, name })
     setUsername('')
     setPassword('')
+    setName('')
   }
 
   return (
@@ -26,6 +28,11 @@ function App() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Password"
+        />
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Device Name"
         />
         <button type="submit">Login</button>
       </form>
