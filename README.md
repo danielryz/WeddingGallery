@@ -250,7 +250,8 @@ Administrative deletion of any comment. Also returns **204 No Content**.
 Reaction endpoints also require the `X-Client-Id` header along with the JWT token.
 
 ### POST `/api/photos/{photoId}/reactions`
-Add a reaction to a photo.
+Add a reaction to a photo. Each device can have only one reaction per photo;
+submitting another reaction will replace the previous one.
 
 Request:
 ```json
@@ -337,7 +338,8 @@ Response:
 ```
 
 ### POST `/api/chat/messages/{messageId}/reactions`
-Add an emoji reaction to a chat message.
+Add an emoji reaction to a chat message. Each device may react only once to a
+given message; submitting another reaction will replace the previous one.
 
 Request:
 ```json

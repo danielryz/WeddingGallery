@@ -87,4 +87,27 @@ class ReactionServiceTest {
         verify(reactionRepository, never()).delete(any());
         SecurityContextHolder.clearContext();
     }
+
+    @Test
+    void addReactionUpdatesExisting() {
+        HttpServletRequest req = mock(HttpServletRequest.class);
+        Photo photo = Photo.builder().id(5L).reactionCount(2).build();
+        Reaction existing = Reaction.builder()
+                .id(10L)
+                .photo(photo)
+                .device(adminDevice)
+                .type("like")
+                .build();
+
+        when(deviceService.getRequestingDevice(req)).thenReturn(adminDevice);
+        when(photoRepository.findById(5L)).thenReturn(Optional.of(photo));
+        when(reactionRepository.findByPhotoIdAndDeviceId(5L, 1L)).thenReturn(Optional.of(existing));
+        when(reactionRepository.save(existing)).thenReturn(existing);
+
+        reactionService.addReaction(5L, "heart", req);
+
+        verify(reactionRepository).save(existing);
+        verify(photoRepository, never()).save(any());
+        org.assertj.core.api.Assertions.assertThat(existing.getType()).isEqualTo("heart");
+    }
 }
