@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +54,14 @@ public class ChatReactionService {
         }
 
         reactionRepository.delete(reaction);
+    }
+
+    @Transactional
+    public List<ChatReactionResponse> getReactions(Long messageId) {
+        return reactionRepository.findByMessageIdOrderByCreatedAt(messageId)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     private ChatReactionResponse toResponse(ChatMessageReaction reaction) {
