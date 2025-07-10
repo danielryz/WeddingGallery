@@ -131,6 +131,24 @@ The `X-Client-Id` header from the login response must also be included.
 ### GET `/api/photos`
 Retrieve all visible photos. Results are paged and sorted by upload time in descending order by default.
 
+### GET `/api/photos/{id}`
+Return details for a single photo.
+Response:
+```json
+{
+  "id": 1,
+  "fileName": "img.jpg",
+  "description": "Our photo",
+  "uploadTime": "2025-01-01T12:00:00",
+  "commentCount": 0,
+  "reactionCount": 0,
+  "uploaderUsername": "alice",
+  "deviceId": 1,
+  "deviceName": "Phone",
+  "visible": true
+}
+```
+
 ### POST `/api/photos`
 Upload a single file using `multipart/form-data`.
 

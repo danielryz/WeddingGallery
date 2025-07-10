@@ -15,6 +15,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.util.UUID;
+import java.util.Optional;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -105,6 +107,28 @@ class PhotoServiceTest {
         when(deviceService.getRequestingDevice(req)).thenThrow(new AccessDeniedException("Client id mismatch"));
 
         assertThrows(AccessDeniedException.class, () -> photoService.savePhoto(file, null, req));
+    }
+
+    @Test
+    void getPhotoReturnsMappedResponse() {
+        Photo photo = Photo.builder()
+                .id(5L)
+                .fileName("img.jpg")
+                .description("desc")
+                .uploadTime(LocalDateTime.now())
+                .commentCount(1)
+                .reactionCount(2)
+                .uploader(device.getUser())
+                .device(device)
+                .visible(true)
+                .build();
+        when(photoRepository.findById(5L)).thenReturn(Optional.of(photo));
+
+        var response = photoService.getPhoto(5L);
+
+        assertThat(response.getId()).isEqualTo(5L);
+        assertThat(response.getFileName()).isEqualTo("img.jpg");
+        verify(photoRepository).findById(5L);
     }
 }
 

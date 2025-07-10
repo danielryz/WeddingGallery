@@ -43,6 +43,16 @@ public class PhotoController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get photo by id")
+    public ResponseEntity<PhotoResponse> getPhoto(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @PathVariable Long id
+    ) {
+        PhotoResponse response = photoService.getPhoto(id);
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Save a photo")
     public ResponseEntity<PhotoResponse> savePhoto(
