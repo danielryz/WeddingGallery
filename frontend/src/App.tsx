@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import Navbar from './components/Navbar'
 import { login } from './api/auth'
 import Home from './pages/Home'
 import GalleryPage from './pages/GalleryPage'
@@ -50,13 +51,16 @@ function App() {
   }
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/gallery" element={<GalleryPage />} />
-      <Route path="/photos/:id" element={<PhotoDetailPage />} />
-      <Route path="/chat" element={<ChatPage />} />
-      <Route path="/menu" element={<MenuPage />} />
-    </Routes>
+    <>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/gallery" element={<GalleryPage />} />
+        <Route path="/photos/:id" element={<PhotoDetailPage />} />
+        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/menu" element={<MenuPage />} />
+      </Routes>
+    </>
   )
 }
 
