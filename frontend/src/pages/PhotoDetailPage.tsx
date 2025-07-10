@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { getPhoto } from '../api/photos'
 import { getComments, addComment } from '../api/comments'
