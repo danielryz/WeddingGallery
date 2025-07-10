@@ -63,7 +63,8 @@ public class ReactionService {
                 reaction.getId(),
                 reaction.getType(),
                 reaction.getPhoto() != null ? reaction.getPhoto().getId() : null,
-                reaction.getDevice() != null ? reaction.getDevice().getId() : null
+                reaction.getDevice() != null ? reaction.getDevice().getId() : null,
+                reaction.getDevice() != null ? reaction.getDevice().getName() : null
         );
     }
 

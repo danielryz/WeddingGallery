@@ -86,7 +86,7 @@ public class AuthService {
                 device.getClientId().toString(),
                 shared.getRoles()
         );
-        return new AuthResponse(device.getClientId().toString(), token);
+        return new AuthResponse(device.getClientId().toString(), token, device.getName());
     }
 
 

@@ -54,7 +54,8 @@ public class ChatService {
                         : null,
                 message.getText(),
                 message.getCreatedAt(),
-                message.getDevice() != null ? message.getDevice().getId() : null
+                message.getDevice() != null ? message.getDevice().getId() : null,
+                message.getDevice() != null ? message.getDevice().getName() : null
         );
     }
 

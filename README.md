@@ -95,7 +95,8 @@ On success the response contains the device identifier and a JWT token:
 ```json
 {
   "clientId": "<uuid>",
-  "token": "<jwt>"
+  "token": "<jwt>",
+  "deviceName": "<name>"
 }
 ```
 Include this token in the `Authorization: Bearer <token>` header when calling secured endpoints.
@@ -195,7 +196,8 @@ Response:
   "text": "Beautiful photo!",
   "createdAt": "2025-01-01T12:00:00",
   "photoId": 1,
-  "deviceId": 1
+  "deviceId": 1,
+  "deviceName": "Phone"
 }
 ```
 
@@ -224,7 +226,8 @@ Response:
   "id": 1,
   "type": "heart",
   "photoId": 1,
-  "deviceId": 1
+  "deviceId": 1,
+  "deviceName": "Phone"
 }
 ```
 
@@ -258,7 +261,8 @@ Response:
   "username": "alice",
   "text": "Hello there",
   "createdAt": "2025-01-01T12:00:00",
-  "deviceId": 1
+  "deviceId": 1,
+  "deviceName": "Phone"
 }
 ```
 
@@ -276,7 +280,8 @@ Response:
       "username": "alice",
       "text": "Hello there",
       "createdAt": "2025-01-01T12:00:00",
-      "deviceId": 1
+      "deviceId": 1,
+      "deviceName": "Phone"
     }
   ]
 }

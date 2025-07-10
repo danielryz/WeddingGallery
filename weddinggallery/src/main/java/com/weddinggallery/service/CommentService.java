@@ -67,7 +67,8 @@ public class CommentService {
                 comment.getText(),
                 comment.getCreatedAt(),
                 comment.getPhoto() != null ? comment.getPhoto().getId() : null,
-                comment.getAuthor() != null ? comment.getAuthor().getId() : null
+                comment.getAuthor() != null ? comment.getAuthor().getId() : null,
+                comment.getAuthor() != null ? comment.getAuthor().getName() : null
         );
     }
 

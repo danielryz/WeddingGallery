@@ -12,5 +12,6 @@ public class ReactionResponse {
     private String type;
     private Long photoId;
     private Long deviceId;
+    private String deviceName;
 }
 
