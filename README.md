@@ -75,6 +75,21 @@ To execute the tests:
 ./mvnw test
 ```
 
+## Frontend development
+
+The React frontend lives in the `frontend` directory. To work on it run:
+
+```bash
+cd frontend
+npm install     # install dependencies
+npm run dev     # start the Vite dev server
+npm run build   # create a production build
+```
+
+Set the environment variable `VITE_API_URL` to point at the backend API base URL. It defaults to `http://localhost:8080` if not defined.
+
+See [`frontend/README.md`](frontend/README.md) for more details.
+
 ## Authentication API
 
 The application exposes a single authentication endpoint.
