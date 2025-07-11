@@ -7,16 +7,11 @@
   --cream-bg: #FDFBF5;
 }
 
+/* src/index.css – globalne style */
 body {
-  margin: 0;
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background-image: url('../assets/pagebackground.png');
-  background-size: cover;
-  background-position: center;
-}
-
-@media (max-width: 360px) {
-  body {
-    font-size: 14px;
-  }
+  margin: 0; /* usuń domyślny margines */
+  min-height: 100vh; /* min. wysokość całego widoku :contentReference[oaicite:8]{index=8} */
+  background: url("assets/pagebackground.png") no-repeat center;
+  background-attachment: scroll; /* tło przewija się ze stroną :contentReference[oaicite:9]{index=9} */
+  background-size: cover;       /* tło skaluje się, pokrywając całość :contentReference[oaicite:10]{index=10} */
 }
