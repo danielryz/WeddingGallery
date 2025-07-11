@@ -7,6 +7,7 @@ import GalleryPage from './pages/GalleryPage'
 import PhotoDetailPage from './pages/PhotoDetailPage'
 import ChatPage from './pages/ChatPage'
 import MenuPage from './pages/MenuPage'
+import UploadPage from "./pages/UploadPage.tsx";
 
 function App() {
   const [username, setUsername] = useState('')
@@ -56,9 +57,10 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/gallery" element={<GalleryPage />} />
-        <Route path="/photos/:id" element={<PhotoDetailPage />} />
+        <Route path="/photo/:id" element={<PhotoDetailPage />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/menu" element={<MenuPage />} />
+        <Route path="/upload" element={<UploadPage />} />
       </Routes>
     </>
   )

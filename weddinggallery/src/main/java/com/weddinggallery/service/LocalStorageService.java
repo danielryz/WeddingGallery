@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 @Profile("local")
 public class LocalStorageService implements StorageService {
-    @Value("${storage.local.path:photos}")
+    @Value("${storage.local.path:Z:\\WeddingGallery\\weddinggallery\\photos}")
     private String rootDir;
 
     private Path root;

@@ -1,121 +1,185 @@
-import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { getPhoto } from '../api/photos'
-import { getComments, addComment } from '../api/comments'
-import {
-  addReaction,
-  deleteReaction,
-  getReactionCounts,
-} from '../api/reactions'
-import type { PhotoResponse } from '../types/photo'
-import type { CommentResponse } from '../types/comment'
-import type { ReactionCountResponse, ReactionResponse } from '../types/reaction'
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getPhoto } from '../api/photos';
+import { getReactionCounts, addReaction } from '../api/reactions';
+import type {CommentResponse} from "../types/comment.ts";
+import {addComment, deleteComment, getComments} from "../api/comments.ts";
 
-function PhotoDetailPage() {
-  const { id } = useParams<{ id: string }>()
-  const photoId = id ? Number(id) : undefined
+const EMOJI_MAP: Record<string, string> = {
+  HEART: '❤️',
+  LAUGH: '😂',
+  WOW: '😮',
+  SAD: '😢',
+  ANGRY: '😡',
+  LIKE: '👍',
+  DISLIKE: '👎',
+};
 
-  const [photo, setPhoto] = useState<PhotoResponse>()
-  const [comments, setComments] = useState<CommentResponse[]>([])
-  const [commentText, setCommentText] = useState('')
-  const [reactions, setReactions] = useState<ReactionCountResponse[]>([])
-  const [myReaction, setMyReaction] = useState<ReactionResponse>()
+const PhotoDetailPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
+  const [photo, setPhoto] = useState<any | null>(null);
+  const [reactions, setReactions] = useState<Record<string, number>>({});
+  const [showPicker, setShowPicker] = useState(false);
+  const [comments, setComments] = useState<CommentResponse[]>([]);
+  const [newComment, setNewComment] = useState('');
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+  const loadPhoto = async () => {
+    const res = await getPhoto(Number(id));
+    setPhoto(res);
+  };
+
+  const loadReactions = async () => {
+    const counts = await getReactionCounts(Number(id));
+    const mapped = Object.fromEntries(
+        counts
+            .filter((r) => EMOJI_MAP[r.type])
+            .map((r) => [EMOJI_MAP[r.type], r.count])
+    );
+    setReactions(mapped);
+  };
+
+  const loadComments = async () => {
+    const res = await getComments(Number(id), 0, 50);
+    setComments(res.content);
+  };
+
+  const handleAddReaction = async (emoji: string) => {
+    const type = Object.entries(EMOJI_MAP).find(([, e]) => e === emoji)?.[0];
+    if (!type) return;
+    await addReaction(Number(id), { type });
+    await loadReactions();
+    setShowPicker(false);
+  };
+
+  const handleSendComment = async () => {
+    if (!newComment.trim()) return;
+    await addComment(Number(id), { text: newComment.trim() });
+    setNewComment('');
+    await loadComments();
+  };
+
+  const handleSendCommentEnter = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendComment();
+    }
+  };
+
+  const handleDeleteComment = async (commentId: number) => {
+    try {
+      await deleteComment(commentId);
+      await loadComments();
+    } catch (err: any) {
+      if (err?.response?.status === 403) {
+        alert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.');
+      } else {
+        console.error('Błąd usuwania komentarza:', err);
+      }
+    }
+  };
 
   useEffect(() => {
-    if (!photoId) return
-    getPhoto(photoId).then(setPhoto)
-    getComments(photoId).then((p) => setComments(p.content))
-    getReactionCounts(photoId).then(setReactions)
-  }, [photoId])
-
-  const handleAddComment = async () => {
-    if (!photoId || !commentText.trim()) return
-    const res = await addComment(photoId, { text: commentText })
-    setComments((prev) => [...prev, res])
-    setCommentText('')
-  }
-
-  const handleAddReaction = async (type: string) => {
-    if (!photoId) return
-    const res = await addReaction(photoId, { type })
-    setMyReaction(res)
-    getReactionCounts(photoId).then(setReactions)
-  }
-
-  const handleRemoveReaction = async () => {
-    if (!myReaction) return
-    await deleteReaction(myReaction.id)
-    setMyReaction(undefined)
-    if (photoId) {
-      getReactionCounts(photoId).then(setReactions)
+    if (id) {
+      loadPhoto();
+      loadReactions();
+      loadComments();
     }
-  }
+  }, [id]);
 
-  if (!photo) return <div>Loading...</div>
-
-  const rating = myReaction ? Number(myReaction.type) : 0
+  if (!photo) return <p className="text-center mt-6">Ładowanie...</p>;
 
   return (
-    <div>
-      <img
-        src={`/files/${photo.fileName}`}
-        alt={photo.description ?? ''}
-        style={{ maxWidth: '100%' }}
-      />
-      <p>{photo.description}</p>
+      <main className="p-4 max-w-md mx-auto">
+        <h1 className="text-xl font-semibold text-brown mb-4 text-center">Podgląd</h1>
 
-      <div>
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button
-            key={n}
-            type="button"
-            onClick={() => handleAddReaction(String(n))}
-            style={{
-              background: 'none',
-              border: 'none',
-              fontSize: '2rem',
-              cursor: 'pointer',
-            }}
-          >
-            {rating >= n ? '⭐' : '☆'}
-          </button>
-        ))}
-        <button type="button" onClick={handleRemoveReaction} disabled={!myReaction}>
-          Remove Rating
-        </button>
-      </div>
-
-      <ul>
-        {reactions.map((r) => (
-          <li key={r.type}>
-            {r.type}: {r.count}
-          </li>
-        ))}
-      </ul>
-
-      <div>
-        <h3>Comments</h3>
-        <ul>
-          {comments.map((c) => (
-            <li key={c.id}>
-              <strong>{c.deviceName}: </strong>
-              {c.text}
-            </li>
-          ))}
-        </ul>
-        <div>
-          <input
-            value={commentText}
-            onChange={(e) => setCommentText(e.target.value)}
-            placeholder="Add a comment"
-          />
-          <button type="button" onClick={handleAddComment}>
-            Post
-          </button>
+        <div className="w-full aspect-square overflow-hidden rounded-lg mb-4">
+          {photo.isVideo ? (
+              <video
+                  src={`${API_URL}/photos/${photo.fileName}`}
+                  controls
+                  className="w-full h-full object-contain"
+              />
+          ) : (
+              <img
+                  src={`${API_URL}/photos/${photo.fileName}`}
+                  alt="Photo"
+                  className="w-full h-full object-contain"
+              />
+          )}
         </div>
-      </div>
-    </div>
-  )
-}
 
-export default PhotoDetailPage
+        <div className="flex justify-center gap-2 mb-3 flex-wrap">
+          {Object.entries(reactions).map(([emoji, count]) => (
+              <div key={emoji} className="text-xl flex items-center gap-1">
+                <span>{emoji}</span>
+                <span className="text-sm">{count}</span>
+              </div>
+          ))}
+        </div>
+
+        <div className="flex justify-center mb-6">
+          {showPicker ? (
+              <div className="flex gap-2 bg-white shadow px-3 py-2 rounded-full">
+                {Object.values(EMOJI_MAP).map((emoji) => (
+                    <button
+                        key={emoji}
+                        onClick={() => handleAddReaction(emoji)}
+                        className="text-xl hover:scale-125 transition-transform"
+                    >
+                      {emoji}
+                    </button>
+                ))}
+              </div>
+          ) : (
+              <button
+                  onClick={() => setShowPicker(true)}
+                  className="px-4 py-2 rounded-full bg-gold text-white font-semibold text-sm"
+              >
+                Dodaj reakcję
+              </button>
+          )}
+        </div>
+
+        <section className="mt-6 space-y-4">
+          <h2 className="text-sm font-semibold text-brown">Komentarze</h2>
+
+          {comments.length === 0 ? (
+              <p className="text-sm text-gray-500">Brak komentarzy</p>
+          ) : (
+              <ul className="space-y-2">
+                {comments.map((comment) => (
+                    <li
+                        key={comment.id}
+                        className="bg-white p-2 rounded shadow-sm text-sm flex justify-between items-start"
+                    >
+                      <div>
+                        <div className="text-brown font-medium">{comment.deviceName}</div>
+                        <div>{comment.text}</div>
+                      </div>
+                      <button
+                          onClick={() => handleDeleteComment(comment.id)}
+                          className="text-gray-400 hover:text-red-600 text-xs ml-2"
+                          title="Usuń komentarz"
+                      >
+                        🗑️
+                      </button>
+                    </li>
+                ))}
+              </ul>
+          )}
+
+          <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyDown={handleSendCommentEnter}
+              placeholder="Dodaj komentarz…"
+              rows={2}
+              className="w-full border rounded-md p-2 text-sm focus:outline-none focus:ring focus:border-gold resize-none"
+          />
+        </section>
+      </main>
+  );
+};
+
+export default PhotoDetailPage;

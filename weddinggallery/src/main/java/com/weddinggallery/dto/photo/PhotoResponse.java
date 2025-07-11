@@ -20,5 +20,6 @@ public class PhotoResponse {
     private Long deviceId;
     private String deviceName;
     private boolean visible;
+    private boolean isVideo;
 }
 

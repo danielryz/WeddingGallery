@@ -1,4 +1,5 @@
 import axiosInstance from './axiosInstance'
+import type { AxiosProgressEvent } from 'axios';
 import type {
   PhotoResponse,
   PhotoDescriptionUpdateRequest,
@@ -54,12 +55,19 @@ export const savePhoto = async (file: File, description?: string): Promise<void>
   await axiosInstance.post('/api/photos', form)
 }
 
-export const savePhotos = async (files: File[], descriptions?: string[]): Promise<void> => {
-  const form = new FormData()
-  files.forEach((f) => form.append('files', f))
-  descriptions?.forEach((d) => form.append('descriptions', d))
-  await axiosInstance.post('/api/photos/batch', form)
-}
+export const savePhotos = async (
+    files: File[],
+    descriptions?: string[],
+    onUploadProgress?: (progressEvent: AxiosProgressEvent) => void
+): Promise<void> => {
+  const form = new FormData();
+  files.forEach((f) => form.append('files', f));
+  descriptions?.forEach((d) => form.append('descriptions', d));
+
+  await axiosInstance.post('/api/photos/batch', form, {
+    onUploadProgress,
+  });
+};
 
 export const deletePhoto = async (id: number): Promise<void> => {
   await axiosInstance.delete(`/api/photos/${id}`)
@@ -77,15 +85,15 @@ export const downloadArchive = async (): Promise<Blob> => {
 export const updateDescription = async (
   id: number,
   data: PhotoDescriptionUpdateRequest,
-): Promise<PhotoResponse> => {
-  const res = await axiosInstance.put<PhotoResponse>(`/api/photos/${id}/description`, data)
-  return res.data
+): Promise<String> => {
+  await axiosInstance.put<PhotoResponse>(`/api/photos/${id}/description`, data)
+  return "Opis został zaktualizowany."
 }
 
 export const updateVisibility = async (
   id: number,
   data: PhotoVisibilityUpdateRequest,
-): Promise<PhotoResponse> => {
-  const res = await axiosInstance.put<PhotoResponse>(`/api/photos/${id}/visibility`, data)
-  return res.data
+): Promise<String> => {
+  await axiosInstance.put<PhotoResponse>(`/api/photos/${id}/visibility`, data)
+  return "Zdjęcie zostało usunięte."
 }

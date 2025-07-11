@@ -94,9 +94,7 @@ public class PhotoService {
         if (extensions != null) {
             spec = spec.and(PhotoSpecifications.withExtensions(extensions));
         }
-        return photoRepository
-                .findAll(spec, pageRequest)
-                .map(this::toResponse);
+        return photoRepository.findAll(spec, pageRequest).map(photo -> toResponse(photo, isVideo(photo.getFileName())));
     }
 
     public Page<PhotoResponse> getPhotos(Pageable pageable, Sort sort, String type) {
@@ -108,6 +106,7 @@ public class PhotoService {
                 extensions = ALLOWED_VIDEO_EXTENSIONS;
             }
         }
+
 
         PageRequest pageRequest = PageRequest.of(
                 pageable.getPageNumber(),
@@ -121,14 +120,14 @@ public class PhotoService {
         }
         return photoRepository
                 .findAll(spec, pageRequest)
-                .map(this::toResponse);
+                .map(photo -> toResponse(photo, isVideo(photo.getFileName())));
     }
 
     @Transactional
     public PhotoResponse getPhoto(Long id) {
         Photo photo = photoRepository.findById(id)
                 .orElseThrow(() -> new AccessDeniedException("Photo not found"));
-        return toResponse(photo);
+        return toResponse(photo, isVideo(photo.getFileName()));
     }
 
     public void savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
@@ -208,7 +207,7 @@ public class PhotoService {
     }
 
     @Transactional
-    public PhotoResponse updatePhotoDescription(Long id, String description, HttpServletRequest request){
+    public void updatePhotoDescription(Long id, String description, HttpServletRequest request){
         Device device = deviceService.getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
@@ -222,11 +221,11 @@ public class PhotoService {
         }
 
         photo.setDescription(description);
-        return toResponse(photoRepository.save(photo));
+
     }
 
     @Transactional
-    public PhotoResponse updatePhotoVisibility(Long id, boolean visible, HttpServletRequest request){
+    public void updatePhotoVisibility(Long id, boolean visible, HttpServletRequest request){
         Device device = deviceService.getRequestingDevice(request);
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
@@ -240,7 +239,7 @@ public class PhotoService {
         }
 
         photo.setVisible(visible);
-        return toResponse(photoRepository.save(photo));
+        photoRepository.save(photo);
     }
 
     public void streamAllPhotosZip(HttpServletResponse response) throws IOException {
@@ -283,7 +282,12 @@ public class PhotoService {
         return photoRepository.save(photo);
     }
 
-    private PhotoResponse toResponse(Photo photo) {
+    private boolean isVideo(String fileName) {
+        String ext = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();
+        return ALLOWED_VIDEO_EXTENSIONS.contains(ext);
+    }
+
+    private PhotoResponse toResponse(Photo photo, boolean isVideo) {
         return new PhotoResponse(
                 photo.getId(),
                 photo.getFileName(),
@@ -294,7 +298,8 @@ public class PhotoService {
                 photo.getUploader() != null ? photo.getUploader().getUsername() : null,
                 photo.getDevice() != null ? photo.getDevice().getId() : null,
                 photo.getDevice() != null ? photo.getDevice().getName() : null,
-                photo.isVisible()
+                photo.isVisible(),
+                isVideo
         );
     }
 

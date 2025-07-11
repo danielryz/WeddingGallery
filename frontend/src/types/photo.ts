@@ -9,6 +9,7 @@ export interface PhotoResponse {
   deviceId: number;
   deviceName: string;
   visible: boolean;
+  isVideo: boolean;
 }
 
 export interface PhotoDescriptionUpdateRequest {

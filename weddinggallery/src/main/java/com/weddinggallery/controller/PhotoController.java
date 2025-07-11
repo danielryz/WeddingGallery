@@ -132,26 +132,26 @@ public class PhotoController {
 
     @PutMapping("/{id}/description")
     @Operation(summary = "Update photo description")
-    public ResponseEntity<PhotoResponse> updateDescription(
+    public ResponseEntity<String> updateDescription(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @PathVariable Long id,
             @RequestBody PhotoDescriptionUpdateRequest updateRequest,
             HttpServletRequest request
     ) {
-        PhotoResponse response = photoService.updatePhotoDescription(id, updateRequest.getDescription(), request);
-        return ResponseEntity.ok(response);
+        photoService.updatePhotoDescription(id, updateRequest.getDescription(), request);
+        return ResponseEntity.ok("Description updated successfully.");
     }
 
     @PutMapping("/{id}/visibility")
     @Operation(summary = "Update photo visibility")
-    public ResponseEntity<PhotoResponse> updateVisibility(
+    public ResponseEntity<String> updateVisibility(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @PathVariable Long id,
             @RequestBody PhotoVisibilityUpdateRequest updateRequest,
             HttpServletRequest request
     ) {
-        PhotoResponse response = photoService.updatePhotoVisibility(id, updateRequest.isVisible(), request);
-        return ResponseEntity.ok(response);
+        photoService.updatePhotoVisibility(id, updateRequest.isVisible(), request);
+        return ResponseEntity.ok("Visibility updated successfully.");
     }
 
 
