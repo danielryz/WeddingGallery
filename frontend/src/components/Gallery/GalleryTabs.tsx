@@ -33,7 +33,7 @@ const GalleryTabs: React.FC = () => {
                         const counts = await getReactionCounts(item.id);
                         reactions = Object.fromEntries(
                             counts
-                                .filter((r) => EMOJI_MAP[r.type]) // tylko znane typy
+                                .filter((r) => EMOJI_MAP[r.type])
                                 .map((r) => [EMOJI_MAP[r.type], r.count])
                         );
                     } catch (err) {
@@ -42,7 +42,8 @@ const GalleryTabs: React.FC = () => {
 
                     return {
                         id: item.id,
-                        isVideo: item.isVideo,
+                        // support both `isVideo` and legacy `video` property
+                        isVideo: item.isVideo ?? (item as { video?: boolean }).video ?? false,
                         src: `${API_URL}/photos/${item.fileName}`,
                         commentCount: item.commentCount,
                         reactions,
