@@ -9,5 +9,6 @@ public class AuthResponse {
     private String clientId;
     private String token;
     private String deviceName;
+    private Long deviceId;
 }
 
