@@ -3,6 +3,7 @@ package com.weddinggallery.dto.photo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,8 @@ public class PhotoResponse {
     private Long deviceId;
     private String deviceName;
     private boolean visible;
+
+    @JsonProperty("isVideo")
     private boolean isVideo;
 }
 

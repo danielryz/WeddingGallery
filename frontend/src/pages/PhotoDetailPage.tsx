@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { getPhoto } from '../api/photos';
+import type { PhotoResponse } from '../types/photo';
 import { getReactionCounts, addReaction } from '../api/reactions';
 import type {CommentResponse} from "../types/comment.ts";
 import {addComment, deleteComment, getComments} from "../api/comments.ts";
@@ -17,7 +18,7 @@ const EMOJI_MAP: Record<string, string> = {
 
 const PhotoDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [photo, setPhoto] = useState<any | null>(null);
+  const [photo, setPhoto] = useState<PhotoResponse | null>(null);
   const [reactions, setReactions] = useState<Record<string, number>>({});
   const [showPicker, setShowPicker] = useState(false);
   const [comments, setComments] = useState<CommentResponse[]>([]);
@@ -26,7 +27,11 @@ const PhotoDetailPage: React.FC = () => {
 
   const loadPhoto = async () => {
     const res = await getPhoto(Number(id));
-    setPhoto(res);
+    // fallback for older backend versions returning `video` field
+    setPhoto({
+      ...res,
+      isVideo: res.isVideo ?? (res as { video?: boolean }).video ?? false,
+    });
   };
 
   const loadReactions = async () => {
@@ -70,8 +75,8 @@ const PhotoDetailPage: React.FC = () => {
     try {
       await deleteComment(commentId);
       await loadComments();
-    } catch (err: any) {
-      if (err?.response?.status === 403) {
+    } catch (err: unknown) {
+      if ((err as { response?: { status?: number } })?.response?.status === 403) {
         alert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.');
       } else {
         console.error('Błąd usuwania komentarza:', err);
@@ -85,6 +90,8 @@ const PhotoDetailPage: React.FC = () => {
       loadReactions();
       loadComments();
     }
+    // id is sufficient here; the helper functions do not change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   if (!photo) return <p className="text-center mt-6">Ładowanie...</p>;

@@ -85,7 +85,7 @@ export const downloadArchive = async (): Promise<Blob> => {
 export const updateDescription = async (
   id: number,
   data: PhotoDescriptionUpdateRequest,
-): Promise<String> => {
+): Promise<string> => {
   await axiosInstance.put<PhotoResponse>(`/api/photos/${id}/description`, data)
   return "Opis został zaktualizowany."
 }
@@ -93,7 +93,7 @@ export const updateDescription = async (
 export const updateVisibility = async (
   id: number,
   data: PhotoVisibilityUpdateRequest,
-): Promise<String> => {
+): Promise<string> => {
   await axiosInstance.put<PhotoResponse>(`/api/photos/${id}/visibility`, data)
   return "Zdjęcie zostało usunięte."
 }
