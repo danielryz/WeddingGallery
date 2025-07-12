@@ -52,7 +52,7 @@ public class SecurityConfig {
                                         "/v3/api-docs",
                                         "/v3/api-docs/**",
                                         "/error",
-                                        "/photos",
+                                        "/ws/**",
                                         "/photos/**"
                                 ).permitAll()
                                 .anyRequest().authenticated())

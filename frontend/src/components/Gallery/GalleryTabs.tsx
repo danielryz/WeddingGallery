@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import GalleryGrid, {type GalleryItemData } from './GalleryGrid';
 import { getPhotos } from '../../api/photos';
 import { getReactionCounts } from '../../api/reactions';
+import './GalleryTabs.css';
 
 type MediaType = 'image' | 'video';
 
@@ -23,17 +24,13 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
     const fetchItems = async (type: MediaType) => {
         setLoading(true);
         try {
-            // Pobierz listę zdjęć lub filmów z API
             const res = await getPhotos(0, 40, 'uploadTime', 'desc', type);
-            // Dla każdego elementu pobierz podsumowanie reakcji i sformatuj dane do wyświetlenia
-            const itemsWithReactions = await Promise.all(res.content.map(async (item) => {
+            const itemsWithReactions = await Promise.all(res.content.map(async item => {
                 let reactions: Record<string, number> = {};
                 try {
                     const counts = await getReactionCounts(item.id);
                     reactions = Object.fromEntries(
-                        counts
-                            .filter(r => EMOJI_MAP[r.type])
-                            .map(r => [EMOJI_MAP[r.type], r.count])
+                        counts.filter(r => EMOJI_MAP[r.type]).map(r => [EMOJI_MAP[r.type], r.count])
                     );
                 } catch (err) {
                     console.warn(`Brak reakcji dla photo ${item.id}`, err);
@@ -58,17 +55,17 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
     }, [activeTab]);
 
     return (
-        <div className="w-full">
+        <div className="gallery-tabs">
             {/* Zakładki */}
-            <div className="flex justify-center mb-4">
+            <div className="tabs-header">
                 <button
-                    className={`px-4 py-2 border-b-2 ${activeTab === 'image' ? 'border-gold text-brown' : 'border-transparent text-gray-500'}`}
+                    className={`tab-button ${activeTab === 'image' ? 'active' : ''}`}
                     onClick={() => setActiveTab('image')}
                 >
                     Zdjęcia
                 </button>
                 <button
-                    className={`px-4 py-2 border-b-2 ${activeTab === 'video' ? 'border-gold text-brown' : 'border-transparent text-gray-500'}`}
+                    className={`tab-button ${activeTab === 'video' ? 'active' : ''}`}
                     onClick={() => setActiveTab('video')}
                 >
                     Filmy
@@ -77,7 +74,7 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
 
             {/* Zawartość galerii */}
             {loading ? (
-                <p className="text-center text-brown">Ładowanie...</p>
+                <p className="loading-text">Ładowanie...</p>
             ) : (
                 <GalleryGrid items={items} onItemClick={onItemClick} />
             )}

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './LoginPage.css';
 
 interface LoginPageProps {
     onLogin: (username: string, password: string, name?: string) => void;
@@ -12,19 +13,18 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onLogin(username, password, deviceName);
-        // (Ewentualna obsługa błędów logowania jest w App.onLogin)
     };
 
     return (
-        <main className="min-h-screen flex items-center justify-center p-4 bg-cream">
-            <div className="bg-white/90 backdrop-blur-md p-6 rounded-xl shadow-lg w-full max-w-sm">
-                <h1 className="text-3xl font-elegant text-brown text-center mb-6">
-                    Anna &amp; Adam <br /><span className="text-lg font-normal">09.06.2024</span>
+        <main className="login-page">
+            <div className="login-box">
+                <h1 className="login-title">
+                    Anna &amp; Adam <br /><span className="login-date">09.06.2024</span>
                 </h1>
-                <form onSubmit={handleSubmit} className="flex flex-col items-center">
+                <form onSubmit={handleSubmit} className="login-form">
                     <input
                         type="text"
-                        className="w-full mb-3 border border-brown rounded px-3 py-2 focus:outline-none focus:ring focus:border-gold"
+                        className="login-input"
                         placeholder="Login"
                         value={username}
                         onChange={e => setUsername(e.target.value)}
@@ -32,7 +32,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                     />
                     <input
                         type="password"
-                        className="w-full mb-3 border border-brown rounded px-3 py-2 focus:outline-none focus:ring focus:border-gold"
+                        className="login-input"
                         placeholder="Hasło"
                         value={password}
                         onChange={e => setPassword(e.target.value)}
@@ -40,16 +40,13 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                     />
                     <input
                         type="text"
-                        className="w-full mb-4 border border-brown rounded px-3 py-2 focus:outline-none focus:ring focus:border-gold"
+                        className="login-input login-input-last"
                         placeholder="Imię (nazwa urządzenia)"
                         value={deviceName}
                         onChange={e => setDeviceName(e.target.value)}
                         required
                     />
-                    <button
-                        type="submit"
-                        className="w-full bg-gold text-white font-semibold px-4 py-2 rounded hover:opacity-90"
-                    >
+                    <button type="submit" className="login-button">
                         Zaloguj
                     </button>
                 </form>

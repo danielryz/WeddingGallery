@@ -1,0 +1,125 @@
+.chat-page {
+    padding: 16px;
+}
+
+.chat-title {
+    font-size: 1.25rem;
+    font-family: 'Playfair Display', serif;
+    color: #5A4633;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.chat-messages {
+    margin-bottom: 16px;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.chat-message.own {
+    align-items: flex-end;
+}
+
+.chat-bubble {
+    position: relative;
+    max-width: 80%;
+    padding: 12px;
+    border-radius: 12px;
+}
+
+.chat-bubble.own {
+    background-color: #D4AF37;
+    color: #FFFFFF;
+}
+
+.chat-bubble.other {
+    background-color: #FFFFFF;
+    color: #5A4633;
+}
+
+.chat-sender-name {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.emoji-picker {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    background-color: #FFFFFF;
+    border-radius: 9999px;
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+    padding: 8px 12px;
+    display: flex;
+    gap: 8px;
+    z-index: 50;
+}
+
+.emoji-picker button {
+    font-size: 20px;
+    transition: transform 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.emoji-picker button:hover {
+    transform: scale(1.25);
+}
+
+.reaction-summary {
+    margin-top: 4px;
+    font-size: 12px;
+    display: flex;
+    color: #5A4633;
+}
+
+.reaction-summary.own {
+    justify-content: flex-end;
+}
+
+.reaction-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.chat-input-area {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chat-input {
+    flex: 1 1 0%;
+    border: 1px solid #CCCCCC;
+    border-radius: 4px;
+    padding: 8px 12px;
+    font-size: 14px;
+}
+
+.chat-input:focus {
+    outline: none;
+    border-color: #D4AF37;
+}
+
+.chat-send-button {
+    padding: 8px 16px;
+    background-color: #D4AF37;
+    color: #FFFFFF;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chat-send-button:hover {
+    opacity: 0.9;
+}

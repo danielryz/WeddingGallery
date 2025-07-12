@@ -1,27 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Client, type StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
-import { addChatReaction, getChatReactionSummary, sendChatMessage } from '../api/chat';
-import type { ChatMessageResponse, ChatReactionCountResponse } from '../types/chat';
+import {
+  addChatReaction,
+  getChatReactionSummary,
+  sendChatMessage,
+  getChatMessages
+} from '../api/chat';
+import type {ChatMessageResponse, ChatReactionCountResponse} from '../types/chat';
+import './ChatPage.css';
 
 function ChatMessage({ message }: { message: ChatMessageResponse }) {
   const [reactions, setReactions] = useState<ChatReactionCountResponse[]>([]);
   const [showPicker, setShowPicker] = useState(false);
   const [holdTimeout, setHoldTimeout] = useState<NodeJS.Timeout | null>(null);
-  const localName = localStorage.getItem('deviceName');
-
-  // Sprawdź, czy wiadomość jest wysłana przez aktualnego użytkownika
-  const isOwn = message.deviceName === localName;
+  const localDeviceId = Number(localStorage.getItem('deviceId'));
+  const isOwn = message.deviceId === localDeviceId;
 
   useEffect(() => {
-    // Pobierz podsumowanie reakcji dla wiadomości
     getChatReactionSummary(message.id).then(setReactions);
   }, [message.id]);
 
   const handleReactionSelect = async (emoji: string) => {
     try {
       await addChatReaction(message.id, { emoji });
-      // Po dodaniu reakcji odśwież lokalne podsumowanie reakcji
       setReactions(await getChatReactionSummary(message.id));
     } catch (err) {
       console.error('Błąd dodawania reakcji do wiadomości:', err);
@@ -30,41 +32,36 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
     }
   };
 
-  // Pokaż selektor emoji po przytrzymaniu 0.4s
   const handleHoldStart = () => {
     const timeout = setTimeout(() => setShowPicker(true), 400);
     setHoldTimeout(timeout);
   };
-  // Anuluj pokazanie selektora jeśli puszczono wcześniej
   const handleHoldEnd = () => {
     if (holdTimeout) clearTimeout(holdTimeout);
   };
 
-  // Lista dostępnych emoji reakcji (pełen zestaw jak w galerii)
   const EMOJIS = ['❤️', '😂', '😮', '😢', '😡', '👍', '👎'];
 
   return (
       <div
-          className={`flex flex-col ${isOwn ? 'items-end' : 'items-start'} mb-4`}
+          className={`chat-message ${isOwn ? 'own' : ''}`}
           onMouseDown={handleHoldStart}
           onMouseUp={handleHoldEnd}
           onTouchStart={handleHoldStart}
           onTouchEnd={handleHoldEnd}
       >
         {/* Pojedynczy dymek wiadomości */}
-        <div className={`relative max-w-[80%] p-3 rounded-xl ${isOwn ? 'bg-gold text-white' : 'bg-white text-brown'}`}>
+        <div className={`chat-bubble ${isOwn ? 'own' : 'other'}`}>
           {!isOwn && (
-              <div className="text-xs font-bold mb-1">{message.deviceName}</div>
+              <div className="chat-sender-name">{message.deviceName}</div>
           )}
           <div>{message.text}</div>
-          {/* Selektor emoji (reakcje) wyświetlany po przytrzymaniu wiadomości */}
           {showPicker && (
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 bg-white rounded-full shadow-lg px-3 py-2 flex space-x-2 z-50">
+              <div className="emoji-picker">
                 {EMOJIS.map(emoji => (
                     <button
                         key={emoji}
                         onClick={() => handleReactionSelect(emoji)}
-                        className="text-xl hover:scale-125 transition-transform"
                     >
                       {emoji}
                     </button>
@@ -74,9 +71,9 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
         </div>
         {/* Podsumowanie reakcji pod wiadomością */}
         {reactions.length > 0 && (
-            <div className={`mt-1 text-xs flex space-x-2 ${isOwn ? 'justify-end' : ''}`}>
+            <div className={`reaction-summary ${isOwn ? 'own' : ''}`}>
               {reactions.map(r => (
-                  <span key={r.emoji} className="flex items-center space-x-1">
+                  <span key={r.emoji} className="reaction-item">
               <span>{r.emoji}</span>
               <span>{r.count}</span>
             </span>
@@ -93,16 +90,21 @@ const ChatPage: React.FC = () => {
   const subRef = useRef<StompSubscription | null>(null);
   const clientRef = useRef<Client | null>(null);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
   useEffect(() => {
-    // Inicjalizacja klienta STOMP (SockJS)
+    // Pobierz historię wiadomości z paginacją (ustaw wysoki rozmiar)
+    getChatMessages(0, 1000)
+        .then(page => setMessages(page.content))
+        .catch(err => console.error('Błąd pobierania historii czatu:', err));
+
     if (!clientRef.current) {
       clientRef.current = new Client({
-        webSocketFactory: () => new SockJS('/ws'),
+        webSocketFactory: () => new SockJS(`${API_URL}/ws`),
         reconnectDelay: 5000
       });
     }
     const client = clientRef.current;
-    // Funkcja subskrypcji na temat czatu
     const subscribe = () => {
       subRef.current = client.subscribe('/topic/chat', frame => {
         try {
@@ -113,7 +115,6 @@ const ChatPage: React.FC = () => {
         }
       });
     };
-    // Po połączeniu (lub jeśli już połączony) – subskrybuj
     if (client.connected) {
       subscribe();
     } else {
@@ -122,7 +123,6 @@ const ChatPage: React.FC = () => {
         client.activate();
       }
     }
-    // Sprzątanie po odmontowaniu – anuluj subskrypcję
     return () => {
       subRef.current?.unsubscribe();
     };
@@ -139,27 +139,24 @@ const ChatPage: React.FC = () => {
   };
 
   return (
-      <main className="p-4">
-        <h1 className="text-xl font-elegant text-brown text-center mb-4">Czat</h1>
+      <main className="chat-page">
+        <h1 className="chat-title">Czat</h1>
         {/* Obszar wiadomości */}
-        <div className="mb-4">
+        <div className="chat-messages">
           {messages.map(m => (
               <ChatMessage key={m.id} message={m} />
           ))}
         </div>
         {/* Pole wpisywania nowej wiadomości */}
-        <div className="flex items-center space-x-2">
+        <div className="chat-input-area">
           <input
-              className="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring focus:border-gold"
+              className="chat-input"
               type="text"
               value={text}
               onChange={e => setText(e.target.value)}
               placeholder="Napisz wiadomość..."
           />
-          <button
-              onClick={handleSend}
-              className="px-4 py-2 bg-gold text-white rounded hover:opacity-90"
-          >
+          <button onClick={handleSend} className="chat-send-button">
             Wyślij
           </button>
         </div>
