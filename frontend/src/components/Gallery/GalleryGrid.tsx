@@ -19,10 +19,9 @@ const GalleryGrid: React.FC<GalleryGridProps> = ({ items, onItemClick }) => {
     if (!items || items.length === 0) {
         return <p className="text-center text-brown mt-6">Brak zawartości w galerii.</p>;
     }
-
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {items.map((item) => (
+            {items.map(item => (
                 <GalleryItem key={item.id} item={item} onItemClick={onItemClick} />
             ))}
         </div>

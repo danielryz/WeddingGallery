@@ -17,16 +17,17 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
     const [reactionTimeout, setReactionTimeout] = useState<NodeJS.Timeout | null>(null);
 
     const handleHoldStart = () => {
-        const timeout = setTimeout(() => {
-            setShowReactions(true);
-        }, 400); // przytrzymanie 0.4s
+        // Po przytrzymaniu przez 400ms pokaż selektor emotikon
+        const timeout = setTimeout(() => setShowReactions(true), 400);
         setReactionTimeout(timeout);
     };
 
     const handleHoldEnd = () => {
+        // Anuluj pokazanie reakcji, jeśli przycisk został zwolniony wcześniej
         if (reactionTimeout) clearTimeout(reactionTimeout);
     };
 
+    // Renderuj obraz lub miniaturę filmu
     const renderMedia = () => {
         if (item.isVideo) {
             return (
@@ -34,17 +35,15 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
                     <video
                         src={item.src}
                         className="w-full h-full object-cover"
-                        preload="metadata"
-                        muted
-                        playsInline
+                        preload="metadata" muted playsInline
                     />
+                    {/* Ikona "play" na środku miniatury filmu */}
                     <div className="absolute inset-0 flex items-center justify-center">
                         <span className="text-white text-4xl drop-shadow">▶</span>
                     </div>
                 </div>
             );
         }
-
         return (
             <img
                 src={item.src}
@@ -65,6 +64,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
         >
             {renderMedia()}
 
+            {/* Selektor reakcji (emotikony) wyświetlany po przytrzymaniu */}
             {showReactions && (
                 <ReactionSelector
                     photoId={item.id}
@@ -73,22 +73,19 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
                 />
             )}
 
-            {/* Dolny pasek: komentarze + reakcje */}
-            <div className="absolute bottom-1 left-1 w-auto bg-black/60 text-white text-xs px-2 py-1 rounded flex items-center space-x-3 backdrop-blur-sm">
+            {/* Dolny pasek informacji: liczba komentarzy + skrótowe reakcje */}
+            <div className="absolute bottom-1 left-1 px-2 py-1 text-xs text-white bg-black/60 backdrop-blur-sm
+                      rounded flex items-center space-x-3">
                 <div className="flex items-center space-x-1">
                     <span>💬</span>
                     <span>{item.commentCount}</span>
                 </div>
-
-                {item.reactions &&
-                    Object.entries(item.reactions)
-                        .slice(0, 3)
-                        .map(([emoji, count]) => (
-                            <div key={emoji} className="flex items-center space-x-1">
-                                <span>{emoji}</span>
-                                <span>{count}</span>
-                            </div>
-                        ))}
+                {Object.entries(item.reactions).slice(0, 3).map(([emoji, count]) => (
+                    <div key={emoji} className="flex items-center space-x-1">
+                        <span>{emoji}</span>
+                        <span>{count}</span>
+                    </div>
+                ))}
             </div>
         </div>
     );
