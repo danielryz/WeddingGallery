@@ -1,9 +1,0 @@
-/* src/HomePage.module.css – moduł CSS dla strony głównej */
-.homePageWrapper {
-    min-height: 100vh; /* wypełnij minimum cały ekran wysokościowo :contentReference[oaicite:14]{index=14} */
-    background-image: url("assets/pagebackground.png");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-attachment: scroll;
-    background-size: cover; /* skalowanie, aby pokryć cały wrapper :contentReference[oaicite:15]{index=15} */
-}

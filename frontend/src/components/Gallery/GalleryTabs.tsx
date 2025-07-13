@@ -25,24 +25,30 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
         setLoading(true);
         try {
             const res = await getPhotos(0, 40, 'uploadTime', 'desc', type);
-            const itemsWithReactions = await Promise.all(res.content.map(async item => {
-                let reactions: Record<string, number> = {};
-                try {
-                    const counts = await getReactionCounts(item.id);
-                    reactions = Object.fromEntries(
-                        counts.filter(r => EMOJI_MAP[r.type]).map(r => [EMOJI_MAP[r.type], r.count])
-                    );
-                } catch (err) {
-                    console.warn(`Brak reakcji dla photo ${item.id}`, err);
-                }
-                return {
-                    id: item.id,
-                    isVideo: item.isVideo ?? (item as { video?: boolean }).video ?? false,
-                    src: `${API_URL}/photos/${item.fileName}`,
-                    commentCount: item.commentCount,
-                    reactions
-                };
-            }));
+            // Mapujemy dane zdjęć/filmów wraz z reakcjami
+            const itemsWithReactions = await Promise.all(
+                res.content.map(async item => {
+                    let reactions: Record<string, number> = {};
+                    try {
+                        const counts = await getReactionCounts(item.id);
+                        reactions = Object.fromEntries(
+                            counts
+                                .filter(r => EMOJI_MAP[r.type])  // tylko obsługiwane reakcje
+                                .map(r => [EMOJI_MAP[r.type], r.count])
+                        );
+                    } catch (err) {
+                        console.warn(`Brak reakcji dla photo ${item.id}`, err);
+                    }
+                    return {
+                        id: item.id,
+                        isVideo: item.isVideo ?? (item as { video?: boolean }).video ?? false,
+                        src: `${API_URL}/photos/${item.fileName}`,
+                        commentCount: item.commentCount,
+                        reactionCount: item.reactionCount,
+                        reactions
+                    };
+                })
+            );
             setItems(itemsWithReactions);
         } catch (err) {
             console.error('Błąd pobierania galerii:', err);
@@ -56,7 +62,7 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
 
     return (
         <div className="gallery-tabs">
-            {/* Zakładki */}
+            {/* Pasek zakładek */}
             <div className="tabs-header">
                 <button
                     className={`tab-button ${activeTab === 'image' ? 'active' : ''}`}

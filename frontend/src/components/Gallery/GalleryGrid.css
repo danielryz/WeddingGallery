@@ -3,19 +3,19 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 12px;
 }
-
+/* Więcej kolumn na większych ekranach dla lepszego wykorzystania przestrzeni */
 @media (min-width: 640px) {
     .gallery-grid {
         grid-template-columns: repeat(3, 1fr);
     }
 }
-
 @media (min-width: 768px) {
     .gallery-grid {
         grid-template-columns: repeat(4, 1fr);
     }
 }
 
+/* Komunikat pustej galerii */
 .empty-msg {
     text-align: center;
     color: #5A4633;

@@ -10,7 +10,8 @@
 /* src/index.css – globalne style */
 body {
   min-height: 100vh;
-  background: url("frontend/src/assets/pagebackground.png") no-repeat center center;
+  background: url("./assets/pagebackground.png") no-repeat center center;
   background-size: cover;
   background-attachment: fixed; /* tło nie przewija się */
 }
+

@@ -21,6 +21,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import com.weddinggallery.util.BufferedMultipartFile;
 
+import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.Set;
 
@@ -29,13 +34,18 @@ import java.time.LocalDateTime;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.web.server.ResponseStatusException;
 
+import javax.imageio.ImageIO;
 import java.io.InputStream;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -261,7 +271,55 @@ public class PhotoService {
         }
     }
 
-    private Photo savePhotoEntity(MultipartFile file, String description, HttpServletRequest request) throws IOException {
+    public byte[] getFramedPhoto(Long photoId) throws IOException {
+        Photo photo = photoRepository.findById(photoId)
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Photo not found" +  photoId));
+        try {
+            InputStream in = storageService.open(photo.getFileName());
+            BufferedImage src = ImageIO.read(in);
+            BufferedImage framed = addFrameAndText(src, photo.getDescription(), photo.getDevice() != null ? photo.getDevice().getName() : null);
+
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                ImageIO.write(framed, "png", baos);
+                return baos.toByteArray();
+            }
+            }catch (IOException ex) {
+            log.error("Error generating framed photo {}", photoId, ex);
+            throw new ResponseStatusException(INTERNAL_SERVER_ERROR, "Error generating framed photo", ex);
+        }
+    }
+
+    public void streamAllPhotosWithDescriptionZip(HttpServletResponse response) throws IOException {
+        List<Photo> photos = photoRepository.findAll();
+        response.setContentType("application/zip");
+        response.setHeader("Content-Disposition", "attachment; filename=media_with_descriptions.zip");
+        try (ZipOutputStream zos = new ZipOutputStream(response.getOutputStream())) {
+            for (Photo photo : photos) {
+                String fn = photo.getFileName();
+                String ext = StringUtils.getFilenameExtension(fn);
+
+                if (ext != null && StorageService.isImageExtension(ext)){
+                    byte[] pngBytes = getFramedPhoto(photo.getId());
+                    zos.putNextEntry(new ZipEntry("photo-" + photo.getId() + ".png"));
+                    zos.write(pngBytes);
+                    zos.closeEntry();
+                } else {
+                    try (InputStream in = storageService.open(fn)) {
+                        zos.putNextEntry(new ZipEntry("video-" + photo.getId() + "." + ext));
+                        in.transferTo(zos);
+                        zos.closeEntry();
+                    }
+                }
+            }
+            zos.finish();
+        }catch (IOException ex) {
+            log.error("Error streaming ZIP file", ex);
+            throw new RuntimeException("Failed to create ZIP", ex);
+        }
+
+    }
+
+    private void savePhotoEntity(MultipartFile file, String description, HttpServletRequest request) throws IOException {
         Device device = deviceService.getRequestingDevice(request);
         String original = file.getOriginalFilename();
         String ext = StringUtils.getFilenameExtension(original);
@@ -279,8 +337,48 @@ public class PhotoService {
                 .reactionCount(0)
                 .uploadTime(LocalDateTime.now())
                 .build();
-        return photoRepository.save(photo);
+        photoRepository.save(photo);
     }
+
+    private BufferedImage addFrameAndText(BufferedImage src, String description, String deviceName) {
+        int pad = 20;
+        int fontSize = 24;
+        Font font = new Font("Serif", Font.PLAIN, fontSize);
+
+        FontRenderContext frc = new FontRenderContext(new AffineTransform(), true, true);
+        Rectangle textBounds;
+        String str;
+        if (deviceName != null && !deviceName.isBlank()) {
+            str = deviceName + ": " + description;
+            textBounds = font.getStringBounds(str, frc).getBounds();
+        } else {
+            str = description;
+            textBounds = font.getStringBounds(str, frc).getBounds();
+        }
+
+        int newW = src.getWidth() + pad * 2;
+        int newH = src.getHeight() + pad * 2 + textBounds.height + pad;
+
+        BufferedImage out = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = out.createGraphics();
+        g2d.setColor(Color.WHITE);
+        g2d.fillRect(0, 0, newW, newH);
+        g2d.setRenderingHint(
+                RenderingHints.KEY_TEXT_ANTIALIASING,
+                RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+        );
+
+        g2d.drawImage(src, pad, pad, null);
+        g2d.setFont(font);
+        g2d.setColor(Color.DARK_GRAY);
+        int textX = (newW - textBounds.width) / 2;
+        int textY = src.getHeight() + pad * 2 + textBounds.height - fontSize/4;
+
+        g2d.drawString(str, textX, textY);
+        g2d.dispose();
+        return out;
+    }
+
 
     private boolean isVideo(String fileName) {
         String ext = fileName.substring(fileName.lastIndexOf('.') + 1).toLowerCase();

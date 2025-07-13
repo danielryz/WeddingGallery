@@ -1,3 +1,4 @@
+// src/components/UploadForm.tsx
 import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
@@ -17,103 +18,102 @@ const UploadForm: React.FC = () => {
     const [progress, setProgress] = useState(0);
     const navigate = useNavigate();
 
-    const onDrop = useCallback((acceptedFiles: File[]) => {
-        const validFiles = acceptedFiles.filter(file => file.size <= MAX_FILE_SIZE_MB * 1024 * 1024);
-        const newItems = validFiles.map(file => ({ file, description: '' }));
-        const totalCount = files.length + newItems.length;
-        if (totalCount > MAX_FILES) {
-            alert(`Możesz dodać maksymalnie ${MAX_FILES} plików.`);
+    const onDrop = useCallback((accepted: File[]) => {
+        const valid = accepted.filter(f => f.size <= MAX_FILE_SIZE_MB * 1024 * 1024);
+        const newItems = valid.map(f => ({ file: f, description: '' }));
+        if (files.length + newItems.length > MAX_FILES) {
+            alert(`Możesz dodać max ${MAX_FILES} plików.`);
             return;
         }
-        if (validFiles.length < acceptedFiles.length) {
-            alert(`Niektóre pliki przekroczyły limit ${MAX_FILE_SIZE_MB}MB i zostały pominięte.`);
+        if (valid.length < accepted.length) {
+            alert(`Niektóre pliki przekroczyły ${MAX_FILE_SIZE_MB}MB i pominięto.`);
         }
         setFiles(prev => [...prev, ...newItems]);
     }, [files]);
 
     const { getRootProps, getInputProps } = useDropzone({
-        onDrop,
-        accept: { 'image/*': [], 'video/*': [] },
-        multiple: true
+        onDrop, accept: { 'image/*': [], 'video/*': [] }, multiple: true
     });
 
-    const handleDescriptionChange = (index: number, desc: string) => {
-        setFiles(prev => {
-            const updated = [...prev];
-            updated[index].description = desc;
-            return updated;
-        });
-    };
+    const handleDesc = (i: number, desc: string) =>
+        setFiles(prev => prev.map((it, j) => j === i ? { ...it, description: desc } : it));
 
-    const handleRemove = (index: number) => {
-        setFiles(prev => prev.filter((_, i) => i !== index));
-    };
+    const handleRemove = (i: number) =>
+        setFiles(prev => prev.filter((_, j) => j !== i));
 
     const handleUpload = async () => {
-        if (files.length === 0) return;
-        const fileList = files.map(item => item.file);
-        const descList = files.map(item => item.description);
+        if (!files.length) return;
         try {
-            await savePhotos(fileList, descList, e => {
-                setProgress(Math.round((e.loaded * 100) / (e.total || 1)));
-            });
-            alert('Pliki zostały dodane do galerii!');
-            setFiles([]);
-            setProgress(0);
+            await savePhotos(
+                files.map(x => x.file),
+                files.map(x => x.description),
+                e => setProgress(Math.round(e.loaded * 100 / (e.total || 1)))
+            );
+            alert('Wysłano!');
+            setFiles([]); setProgress(0);
             navigate('/gallery');
-        } catch (err) {
-            console.error('Błąd wysyłania plików:', err);
-            alert('Wystąpił błąd podczas wysyłania. Spróbuj ponownie.');
+        } catch {
+            alert('Błąd wysyłania.');
         }
     };
 
     return (
         <div className="upload-form-container">
-            {/* Obszar "przeciągnij i upuść" */}
             <div {...getRootProps()} className="dropzone">
                 <input {...getInputProps()} />
-                <p>Przeciągnij zdjęcia/filmy tutaj lub kliknij, aby wybrać pliki</p>
+                <p>Przeciągnij zdjęcia/filmy lub kliknij</p>
             </div>
 
-            {/* Lista dodanych plików z podglądem i opisem */}
-            {files.map((item, index) => (
-                <div key={index} className="preview-item">
-                    {item.file.type.startsWith('image/') ? (
-                        <img
-                            src={URL.createObjectURL(item.file)}
-                            alt="podgląd"
-                            className="preview-media"
-                        />
-                    ) : (
-                        <video
-                            src={URL.createObjectURL(item.file)}
-                            className="preview-media"
-                            controls
-                        />
-                    )}
-                    <textarea
-                        placeholder="Dodaj opis..."
-                        className="desc-input"
-                        value={item.description}
-                        onChange={e => handleDescriptionChange(index, e.target.value)}
-                    />
-                    <button
-                        onClick={() => handleRemove(index)}
-                        className="remove-btn"
-                    >
-                        Usuń
-                    </button>
+            {files.length > 0 && (
+                <div className="previews-grid">
+                    {files.map((it, i) => (
+                        <div key={i} className="preview-item">
+                            {it.file.type.startsWith('image/') ? (
+                                <img
+                                    src={URL.createObjectURL(it.file)}
+                                    alt="podgląd"
+                                    className="preview-media"
+                                />
+                            ) : (
+                                <video
+                                    src={URL.createObjectURL(it.file)}
+                                    className="preview-media"
+                                    controls
+                                />
+                            )}
+                            <textarea
+                                className="desc-input"
+                                placeholder="Dodaj opis..."
+                                value={it.description}
+                                onChange={e => handleDesc(i, e.target.value)}
+                            />
+                            <button
+                                className="remove-btn"
+                                onClick={() => handleRemove(i)}
+                            >Usuń</button>
+                        </div>
+                    ))}
                 </div>
-            ))}
+            )}
 
-            {/* Przycisk wysyłania oraz wskaźnik postępu */}
             {files.length > 0 && (
                 <>
-                    <button onClick={handleUpload} className="upload-submit-btn">
-                        Wyślij do galerii
-                    </button>
-                    {progress > 0 && (
-                        <p className="upload-progress">Wysyłanie: {progress}%</p>
+                    <button
+                        className="upload-submit-btn"
+                        onClick={handleUpload}
+                    >Wyślij do galerii</button>
+
+                    {/* pasek postępu */}
+                    {progress > 0 && progress < 100 && (
+                        <div className="progress-bar">
+                            <div
+                                className="progress-fill"
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
+                    )}
+                    {progress === 100 && (
+                        <p className="upload-progress">Gotowe!</p>
                     )}
                 </>
             )}

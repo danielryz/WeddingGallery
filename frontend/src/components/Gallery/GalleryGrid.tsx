@@ -8,6 +8,7 @@ export interface GalleryItemData {
     src: string;
     thumbnail?: string;
     commentCount: number;
+    reactionCount: number;
     reactions: Record<string, number>;
 }
 
@@ -21,11 +22,11 @@ const GalleryGrid: React.FC<GalleryGridProps> = ({ items, onItemClick }) => {
         return <p className="empty-msg">Brak zawartości w galerii.</p>;
     }
     return (
-        <div className="gallery-grid">
-            {items.map(item => (
-                <GalleryItem key={item.id} item={item} onItemClick={onItemClick} />
-            ))}
-        </div>
+            <div className="gallery-grid">
+                {items.map(item => (
+                    <GalleryItem key={item.id} item={item} onItemClick={onItemClick} />
+                ))}
+            </div>
     );
 };
 

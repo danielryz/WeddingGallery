@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+// src/pages/ChatPage.tsx
+import React, { useState, useEffect, useRef, type UIEvent } from 'react';
 import { Client, type StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import {
@@ -7,13 +8,13 @@ import {
   sendChatMessage,
   getChatMessages
 } from '../api/chat';
-import type {ChatMessageResponse, ChatReactionCountResponse} from '../types/chat';
+import type { ChatMessageResponse, ChatReactionCountResponse } from '../types/chat';
 import './ChatPage.css';
 
 function ChatMessage({ message }: { message: ChatMessageResponse }) {
   const [reactions, setReactions] = useState<ChatReactionCountResponse[]>([]);
   const [showPicker, setShowPicker] = useState(false);
-  const [holdTimeout, setHoldTimeout] = useState<NodeJS.Timeout | null>(null);
+  const pickerRef = useRef<HTMLDivElement>(null);
   const localDeviceId = Number(localStorage.getItem('deviceId'));
   const isOwn = message.deviceId === localDeviceId;
 
@@ -21,55 +22,59 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
     getChatReactionSummary(message.id).then(setReactions);
   }, [message.id]);
 
+  // klik poza picker → ukryj
+  useEffect(() => {
+    const onClickOutside = (e: Event) => {
+      if (showPicker && pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
+        setShowPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', onClickOutside);
+    document.addEventListener('touchstart', onClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', onClickOutside);
+      document.removeEventListener('touchstart', onClickOutside);
+    };
+  }, [showPicker]);
+
   const handleReactionSelect = async (emoji: string) => {
     try {
       await addChatReaction(message.id, { emoji });
       setReactions(await getChatReactionSummary(message.id));
     } catch (err) {
-      console.error('Błąd dodawania reakcji do wiadomości:', err);
+      console.error('Błąd dodawania reakcji:', err);
     } finally {
       setShowPicker(false);
     }
   };
 
-  const handleHoldStart = () => {
-    const timeout = setTimeout(() => setShowPicker(true), 400);
-    setHoldTimeout(timeout);
-  };
-  const handleHoldEnd = () => {
-    if (holdTimeout) clearTimeout(holdTimeout);
+  const handleBubbleClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowPicker(true);
   };
 
   const EMOJIS = ['❤️', '😂', '😮', '😢', '😡', '👍', '👎'];
 
   return (
-      <div
-          className={`chat-message ${isOwn ? 'own' : ''}`}
-          onMouseDown={handleHoldStart}
-          onMouseUp={handleHoldEnd}
-          onTouchStart={handleHoldStart}
-          onTouchEnd={handleHoldEnd}
-      >
-        {/* Pojedynczy dymek wiadomości */}
-        <div className={`chat-bubble ${isOwn ? 'own' : 'other'}`}>
-          {!isOwn && (
-              <div className="chat-sender-name">{message.deviceName}</div>
-          )}
+      <div className={`chat-message ${isOwn ? 'own' : ''}`}>
+        <div
+            className={`chat-bubble ${isOwn ? 'own' : 'other'}`}
+            onClick={handleBubbleClick}
+        >
+          {!isOwn && <div className="chat-sender-name">{message.deviceName}</div>}
           <div>{message.text}</div>
-          {showPicker && (
-              <div className="emoji-picker">
-                {EMOJIS.map(emoji => (
-                    <button
-                        key={emoji}
-                        onClick={() => handleReactionSelect(emoji)}
-                    >
-                      {emoji}
-                    </button>
-                ))}
-              </div>
-          )}
         </div>
-        {/* Podsumowanie reakcji pod wiadomością */}
+
+        {showPicker && (
+            <div ref={pickerRef} className="emoji-picker">
+              {EMOJIS.map(emoji => (
+                  <button key={emoji} onClick={() => handleReactionSelect(emoji)}>
+                    {emoji}
+                  </button>
+              ))}
+            </div>
+        )}
+
         {reactions.length > 0 && (
             <div className={`reaction-summary ${isOwn ? 'own' : ''}`}>
               {reactions.map(r => (
@@ -87,17 +92,60 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
 const ChatPage: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessageResponse[]>([]);
   const [text, setText] = useState('');
+  const [pageNumber, setPageNumber] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const prevScrollHeightRef = useRef<number>(0);
+  const isPrependingRef = useRef<boolean>(false);
   const subRef = useRef<StompSubscription | null>(null);
   const clientRef = useRef<Client | null>(null);
-
+  const sizePerPage = 100;
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+  // 1) Pobierz pierwszą stronę
   useEffect(() => {
-    // Pobierz historię wiadomości z paginacją (ustaw wysoki rozmiar)
-    getChatMessages(0, 1000)
-        .then(page => setMessages(page.content))
-        .catch(err => console.error('Błąd pobierania historii czatu:', err));
+    (async () => {
+      try {
+        const page = await getChatMessages(0, sizePerPage);
+        setMessages(page.content);
+        setHasMore(!page.last);
+      } catch (err) {
+        console.error('Błąd pobierania historii:', err);
+      }
+    })();
+  }, []);
 
+  // 2) Infinite scroll: doładowanie starszych z utrzymaniem scrolla
+  const onScroll = async (e: UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    if (el.scrollTop === 0 && hasMore && containerRef.current) {
+      isPrependingRef.current = true;
+      prevScrollHeightRef.current = containerRef.current.scrollHeight;
+
+      try {
+        const nextPage = pageNumber + 1;
+        const page = await getChatMessages(nextPage, sizePerPage);
+        setMessages(prev => [...page.content, ...prev]);
+        setPageNumber(nextPage);
+        if (page.last) setHasMore(false);
+      } catch (err) {
+        console.error('Błąd ładowania kolejnej strony:', err);
+      }
+    }
+  };
+
+  // 3) Po prepend, skoryguj scroll
+  useEffect(() => {
+    if (isPrependingRef.current && containerRef.current) {
+      const delta = containerRef.current.scrollHeight - prevScrollHeightRef.current;
+      containerRef.current.scrollTop = delta;
+      isPrependingRef.current = false;
+    }
+  }, [messages]);
+
+  // 4) STOMP subskrypcja nowych
+  useEffect(() => {
     if (!clientRef.current) {
       clientRef.current = new Client({
         webSocketFactory: () => new SockJS(`${API_URL}/ws`),
@@ -111,7 +159,7 @@ const ChatPage: React.FC = () => {
           const msg: ChatMessageResponse = JSON.parse(frame.body);
           setMessages(prev => [...prev, msg]);
         } catch (err) {
-          console.error('Error parsing chat message', err);
+          console.error('Błąd parsowania:', err);
         }
       });
     };
@@ -119,14 +167,19 @@ const ChatPage: React.FC = () => {
       subscribe();
     } else {
       client.onConnect = subscribe;
-      if (!client.active) {
-        client.activate();
-      }
+      if (!client.active) client.activate();
     }
     return () => {
       subRef.current?.unsubscribe();
     };
   }, []);
+
+  // 5) Scroll do dołu po nowej wiadomości (tylko gdy nie prepend)
+  useEffect(() => {
+    if (!isPrependingRef.current) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const handleSend = async () => {
     if (!text.trim()) return;
@@ -134,20 +187,19 @@ const ChatPage: React.FC = () => {
       await sendChatMessage({ text });
       setText('');
     } catch (err) {
-      console.error('Błąd wysyłania wiadomości:', err);
+      console.error('Błąd wysyłania:', err);
     }
   };
 
   return (
-      <main className="chat-page">
+      <main className="chat-page" onClick={() => {/* klik poza chat-message nie będzie kolidował */}}>
         <h1 className="chat-title">Czat</h1>
-        {/* Obszar wiadomości */}
-        <div className="chat-messages">
+        <div className="chat-messages" ref={containerRef} onScroll={onScroll}>
           {messages.map(m => (
               <ChatMessage key={m.id} message={m} />
           ))}
+          <div ref={messagesEndRef} />
         </div>
-        {/* Pole wpisywania nowej wiadomości */}
         <div className="chat-input-area">
           <input
               className="chat-input"

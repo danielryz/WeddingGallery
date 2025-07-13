@@ -6,7 +6,7 @@
     margin-bottom: 8px;
     background-color: #FFFFFF;
     border-radius: 9999px;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 15px -3px rgba(168, 151, 120, 0.39), 0 4px 6px -4px rgba(166, 123, 53, 0.1);
     padding: 8px 12px;
     display: flex;
     gap: 8px;
@@ -14,13 +14,13 @@
 }
 
 .reaction-selector button {
-    font-size: 20px;
-    transition: transform 0.2s;
     background: none;
     border: none;
+    padding: 4px;
     cursor: pointer;
+    transition: transform 0.2s;
+}
+.reaction-selector button:hover {
+    transform: scale(1.2);
 }
 
-.reaction-selector button:hover {
-    transform: scale(1.25);
-}

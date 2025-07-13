@@ -6,7 +6,7 @@ interface LoginPageProps {
 }
 
 const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
-    const [username, setUsername] = useState('');
+    const [username, setUsername] = useState('Ania&Kamil2025');
     const [password, setPassword] = useState('');
     const [deviceName, setDeviceName] = useState('');
 
@@ -41,7 +41,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                     <input
                         type="text"
                         className="login-input login-input-last"
-                        placeholder="Imię (nazwa urządzenia)"
+                        placeholder="Imię (nazwa wyświetlana)"
                         value={deviceName}
                         onChange={e => setDeviceName(e.target.value)}
                         required

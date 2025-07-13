@@ -1,74 +1,70 @@
+/* src/components/Navbar.css */
+
+/* 1) Przezroczyste tło i brak cienia */
 .navbar {
-    background-color: #FEFBEA;
-    color: #5A4633;
+    background-color: transparent;       /* zamiast kremowego tła */
+    box-shadow: none;                    /* usuń cień */
     font-family: 'Playfair Display', serif;
     padding: 12px 16px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    position: relative;
+    flex-direction: column;              /* tytuł nad linkami */ /* wyśrodkuj zawartość */
+    position: relative;                  /* dla poprawnego pozycjonowania menu */
 }
 
+/* Tytuł zawsze na górze, centralnie */
 .navbar-title {
     font-size: 1.5rem;
+    color: #5A4633;
+    margin-bottom: 8px;
 }
 
-.navbar-date {
-    font-size: 1.125rem;
-}
-
-.hamburger-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.hamburger-icon {
-    width: 24px;
-    height: 24px;
-}
-
+/* 2) Menu pod tytułem: zawsze wyświetlone i w rzędzie */
 .navbar-menu {
-    position: absolute;
-    top: 100%;
-    left: 0;
+    display: flex !important;            /* zawsze widoczne */
+    flex-direction: row;                 /* linki w rzędzie */
+    justify-content: center;             /* wyśrodkuj linki */
+    gap: 24px;                           /* odstęp między linkami */
     width: 100%;
-    background-color: #FEFBEA;
-    display: none;
+    background: transparent;             /* bez tła */
+    position: static;                    /* nie absolutnie */
+    margin: 0;                           /* usuń domyślne marginesy */
+    padding: 0;                          /* usuń wewnętrzne odstępy */
 }
 
-.navbar-menu.open {
-    display: block;
-}
-
+/* 3) Styl pojedynczego linku */
 .nav-link {
-    display: block;
-    padding: 8px 16px;
+    display: inline-block;
+    padding: 4px 8px;
     color: #5A4633;
     text-decoration: none;
+    font-size: 1rem;
+
+    /* przygotowanie ramki do hover */
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.2s, color 0.2s;
 }
 
+/* Hover: złota ramka i zmiana koloru tekstu */
 .nav-link:hover {
-    color: #D4AF37;
+    color: #D4AF37;                      /* zmiana koloru tekstu na złoty */
+    border-color: #D4AF37;               /* ramka w kolorze złotym */
 }
 
+/* 4) Ukryj hamburger na desktopie (jeśli nadal go używasz) */
 @media (min-width: 768px) {
     .hamburger-btn {
-        display: none;
+        display: none;                   /* ukryj przycisk menu */
     }
+}
+
+/* 5) Na mobilu również trzy linki w rzędzie */
+@media (max-width: 767px) {
     .navbar-menu {
-        position: static;
-        width: auto;
-        display: flex;
-        align-items: center;
-    }
-    .navbar-menu.open {
-        display: flex;
+        flex-wrap: wrap;                 /* ew. zawijanie, jeśli za ciasno */
     }
     .nav-link {
-        display: inline-block;
-        padding-top: 0;
-        padding-bottom: 0;
+        flex: 1 1 auto;                  /* równo rozłóż na szerokość */
+        text-align: center;
     }
 }

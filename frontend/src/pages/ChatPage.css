@@ -1,3 +1,5 @@
+/* src/pages/ChatPage.css */
+
 .chat-page {
     padding: 16px;
 }
@@ -11,34 +13,36 @@
 }
 
 .chat-messages {
+    flex: 1;
+    overflow-y: auto;
     margin-bottom: 16px;
 }
 
 .chat-message {
+    position: relative; /* dla emoji-picker */
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     margin-bottom: 16px;
 }
-
 .chat-message.own {
     align-items: flex-end;
 }
 
 .chat-bubble {
-    position: relative;
     max-width: 80%;
     padding: 12px;
     border-radius: 12px;
+    cursor: pointer;
 }
 
 .chat-bubble.own {
     background-color: #D4AF37;
-    color: #FFFFFF;
+    color: #FFF;
 }
 
 .chat-bubble.other {
-    background-color: #FFFFFF;
+    background-color: #FFF;
     color: #5A4633;
 }
 
@@ -48,31 +52,34 @@
     margin-bottom: 4px;
 }
 
+/* picker nad dymkiem */
 .emoji-picker {
     position: absolute;
     bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    margin-bottom: 8px;
-    background-color: #FFFFFF;
-    border-radius: 9999px;
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
-    padding: 8px 12px;
+    left: 0;
+    margin-bottom: 4px;
     display: flex;
+    flex-wrap: wrap;
     gap: 8px;
+    padding: 8px 12px;
+    max-width: 80%;
+    background-color: #FFF;
+    border-radius: 9999px;
+    box-shadow:
+            0 10px 15px -3px rgba(0,0,0,0.1),
+            0 4px 6px -4px rgba(0,0,0,0.1);
     z-index: 50;
 }
 
 .emoji-picker button {
-    font-size: 20px;
-    transition: transform 0.2s;
+    font-size: 16px;  /* zmniejszone */
     background: none;
     border: none;
     cursor: pointer;
 }
 
 .emoji-picker button:hover {
-    transform: scale(1.25);
+    transform: scale(1.2);
 }
 
 .reaction-summary {
@@ -81,7 +88,6 @@
     display: flex;
     color: #5A4633;
 }
-
 .reaction-summary.own {
     justify-content: flex-end;
 }
@@ -99,8 +105,8 @@
 }
 
 .chat-input {
-    flex: 1 1 0%;
-    border: 1px solid #CCCCCC;
+    flex: 1;
+    border: 1px solid #CCC;
     border-radius: 4px;
     padding: 8px 12px;
     font-size: 14px;
@@ -114,7 +120,7 @@
 .chat-send-button {
     padding: 8px 16px;
     background-color: #D4AF37;
-    color: #FFFFFF;
+    color: #FFF;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -122,4 +128,34 @@
 
 .chat-send-button:hover {
     opacity: 0.9;
+}
+@media screen and (max-width: 405px) {
+    .reaction-summary {
+        flex-wrap: wrap;
+        gap: 2px;
+        padding: 0 4px;
+        box-sizing: border-box;
+        width: 100%;
+    }
+
+    .reaction-item {
+        font-size: 10px;
+        padding: 1px 3px;
+        border-radius: 10px;
+        background: rgba(0,0,0,0.05);
+    }
+
+    .reaction-item > span:first-child {
+        margin-right: 1px;
+    }
+
+    .emoji-picker {
+        max-width: 90%;
+        gap: 4px;
+        padding: 6px 8px;
+    }
+
+    .emoji-picker button {
+        font-size: 14px;
+    }
 }

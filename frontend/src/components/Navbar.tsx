@@ -8,27 +8,8 @@ const Navbar: React.FC = () => {
     return (
         <nav className="navbar">
             <div className="navbar-title">
-                Anna &amp; Adam <span className="navbar-date">| 09.06.2024</span>
+                Ania &amp; Kamil <span className="navbar-date">| 23.08.2025</span>
             </div>
-            <button
-                className="hamburger-btn"
-                onClick={() => setMenuOpen(!menuOpen)}
-                aria-label="Otwórz menu"
-            >
-                <svg
-                    className="hamburger-icon"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5"
-                    />
-                </svg>
-            </button>
             <div className={`navbar-menu ${menuOpen ? 'open' : ''}`}>
                 <Link to="/gallery" className="nav-link" onClick={() => setMenuOpen(false)}>
                     Galeria
@@ -37,7 +18,7 @@ const Navbar: React.FC = () => {
                     Dodaj zdjęcie/film
                 </Link>
                 <Link to="/chat" className="nav-link" onClick={() => setMenuOpen(false)}>
-                    Kontakt
+                    Chat
                 </Link>
             </div>
         </nav>

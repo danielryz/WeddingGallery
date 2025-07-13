@@ -130,6 +130,13 @@ public class PhotoController {
         photoService.streamAllPhotosZip(response);
     }
 
+    @GetMapping("/admin/archive/description")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Download all photos with description as zip")
+    public void downloadAllPhotosWithDescription(HttpServletResponse response) throws java.io.IOException {
+        photoService.streamAllPhotosWithDescriptionZip(response);
+    }
+
     @PutMapping("/{id}/description")
     @Operation(summary = "Update photo description")
     public ResponseEntity<String> updateDescription(

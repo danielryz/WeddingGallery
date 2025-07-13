@@ -1,9 +1,11 @@
+/* src/components/UploadForm.css */
+
 .upload-form-container {
     background-color: #FEFBEA;
     padding: 16px;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    max-width: 448px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
@@ -15,43 +17,64 @@
     cursor: pointer;
     margin-bottom: 16px;
 }
-
 .dropzone p {
     color: #5A4633;
     font-weight: 600;
 }
 
-.preview-item {
+/* GRID: domyślnie 2 kolumny od 360px wzwyż */
+.previews-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
     margin-bottom: 16px;
-    border: 1px solid #D4AF37;
-    padding: 8px;
-    border-radius: 4px;
+}
+@media (min-width: 480px) {
+    .previews-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (min-width: 768px) {
+    .previews-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.preview-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* centrowanie poziome elementów */
     background-color: #FFFFFF;
+    border: 1px solid #D4AF37;
+    border-radius: 4px;
+    padding: 4px;
+    gap: 8px;
 }
 
 .preview-media {
     width: 100%;
-    height: 192px;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: 4px;
 }
 
 .desc-input {
-    width: 100%;
-    margin-top: 8px;
+    width: 90%;
+    margin: 8px auto 0;
     border: 1px solid #CCCCCC;
     border-radius: 4px;
     padding: 8px;
     font-size: 14px;
-    resize: none;
+    resize: vertical;
+    min-height: 20px;
 }
-
 .desc-input:focus {
     outline: none;
     border-color: #D4AF37;
 }
 
 .remove-btn {
+    align-self: flex-end;
     margin-top: 8px;
     font-size: 12px;
     color: #EF4444;
@@ -70,10 +93,25 @@
     width: 100%;
     cursor: pointer;
     transition: opacity 0.2s;
+    margin-top: 16px;
 }
-
 .upload-submit-btn:hover {
     opacity: 0.9;
+}
+
+/* pasek postępu */
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+.progress-fill {
+    height: 100%;
+    background: #D4AF37;
+    transition: width 0.3s ease;
 }
 
 .upload-progress {

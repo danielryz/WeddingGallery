@@ -1,5 +1,7 @@
 .gallery-page {
     padding: 16px;
+    /* można dodać tło strony, jeśli wymagane, np. pastelowy krem:
+       background-color: #FEFBEA; */
 }
 
 .gallery-title {
