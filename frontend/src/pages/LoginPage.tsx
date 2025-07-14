@@ -19,7 +19,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         <main className="login-page">
             <div className="login-box">
                 <h1 className="login-title">
-                    Anna &amp; Adam <br /><span className="login-date">09.06.2024</span>
+                    Ania &amp; Kamil <br /><span className="login-date">23.08.2025</span>
                 </h1>
                 <form onSubmit={handleSubmit} className="login-form">
                     <input

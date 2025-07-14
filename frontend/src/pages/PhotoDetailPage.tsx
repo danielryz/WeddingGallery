@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getPhoto } from '../api/photos';
+import {getPhoto, updateDescription, updateVisibility} from '../api/photos';
 import { getReactionCounts, addReaction } from '../api/reactions';
 import { getComments, addComment, deleteComment } from '../api/comments';
 import type {PhotoResponse} from '../types/photo';
 import type {CommentResponse} from '../types/comment';
 import './PhotoDetailPage.css';
+import {isAdmin, isThisDevice} from "../utils/authUtils.ts";
 
 const EMOJI_MAP: Record<string, string> = {
   HEART: '❤️', LAUGH: '😂', WOW: '😮', SAD: '😢',
@@ -82,6 +83,7 @@ const PhotoDetailPage: React.FC = () => {
     try {
       await deleteComment(commentId);
       setComments(comments.filter(c => c.id !== commentId));
+      console.log("deleted");
     } catch (err: any) {
       if (err.response?.status === 403) {
         alert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.');
@@ -90,6 +92,36 @@ const PhotoDetailPage: React.FC = () => {
       }
     }
   };
+
+  const handleDeletePhoto = async () => {
+    try{
+      await updateVisibility(Number(id), {visible: false});
+      window.location.href = '/gallery';
+      console.log("deleted");
+    }catch (err:any) {
+      if (err.response?.status === 403){
+        alert('Nie możesz usunąć tego zdjęcia - brak Autoryzacji.')
+      } else {
+        console.error('Błąd usuwania zdjęcia:', err);
+      }
+    }
+  }
+
+  const handleEditDescription = async (text: string) => {
+    try {
+      await  updateDescription(Number(id), {description: text});
+      console.log("updated");
+    }catch (err:any) {
+      if (err.response?.status === 403){
+        alert('Nie możesz zmienić tego opisu - brak Autoryzacji.')
+      } else {
+        console.error('Błąd edycji opisu:', err);
+      }
+    }
+  }
+
+
+
 
   return (
       <main className="photo-detail">
@@ -111,6 +143,17 @@ const PhotoDetailPage: React.FC = () => {
               />
           )}
         </div>
+        <div className="photo-info">
+        <span className="photo-deviceName">{photo.deviceName}</span>
+        <span className="photo-description">{photo.description}</span>
+        </div>
+
+        {(isThisDevice(photo.deviceId) || isAdmin()) && (
+            <button className="delete-photo-btn" onClick={handleDeletePhoto}> Usuń Zdjęcie</button>
+        )}
+        {isThisDevice(photo.deviceId) && (
+            <textarea className="update-description-input" placeholder="Dodaj opis..." onChange={(e) => handleEditDescription(e.target.value)}></textarea>
+        )}
 
         {/* Sekcja reakcji pod zdjęciem/filmem */}
         <div className="reactions-container">
@@ -160,6 +203,7 @@ const PhotoDetailPage: React.FC = () => {
                       <div className="comment-bubble">
                         <div className="comment-author">{comment.deviceName}</div>
                         <div>{comment.text}</div>
+                        {(isThisDevice(comment.deviceId) || isAdmin()) && (
                         <button
                             onClick={() => handleDeleteComment(comment.id)}
                             className="delete-btn"
@@ -167,6 +211,7 @@ const PhotoDetailPage: React.FC = () => {
                         >
                           🗑️
                         </button>
+                        )}
                       </div>
                     </li>
                 ))}

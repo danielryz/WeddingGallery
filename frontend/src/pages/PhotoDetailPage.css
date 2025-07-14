@@ -75,9 +75,9 @@
 
 .add-reaction-btn {
     padding: 8px 16px;
-    border-radius: 9999px;
-    background-color: #D4AF37;
-    color: #FFFFFF;
+    border-radius: 8px;
+    background-color: #d9cb93; /* pastelowe tło */
+    color: #5A4633;
     font-weight: 600;
     font-size: 14px;
     cursor: pointer;

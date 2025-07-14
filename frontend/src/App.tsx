@@ -7,6 +7,7 @@ import PhotoDetailPage from './pages/PhotoDetailPage';
 import ChatPage from './pages/ChatPage';
 import UploadPage from './pages/UploadPage';
 import { login } from './api/auth';
+import AdminPanelPage from "./pages/AdminPanelPage.tsx";
 
 function App() {
   const [isAuth, setIsAuth] = useState(() => {
@@ -70,6 +71,7 @@ function App() {
           <Route path="/photo/:id" element={<PhotoDetailPage />} />
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/chat" element={<ChatPage />} />
+          <Route path="/admin/download-panel/" element={<AdminPanelPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </>

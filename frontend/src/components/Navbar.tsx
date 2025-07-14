@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
+import {isAdmin} from "../utils/authUtils.ts";
 
 const Navbar: React.FC = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -20,6 +21,11 @@ const Navbar: React.FC = () => {
                 <Link to="/chat" className="nav-link" onClick={() => setMenuOpen(false)}>
                     Chat
                 </Link>
+                {isAdmin() && (
+                    <Link to="/admin/download-panel" className="nav-link" onClick={() => setMenuOpen(false)}>
+                        Admin Panel
+                    </Link>
+                )}
             </div>
         </nav>
     );

@@ -82,6 +82,11 @@ export const downloadArchive = async (): Promise<Blob> => {
   return res.data
 }
 
+export const downloadArchiveWithDescription = async (): Promise<Blob> => {
+  const res = await axiosInstance.get('/api/photos/admin/archive/description', { responseType: 'blob' })
+  return res.data
+}
+
 export const updateDescription = async (
   id: number,
   data: PhotoDescriptionUpdateRequest,
