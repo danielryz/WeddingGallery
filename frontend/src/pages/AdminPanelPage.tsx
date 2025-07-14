@@ -1,14 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {downloadArchive, downloadArchiveWithDescription} from "../api/photos.ts";
+import AlertStack from "../components/alert/AlertStack.tsx"
 
 export const AdminPanelPage: React.FC = () => {
     const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     const [downloadUrl2, setDownloadUrl2] = useState<string | null>(null);
     const [loading2, setLoading2] = useState(false);
-    const [error2, setError2] = useState<string | null>(null);
+
+    const [alerts, setAlerts] = useState<
+        { id: number; message: string; type: "success" | "error" }[]
+    >([]);
+    const nextId = useRef(0);
+
+    const showAlert = (message: string, type: "success" | "error") => {
+        const id = nextId.current++;
+        setAlerts((prev) => [...prev, { id, message, type }]);
+    };
+
+    const removeAlert = (id: number) => {
+        setAlerts((prev) => prev.filter((a) => a.id !== id));
+    };
 
     useEffect(() => {
         return () => {
@@ -23,14 +36,14 @@ export const AdminPanelPage: React.FC = () => {
 
     const handleDownloadClick1 = async () => {
         setLoading(true);
-        setError(null);
         try {
             const blob = await downloadArchive();
             const url = URL.createObjectURL(new Blob([blob], { type: 'application/zip' }));
             setDownloadUrl(url);
+            showAlert('Link wygenerowany poprawnie.', 'success');
         } catch (e: any) {
             console.error(e);
-            setError('Nie udało się pobrać archiwum.');
+            showAlert('Nie udało się pobrać archiwum.', 'error');
         } finally {
             setLoading(false);
         }
@@ -38,14 +51,14 @@ export const AdminPanelPage: React.FC = () => {
 
     const handleDownloadClick2 = async () => {
         setLoading2(true);
-        setError2(null);
         try {
             const blob = await downloadArchiveWithDescription();
             const url = URL.createObjectURL(new Blob([blob], { type: 'application/zip' }));
             setDownloadUrl2(url);
+            showAlert('Link wygenerowany poprawnie.', 'success');
         } catch (e: any) {
             console.error(e);
-            setError2('Nie udało się pobrać archiwum z opisami.');
+            showAlert('Nie udało się pobrać archiwum z opisami.', 'error');
         } finally {
             setLoading2(false);
         }
@@ -85,9 +98,6 @@ export const AdminPanelPage: React.FC = () => {
                 {loading2 ? 'Ładowanie...' : 'Pobierz archiwum z opisami'}
             </button>
 
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {error2 && <p style={{ color: 'red' }}>{error2}</p>}
-
             {downloadUrl && (
                 <p style={{ marginTop: '1rem' }}>
                     <a
@@ -111,6 +121,7 @@ export const AdminPanelPage: React.FC = () => {
                     </a>
                 </p>
             )}
+            <AlertStack alerts={alerts} onRemove={removeAlert} />
         </div>
     );
 };

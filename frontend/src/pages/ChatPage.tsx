@@ -10,6 +10,7 @@ import {
 } from '../api/chat';
 import type { ChatMessageResponse, ChatReactionCountResponse } from '../types/chat';
 import './ChatPage.css';
+import AlertStack from "../components/alert/AlertStack.tsx"
 
 function ChatMessage({ message }: { message: ChatMessageResponse }) {
   const [reactions, setReactions] = useState<ChatReactionCountResponse[]>([]);
@@ -17,6 +18,20 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
   const pickerRef = useRef<HTMLDivElement>(null);
   const localDeviceId = Number(localStorage.getItem('deviceId'));
   const isOwn = message.deviceId === localDeviceId;
+
+  const [alerts, setAlerts] = useState<
+      { id: number; message: string; type: "success" | "error" }[]
+  >([]);
+  const nextId = useRef(0);
+
+  const showAlert = (message: string, type: "success" | "error") => {
+    const id = nextId.current++;
+    setAlerts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeAlert = (id: number) => {
+    setAlerts((prev) => prev.filter((a) => a.id !== id));
+  };
 
   useEffect(() => {
     getChatReactionSummary(message.id).then(setReactions);
@@ -42,7 +57,7 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
       await addChatReaction(message.id, { emoji });
       setReactions(await getChatReactionSummary(message.id));
     } catch (err) {
-      console.error('Błąd dodawania reakcji:', err);
+      showAlert('Błąd dodawania reakcji: ' + err, 'error');
     } finally {
       setShowPicker(false);
     }
@@ -85,6 +100,7 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
               ))}
             </div>
         )}
+        <AlertStack alerts={alerts} onRemove={removeAlert} />
       </div>
   );
 }
@@ -103,6 +119,19 @@ const ChatPage: React.FC = () => {
   const sizePerPage = 100;
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+  const [alerts, setAlerts] = useState<
+      { id: number; message: string; type: "success" | "error" }[]
+  >([]);
+  const nextId = useRef(0);
+
+  const showAlert = (message: string, type: "success" | "error") => {
+    const id = nextId.current++;
+    setAlerts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeAlert = (id: number) => {
+    setAlerts((prev) => prev.filter((a) => a.id !== id));
+  };
   // 1) Pobierz pierwszą stronę
   useEffect(() => {
     (async () => {
@@ -111,7 +140,7 @@ const ChatPage: React.FC = () => {
         setMessages(page.content);
         setHasMore(!page.last);
       } catch (err) {
-        console.error('Błąd pobierania historii:', err);
+        showAlert('Błąd pobierania historii: ' + err, 'error');
       }
     })();
   }, []);
@@ -130,7 +159,7 @@ const ChatPage: React.FC = () => {
         setPageNumber(nextPage);
         if (page.last) setHasMore(false);
       } catch (err) {
-        console.error('Błąd ładowania kolejnej strony:', err);
+        showAlert('Błąd ładowania kolejnej strony: ' + err, 'error');
       }
     }
   };
@@ -159,7 +188,7 @@ const ChatPage: React.FC = () => {
           const msg: ChatMessageResponse = JSON.parse(frame.body);
           setMessages(prev => [...prev, msg]);
         } catch (err) {
-          console.error('Błąd parsowania:', err);
+          showAlert('Błąd parsowania: ' + err, 'error');
         }
       });
     };
@@ -212,6 +241,7 @@ const ChatPage: React.FC = () => {
             Wyślij
           </button>
         </div>
+        <AlertStack alerts={alerts} onRemove={removeAlert} />
       </main>
   );
 };

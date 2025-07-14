@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import {getPhoto, updateDescription, updateVisibility} from '../api/photos';
 import { getReactionCounts, addReaction } from '../api/reactions';
@@ -7,6 +7,7 @@ import type {PhotoResponse} from '../types/photo';
 import type {CommentResponse} from '../types/comment';
 import './PhotoDetailPage.css';
 import {isAdmin, isThisDevice} from "../utils/authUtils.ts";
+import AlertStack from "../components/alert/AlertStack.tsx"
 
 const EMOJI_MAP: Record<string, string> = {
   HEART: '❤️', LAUGH: '😂', WOW: '😮', SAD: '😢',
@@ -21,6 +22,19 @@ const PhotoDetailPage: React.FC = () => {
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [newComment, setNewComment] = useState('');
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+  const [alerts, setAlerts] = useState<
+      { id: number; message: string; type: "success" | "error" }[]
+  >([]);
+  const nextId = useRef(0);
+
+  const showAlert = (message: string, type: "success" | "error") => {
+    const id = nextId.current++;
+    setAlerts((prev) => [...prev, { id, message, type }]);
+  };
+
+  const removeAlert = (id: number) => {
+    setAlerts((prev) => prev.filter((a) => a.id !== id));
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -83,12 +97,12 @@ const PhotoDetailPage: React.FC = () => {
     try {
       await deleteComment(commentId);
       setComments(comments.filter(c => c.id !== commentId));
-      console.log("deleted");
+      showAlert('Komentarz usunięty', 'success');
     } catch (err: any) {
       if (err.response?.status === 403) {
-        alert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.');
+        showAlert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.', 'error');
       } else {
-        console.error('Błąd usuwania komentarza:', err);
+        showAlert('Bład usuwania komentarza: ' + err, 'error');
       }
     }
   };
@@ -97,12 +111,12 @@ const PhotoDetailPage: React.FC = () => {
     try{
       await updateVisibility(Number(id), {visible: false});
       window.location.href = '/gallery';
-      console.log("deleted");
+      showAlert('Zdjęcie usunięte', 'success');
     }catch (err:any) {
       if (err.response?.status === 403){
-        alert('Nie możesz usunąć tego zdjęcia - brak Autoryzacji.')
+        showAlert('Nie możesz usunąć tego zdjęcia - brak Autoryzacji.', 'error');
       } else {
-        console.error('Błąd usuwania zdjęcia:', err);
+        showAlert('Błąd usuwania zdjęcia: ' + err, 'error');
       }
     }
   }
@@ -110,12 +124,12 @@ const PhotoDetailPage: React.FC = () => {
   const handleEditDescription = async (text: string) => {
     try {
       await  updateDescription(Number(id), {description: text});
-      console.log("updated");
+      showAlert('Opis zaktualizowany', 'success');
     }catch (err:any) {
       if (err.response?.status === 403){
-        alert('Nie możesz zmienić tego opisu - brak Autoryzacji.')
+        showAlert('Nie możesz zmienić tego opisu - brak Autoryzacji.', 'error');
       } else {
-        console.error('Błąd edycji opisu:', err);
+        showAlert('Błąd edycji opisu: ' + err, 'error');
       }
     }
   }
@@ -227,6 +241,7 @@ const PhotoDetailPage: React.FC = () => {
               className="comment-input"
           />
         </section>
+        <AlertStack alerts={alerts} onRemove={removeAlert} />
       </main>
   );
 };

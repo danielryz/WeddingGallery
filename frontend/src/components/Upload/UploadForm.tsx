@@ -1,9 +1,10 @@
 // src/components/UploadForm.tsx
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { savePhotos } from '../../api/photos';
 import './UploadForm.css';
+import AlertStack from '../../components/alert/AlertStack'
 
 interface UploadItem {
     file: File;
@@ -17,16 +18,29 @@ const UploadForm: React.FC = () => {
     const [files, setFiles] = useState<UploadItem[]>([]);
     const [progress, setProgress] = useState(0);
     const navigate = useNavigate();
+    const [alerts, setAlerts] = useState<
+        { id: number; message: string; type: "success" | "error" }[]
+    >([]);
+    const nextId = useRef(0);
+
+    const showAlert = (message: string, type: "success" | "error") => {
+        const id = nextId.current++;
+        setAlerts((prev) => [...prev, { id, message, type }]);
+    };
+
+    const removeAlert = (id: number) => {
+        setAlerts((prev) => prev.filter((a) => a.id !== id));
+    };
 
     const onDrop = useCallback((accepted: File[]) => {
         const valid = accepted.filter(f => f.size <= MAX_FILE_SIZE_MB * 1024 * 1024);
         const newItems = valid.map(f => ({ file: f, description: '' }));
         if (files.length + newItems.length > MAX_FILES) {
-            alert(`Możesz dodać max ${MAX_FILES} plików.`);
+            showAlert(`Możesz dodać max ${MAX_FILES} plików.`, 'error');
             return;
         }
         if (valid.length < accepted.length) {
-            alert(`Niektóre pliki przekroczyły ${MAX_FILE_SIZE_MB}MB i pominięto.`);
+            showAlert(`Niektóre pliki przekroczyły ${MAX_FILE_SIZE_MB}MB i pominięto.`, 'error');
         }
         setFiles(prev => [...prev, ...newItems]);
     }, [files]);
@@ -49,11 +63,15 @@ const UploadForm: React.FC = () => {
                 files.map(x => x.description),
                 e => setProgress(Math.round(e.loaded * 100 / (e.total || 1)))
             );
-            alert('Wysłano!');
+            showAlert('Wysłano!', 'success');
             setFiles([]); setProgress(0);
             navigate('/gallery');
         } catch {
-            alert('Błąd wysyłania.');
+            showAlert('Błąd wysyłania.', 'error');
+            setProgress(0);
+            setFiles(
+                files.map(x => ({ ...x, description: '' }))
+            )
         }
     };
 
@@ -117,6 +135,7 @@ const UploadForm: React.FC = () => {
                     )}
                 </>
             )}
+            <AlertStack alerts={alerts} onRemove={removeAlert} />
         </div>
     );
 };
