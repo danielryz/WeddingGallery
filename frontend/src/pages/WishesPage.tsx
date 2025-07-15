@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPhotos } from '../api/photos';
+import { getWishes } from '../api/photos';
 import type { PhotoResponse } from '../types/photo';
 import GalleryGrid, { type GalleryItemData } from '../components/Gallery/GalleryGrid';
 import WishUploadForm from '../components/Wishes/WishUploadForm';
 import './WishesPage.css';
-import { isAdmin, isThisDevice } from '../utils/authUtils';
 
 const WishesPage: React.FC = () => {
   const [items, setItems] = useState<GalleryItemData[]>([]);
@@ -15,12 +14,8 @@ const WishesPage: React.FC = () => {
   useEffect(() => {
     (async () => {
       try {
-        const page = await getPhotos(0, 100, 'uploadTime', 'desc');
-        const wishes = page.content
-          .filter((p: PhotoResponse) =>
-            p.isWish && (p.isVisibleForGuest || isAdmin() || isThisDevice(p.deviceId))
-          )
-          .map((p: PhotoResponse) => ({
+        const page = await getWishes(0, 100, 'uploadTime', 'desc');
+        const wishes = page.content.map((p: PhotoResponse) => ({
             id: p.id,
             isVideo: p.isVideo ?? false,
             src: `${API_URL}/photos/${p.fileName}`,

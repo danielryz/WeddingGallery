@@ -25,6 +25,24 @@ export const getPhotos = async (
   return res.data
 }
 
+export const getWishes = async (
+  page = 0,
+  size = 20,
+  sortBy = 'uploadTime',
+  direction = 'desc',
+  type?: string,
+): Promise<Page<PhotoResponse>> => {
+  const params: Record<string, string | number> = {
+    page,
+    size,
+    sortBy,
+    direction,
+  }
+  if (type) params.type = type
+  const res = await axiosInstance.get<Page<PhotoResponse>>('/api/photos/wishes', { params })
+  return res.data
+}
+
 export const getDevicePhotos = async (
   page = 0,
   size = 20,
