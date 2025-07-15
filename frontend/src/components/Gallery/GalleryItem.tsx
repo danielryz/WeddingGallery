@@ -53,7 +53,10 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
         <div
             className="gallery-item"
             {...handlers}
-            onClick={() => onItemClick?.(item.id)}
+            onClick={() => {
+                if (showReactions) return;
+                onItemClick?.(item.id);
+            }}
         >
             {renderMedia()}
 
