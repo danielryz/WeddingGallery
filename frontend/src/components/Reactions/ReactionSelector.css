@@ -4,7 +4,7 @@
     left: 50%;
     transform: translateX(-50%);
     margin-bottom: 8px;
-    background-color: #FFFFFF;
+    background-color: var(--white);
     border-radius: 9999px;
     box-shadow: 0 10px 15px -3px rgba(168, 151, 120, 0.39), 0 4px 6px -4px rgba(166, 123, 53, 0.1);
     padding: 8px 12px;

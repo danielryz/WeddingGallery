@@ -1,13 +1,13 @@
 .gallery-page {
     padding: 16px;
     /* można dodać tło strony, jeśli wymagane, np. pastelowy krem:
-       background-color: #FEFBEA; */
+       background-color: var(--cream-light); */
 }
 
 .gallery-title {
     font-size: 1.5rem;
     font-family: 'Playfair Display', serif;
-    color: #5A4633;
+    color: var(--brown);
     text-align: center;
     margin-bottom: 24px;
 }

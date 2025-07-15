@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {downloadArchive, downloadArchiveWithDescription} from "../api/photos.ts";
 import { useAlerts } from "../components/alert/useAlerts"
+import './AdminPanelPage.css';
 
 export const AdminPanelPage: React.FC = () => {
     const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -71,11 +72,11 @@ export const AdminPanelPage: React.FC = () => {
             </button>
 
             {downloadUrl && (
-                <p style={{ marginTop: '1rem' }}>
+                <p className="download-info">
                     <a
                         href={downloadUrl}
                         download="photos-archive.zip"
-                        style={{ color: '#D4AF37', textDecoration: 'underline' }}
+                        className="download-link"
                     >
                         Kliknij tutaj, aby pobrać archiwum
                     </a>
@@ -83,12 +84,12 @@ export const AdminPanelPage: React.FC = () => {
             )}
 
             {downloadUrl2 && (
-                <p style={{ marginTop: '1rem' }}>
+                <p className="download-info">
                     <a
                         href={downloadUrl2}
                         download="photos-archive-with-description.zip"
-                        style={{ color: '#D4AF37', textDecoration: 'underline' }}
-                        >
+                        className="download-link"
+                    >
                         Kliknij tutaj, aby pobrać archiwum z opisami
                     </a>
                 </p>

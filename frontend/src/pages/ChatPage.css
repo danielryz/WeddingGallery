@@ -7,7 +7,7 @@
 .chat-title {
     font-size: 1.25rem;
     font-family: 'Playfair Display', serif;
-    color: #5A4633;
+    color: var(--brown);
     text-align: center;
     margin-bottom: 16px;
 }
@@ -37,13 +37,13 @@
 }
 
 .chat-bubble.own {
-    background-color: #D4AF37;
-    color: #FFF;
+    background-color: var(--gold-bright);
+    color: var(--white);
 }
 
 .chat-bubble.other {
-    background-color: #FFF;
-    color: #5A4633;
+    background-color: var(--white);
+    color: var(--brown);
 }
 
 .chat-sender-name {
@@ -63,7 +63,7 @@
     gap: 8px;
     padding: 8px 12px;
     max-width: 80%;
-    background-color: #FFF;
+    background-color: var(--white);
     border-radius: 9999px;
     box-shadow:
             0 10px 15px -3px rgba(0,0,0,0.1),
@@ -86,7 +86,7 @@
     margin-top: 4px;
     font-size: 12px;
     display: flex;
-    color: #5A4633;
+    color: var(--brown);
 }
 .reaction-summary.own {
     justify-content: flex-end;
@@ -106,7 +106,7 @@
 
 .chat-input {
     flex: 1;
-    border: 1px solid #CCC;
+    border: 1px solid var(--grey-border);
     border-radius: 4px;
     padding: 8px 12px;
     font-size: 14px;
@@ -114,7 +114,7 @@
 
 .chat-input:focus {
     outline: none;
-    border-color: #D4AF37;
+    border-color: var(--gold-bright);
 }
 @media screen and (max-width: 405px) {
     .reaction-summary {

@@ -18,18 +18,18 @@
 
 
 .alert-success {
-    background-color: #7a6228;
-    color: #000000;
+    background-color: var(--alert-bg);
+    color: var(--black);
 }
 
 .alert-error {
-    background-color: #ff0013;
-    color: #000000;
+    background-color: var(--red-error);
+    color: var(--black);
 }
 
 .alert-info {
-    background-color: #2c78ff;
-    color: #ffffff;
+    background-color: var(--blue-info);
+    color: var(--white);
 }
 
 .alert-content {
@@ -41,7 +41,7 @@
 .alert-buttons button.alert-close {
     background: transparent;
     border: none;
-    color: #000000;
+    color: var(--black);
     font-size: 18px;
     margin-left: 12px;
     cursor: pointer;

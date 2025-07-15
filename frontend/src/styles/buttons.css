@@ -16,11 +16,11 @@
 }
 
 .btn-primary {
-  background-color: #D4AF37;
-  color: #fff;
+  background-color: var(--gold-bright);
+  color: var(--white);
 }
 
 .btn-danger {
-  background-color: #DC2626;
-  color: #fff;
+  background-color: var(--danger);
+  color: var(--white);
 }
