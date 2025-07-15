@@ -78,3 +78,12 @@
     font-size: 14px;
     color: var(--brown);
 }
+
+.visible-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    color: var(--brown);
+    font-size: 14px;
+}
