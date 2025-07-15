@@ -2,6 +2,7 @@ package com.weddinggallery.service;
 
 import com.weddinggallery.model.Photo;
 import com.weddinggallery.model.Device;
+import com.weddinggallery.model.User;
 import com.weddinggallery.repository.PhotoRepository;
 import com.weddinggallery.repository.PhotoSpecifications;
 import com.weddinggallery.dto.photo.PhotoResponse;
@@ -336,7 +337,7 @@ public class PhotoService {
                 .commentCount(0)
                 .reactionCount(0)
                 .uploadTime(LocalDateTime.now())
-                .isVisibleForGuset(isVisbleForGuest)
+                .isVisibleForGuest(isVisbleForGuest)
                 .isWish(isWish)
                 .build();
         photoRepository.save(photo);
