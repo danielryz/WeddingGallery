@@ -93,6 +93,7 @@ const PhotoDetailPage: React.FC = () => {
       setComments(comments.filter(c => c.id !== commentId));
       showAlert('Komentarz usunięty', 'success');
   } catch (err: unknown) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const e = err as any;
       if (e.response?.status === 403) {
         showAlert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.', 'error');
@@ -108,6 +109,7 @@ const PhotoDetailPage: React.FC = () => {
       window.location.href = '/gallery';
       showAlert('Zdjęcie usunięte', 'success');
   }catch (err: unknown) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const e = err as any;
       if (e.response?.status === 403){
         showAlert('Nie możesz usunąć tego zdjęcia - brak Autoryzacji.', 'error');
@@ -123,6 +125,7 @@ const PhotoDetailPage: React.FC = () => {
       showAlert('Opis zaktualizowany', 'success');
       setPhoto(prev => prev ? { ...prev, description: text } : prev);
     }catch (err: unknown) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const e = err as any;
       if (e.response?.status === 403){
         showAlert('Nie możesz zmienić tego opisu - brak Autoryzacji.', 'error');
@@ -161,7 +164,7 @@ const PhotoDetailPage: React.FC = () => {
         </div>
 
         {(isThisDevice(photo.deviceId) || isAdmin()) && (
-            <button className="delete-photo-btn" onClick={() => setShowDeletePhotoConfirm(true)}> Usuń Zdjęcie</button>
+            <button className="btn btn-danger" onClick={() => setShowDeletePhotoConfirm(true)}> Usuń Zdjęcie</button>
         )}
         {isThisDevice(photo.deviceId) && (
             <>
@@ -171,7 +174,7 @@ const PhotoDetailPage: React.FC = () => {
                 value={descInput}
                 onChange={e => setDescInput(e.target.value)}
             />
-            <button className="add-reaction-btn" onClick={() => setShowEditConfirm(true)}>Zapisz opis</button>
+            <button className="btn btn-primary" onClick={() => setShowEditConfirm(true)}>Zapisz opis</button>
             </>
         )}
 
@@ -199,7 +202,7 @@ const PhotoDetailPage: React.FC = () => {
           ) : (
               <button
                   onClick={() => setShowPicker(true)}
-                  className="add-reaction-btn"
+                  className="btn btn-primary"
               >
                 Dodaj reakcję
               </button>

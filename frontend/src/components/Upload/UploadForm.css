@@ -77,26 +77,12 @@
     align-self: flex-end;
     margin-top: 8px;
     font-size: 12px;
-    color: #EF4444;
-    text-decoration: underline;
-    background: none;
-    border: none;
-    cursor: pointer;
+    padding: 4px 8px;
 }
 
 .upload-submit-btn {
-    padding: 8px 16px;
-    background-color: #D4AF37;
-    color: #FFFFFF;
-    border: none;
-    border-radius: 4px;
     width: 100%;
-    cursor: pointer;
-    transition: opacity 0.2s;
     margin-top: 16px;
-}
-.upload-submit-btn:hover {
-    opacity: 0.9;
 }
 
 /* pasek postępu */

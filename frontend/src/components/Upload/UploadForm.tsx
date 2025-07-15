@@ -99,7 +99,7 @@ const UploadForm: React.FC = () => {
                                 onChange={e => handleDesc(i, e.target.value)}
                             />
                             <button
-                                className="remove-btn"
+                                className="btn btn-danger remove-btn"
                                 onClick={() => handleRemove(i)}
                             >Usuń</button>
                         </div>
@@ -110,7 +110,7 @@ const UploadForm: React.FC = () => {
             {files.length > 0 && (
                 <>
                     <button
-                        className="upload-submit-btn"
+                        className="btn btn-primary upload-submit-btn"
                         onClick={handleUpload}
                     >Wyślij do galerii</button>
 

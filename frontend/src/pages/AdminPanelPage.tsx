@@ -57,15 +57,7 @@ export const AdminPanelPage: React.FC = () => {
             <button
                 onClick={handleDownloadClick1}
                 disabled={loading}
-                style={{
-                    padding: '0.5rem 1rem',
-                    background: '#D4AF37',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '0.25rem',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    gap: '1rem'
-                }}
+                className="btn btn-primary"
             >
                 {loading ? 'Ładowanie...' : 'Pobierz archiwum'}
             </button>
@@ -73,15 +65,7 @@ export const AdminPanelPage: React.FC = () => {
             <button
                 onClick={handleDownloadClick2}
                 disabled={loading2}
-                style={{
-                    padding: '0.5rem 1rem',
-                    background: '#D4AF37',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '0.25rem',
-                    cursor: loading2 ? 'not-allowed' : 'pointer',
-                    gap: '1rem'
-                }}
+                className="btn btn-primary"
             >
                 {loading2 ? 'Ładowanie...' : 'Pobierz archiwum z opisami'}
             </button>

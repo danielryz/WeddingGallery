@@ -212,7 +212,7 @@ const ChatPage: React.FC = () => {
               onChange={e => setText(e.target.value)}
               placeholder="Napisz wiadomość..."
           />
-          <button onClick={handleSend} className="chat-send-button">
+          <button onClick={handleSend} className="btn btn-primary">
             Wyślij
           </button>
         </div>

@@ -73,19 +73,6 @@
     transform: scale(1.25);
 }
 
-.add-reaction-btn {
-    padding: 8px 16px;
-    border-radius: 8px;
-    background-color: #d9cb93; /* pastelowe tło */
-    color: #5A4633;
-    font-weight: 600;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-.add-reaction-btn:hover {
-    opacity: 0.9;
-}
 
 .comments-section {
     margin-top: 24px;

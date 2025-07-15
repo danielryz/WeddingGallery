@@ -46,7 +46,7 @@ const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                         onChange={e => setDeviceName(e.target.value)}
                         required
                     />
-                    <button type="submit" className="login-button">
+                    <button type="submit" className="btn btn-primary login-button">
                         Zaloguj
                     </button>
                 </form>
