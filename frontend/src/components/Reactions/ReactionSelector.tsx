@@ -2,15 +2,6 @@
 import React from 'react';
 import { addReaction } from '../../api/reactions';
 import './ReactionSelector.css';
-import {
-    Heart,
-    Smile,
-    Zap,
-    Frown,
-    AlertCircle,
-    ThumbsUp,
-    ThumbsDown,
-} from 'lucide-react';
 
 interface Props {
     photoId?: number;
@@ -30,16 +21,6 @@ const EMOJI_MAP: Record<string, string> = {
     '👎': 'DISLIKE',
 };
 
-// mapujemy unicode → komponent ikony
-const ICON_MAP: Record<string, React.FC<{ size?: number }>> = {
-    '❤️': Heart,
-    '😂': Smile,
-    '😮': Zap,
-    '😢': Frown,
-    '😡': AlertCircle,
-    '👍': ThumbsUp,
-    '👎': ThumbsDown,
-};
 
 const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReactionFn }) => {
     const handleSelect = async (emoji: string) => {
@@ -56,18 +37,18 @@ const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReac
 
     return (
         <div className="reaction-selector">
-            {Object.keys(EMOJI_MAP).map(emoji => {
-                const Icon = ICON_MAP[emoji];
-                return (
-                    <button
-                        key={emoji}
-                        aria-label={`Reakcja ${emoji}`}
-                        onClick={() => handleSelect(emoji)}
-                    >
-                        <Icon size={24} />
-                    </button>
-                );
-            })}
+            {Object.keys(EMOJI_MAP).map(emoji => (
+                <button
+                    key={emoji}
+                    aria-label={`Reakcja ${emoji}`}
+                    onClick={e => {
+                        e.stopPropagation();
+                        handleSelect(emoji);
+                    }}
+                >
+                    <span className="reaction-emoji">{emoji}</span>
+                </button>
+            ))}
         </div>
     );
 };
