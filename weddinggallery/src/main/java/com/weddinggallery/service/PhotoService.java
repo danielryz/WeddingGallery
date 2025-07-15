@@ -388,7 +388,7 @@ public class PhotoService {
             textBounds = font.getStringBounds(str, frc).getBounds();
         }
 
-        int newW = src.getWidth() + pad * 2;
+        int newW = Math.max(src.getWidth(), textBounds.width) + pad * 2;
         int newH = src.getHeight() + pad * 2 + textBounds.height + pad;
 
         BufferedImage out = new BufferedImage(newW, newH, BufferedImage.TYPE_INT_RGB);
