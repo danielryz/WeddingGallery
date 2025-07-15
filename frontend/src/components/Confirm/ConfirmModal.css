@@ -10,8 +10,8 @@
 }
 
 .confirm-box {
-    background-color: #735c23;
-    color: #000000;
+    background-color: var(--confirm-bg);
+    color: var(--black);
     padding: 30px;
     border-radius: 12px;
     max-width: 400px;
@@ -20,7 +20,7 @@
 }
 
 .confirm-box h3 {
-    color: #735c23;
+    color: var(--confirm-bg);
     margin-bottom: 16px;
 }
 
@@ -45,11 +45,11 @@
 }
 
 .confirm-actions button.confirm-yes {
-    background-color: #735c23;
-    color: #000000;
+    background-color: var(--confirm-bg);
+    color: var(--black);
 }
 
 .confirm-actions button.confirm-no {
-    background-color: #735c23;
-    color: #000000;
+    background-color: var(--confirm-bg);
+    color: var(--black);
 }

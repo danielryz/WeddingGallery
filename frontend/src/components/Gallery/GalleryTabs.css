@@ -7,7 +7,7 @@
     display: flex;
     justify-content: center;
     margin-bottom: 16px;
-    background-color: #FEFBEA;        /* pastelowy kremowy */
+    background-color: var(--cream-light);        /* pastelowy kremowy */
     border-radius: 8px;           /* zaokrąglone krawędzie kontenera */
     padding: 4px;                    /* odstęp wewnętrzny, aby kremowy był widoczny */
     font-family: 'Playfair Display', serif;
@@ -18,7 +18,7 @@
     padding: 8px 16px;
     font: inherit;
     font-size: 1rem;
-    color: #6B7280;                  /* nieaktywny tekst */
+    color: var(--gray);                  /* nieaktywny tekst */
     background: none;
     border: 1px solid currentColor; /* ramka w kolorze tekstu */
     cursor: pointer;
@@ -38,7 +38,7 @@
 
 /* Styl aktywnej zakładki */
 .tab-button.active {
-    background-color: #d9cb93; /* pastelowe tło */
-    color: #5A4633;            /* ciemny brąz */
+    background-color: var(--gold-dim); /* pastelowe tło */
+    color: var(--brown);            /* ciemny brąz */
     /* border-color: currentColor; – już jest dzięki currentColor */
 }

@@ -1,0 +1,9 @@
+.download-info {
+    margin-top: 1rem;
+}
+
+.download-link {
+    color: var(--gold-bright);
+    text-decoration: underline;
+}
+

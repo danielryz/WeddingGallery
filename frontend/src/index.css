@@ -6,6 +6,21 @@
   --text-main: #4E491B;
   --accent-green: #96962D;
   --cream-bg: #FDFBF5;
+  --cream-light: #FEFBEA;
+  --gray: #6B7280;
+  --gold-dim: #d9cb93;
+  --brown: #5A4633;
+  --white: #FFFFFF;
+  --black: #000000;
+  --alert-bg: #7a6228;
+  --confirm-bg: #735c23;
+  --red-error: #ff0013;
+  --blue-info: #2c78ff;
+  --grey-border: #CCCCCC;
+  --gold-bright: #D4AF37;
+  --danger: #DC2626;
+  --progress-bg: #e0e0e0;
+  --gray-muted: #9CA3AF;
 }
 
 /* src/index.css – globalne style */

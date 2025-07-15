@@ -18,6 +18,6 @@
 /* Komunikat pustej galerii */
 .empty-msg {
     text-align: center;
-    color: #5A4633;
+    color: var(--brown);
     margin-top: 24px;
 }

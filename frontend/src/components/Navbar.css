@@ -14,7 +14,7 @@
 /* Tytuł zawsze na górze, centralnie */
 .navbar-title {
     font-size: 1.5rem;
-    color: #5A4633;
+    color: var(--brown);
     margin-bottom: 8px;
 }
 
@@ -35,7 +35,7 @@
 .nav-link {
     display: inline-block;
     padding: 4px 8px;
-    color: #5A4633;
+    color: var(--brown);
     text-decoration: none;
     font-size: 1rem;
 
@@ -47,8 +47,8 @@
 
 /* Hover: złota ramka i zmiana koloru tekstu */
 .nav-link:hover {
-    color: #D4AF37;                      /* zmiana koloru tekstu na złoty */
-    border-color: #D4AF37;               /* ramka w kolorze złotym */
+    color: var(--gold-bright);                      /* zmiana koloru tekstu na złoty */
+    border-color: var(--gold-bright);               /* ramka w kolorze złotym */
 }
 
 /* 4) Ukryj hamburger na desktopie (jeśli nadal go używasz) */

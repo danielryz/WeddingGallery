@@ -1,7 +1,7 @@
 /* src/components/UploadForm.css */
 
 .upload-form-container {
-    background-color: #FEFBEA;
+    background-color: var(--cream-light);
     padding: 16px;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -10,7 +10,7 @@
 }
 
 .dropzone {
-    border: 2px dashed #D4AF37;
+    border: 2px dashed var(--gold-bright);
     border-radius: 4px;
     padding: 24px;
     text-align: center;
@@ -18,7 +18,7 @@
     margin-bottom: 16px;
 }
 .dropzone p {
-    color: #5A4633;
+    color: var(--brown);
     font-weight: 600;
 }
 
@@ -44,8 +44,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;    /* centrowanie poziome elementów */
-    background-color: #FFFFFF;
-    border: 1px solid #D4AF37;
+    background-color: var(--white);
+    border: 1px solid var(--gold-bright);
     border-radius: 4px;
     padding: 4px;
     gap: 8px;
@@ -61,7 +61,7 @@
 .desc-input {
     width: 90%;
     margin: 8px auto 0;
-    border: 1px solid #CCCCCC;
+    border: 1px solid var(--grey-border);
     border-radius: 4px;
     padding: 8px;
     font-size: 14px;
@@ -70,7 +70,7 @@
 }
 .desc-input:focus {
     outline: none;
-    border-color: #D4AF37;
+    border-color: var(--gold-bright);
 }
 
 .remove-btn {
@@ -89,19 +89,19 @@
 .progress-bar {
     width: 100%;
     height: 6px;
-    background: #e0e0e0;
+    background: var(--progress-bg);
     border-radius: 3px;
     overflow: hidden;
     margin-top: 8px;
 }
 .progress-fill {
     height: 100%;
-    background: #D4AF37;
+    background: var(--gold-bright);
     transition: width 0.3s ease;
 }
 
 .upload-progress {
     margin-top: 8px;
     font-size: 14px;
-    color: #5A4633;
+    color: var(--brown);
 }
