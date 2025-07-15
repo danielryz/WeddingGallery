@@ -52,12 +52,13 @@ export const savePhoto = async (
   file: File,
   description?: string,
   isVisibleForGuest = true,
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void,
 ): Promise<void> => {
   const form = new FormData()
   form.append('file', file)
   if (description) form.append('description', description)
   form.append('isVisibleForGuest', String(isVisibleForGuest))
-  await axiosInstance.post('/api/photos', form)
+  await axiosInstance.post('/api/photos', form, { onUploadProgress })
 }
 
 export const savePhotos = async (

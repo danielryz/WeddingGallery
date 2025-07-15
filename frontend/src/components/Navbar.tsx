@@ -18,6 +18,9 @@ const Navbar: React.FC = () => {
                 <Link to="/upload" className="nav-link" onClick={() => setMenuOpen(false)}>
                     Dodaj zdjęcie/film
                 </Link>
+                <Link to="/wishes" className="nav-link" onClick={() => setMenuOpen(false)}>
+                    Życzenia
+                </Link>
                 <Link to="/chat" className="nav-link" onClick={() => setMenuOpen(false)}>
                     Chat
                 </Link>
