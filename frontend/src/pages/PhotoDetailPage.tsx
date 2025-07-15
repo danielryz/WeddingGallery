@@ -8,6 +8,7 @@ import type {CommentResponse} from '../types/comment';
 import './PhotoDetailPage.css';
 import {isAdmin, isThisDevice} from "../utils/authUtils.ts";
 import { useAlerts } from "../components/alert/useAlerts"
+import ConfirmModal from "../components/Confirm/ConfirmModal";
 
 const EMOJI_MAP: Record<string, string> = {
   HEART: '❤️', LAUGH: '😂', WOW: '😮', SAD: '😢',
@@ -21,6 +22,10 @@ const PhotoDetailPage: React.FC = () => {
   const [showPicker, setShowPicker] = useState(false);
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [newComment, setNewComment] = useState('');
+  const [showDeletePhotoConfirm, setShowDeletePhotoConfirm] = useState(false);
+  const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
+  const [descInput, setDescInput] = useState('');
+  const [showEditConfirm, setShowEditConfirm] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   const showAlert = useAlerts();
 
@@ -32,6 +37,7 @@ const PhotoDetailPage: React.FC = () => {
         ...res,
         isVideo: res.isVideo ?? (res as { video?: boolean }).video ?? false,
       });
+      setDescInput(res.description || '');
     };
     const loadReactions = async () => {
       const counts = await getReactionCounts(Number(id));
@@ -87,7 +93,8 @@ const PhotoDetailPage: React.FC = () => {
       setComments(comments.filter(c => c.id !== commentId));
       showAlert('Komentarz usunięty', 'success');
   } catch (err: unknown) {
-      if (err.response?.status === 403) {
+      const e = err as any;
+      if (e.response?.status === 403) {
         showAlert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.', 'error');
       } else {
         showAlert('Bład usuwania komentarza: ' + err, 'error');
@@ -101,7 +108,8 @@ const PhotoDetailPage: React.FC = () => {
       window.location.href = '/gallery';
       showAlert('Zdjęcie usunięte', 'success');
   }catch (err: unknown) {
-      if (err.response?.status === 403){
+      const e = err as any;
+      if (e.response?.status === 403){
         showAlert('Nie możesz usunąć tego zdjęcia - brak Autoryzacji.', 'error');
       } else {
         showAlert('Błąd usuwania zdjęcia: ' + err, 'error');
@@ -113,8 +121,10 @@ const PhotoDetailPage: React.FC = () => {
     try {
       await  updateDescription(Number(id), {description: text});
       showAlert('Opis zaktualizowany', 'success');
+      setPhoto(prev => prev ? { ...prev, description: text } : prev);
     }catch (err: unknown) {
-      if (err.response?.status === 403){
+      const e = err as any;
+      if (e.response?.status === 403){
         showAlert('Nie możesz zmienić tego opisu - brak Autoryzacji.', 'error');
       } else {
         showAlert('Błąd edycji opisu: ' + err, 'error');
@@ -151,10 +161,18 @@ const PhotoDetailPage: React.FC = () => {
         </div>
 
         {(isThisDevice(photo.deviceId) || isAdmin()) && (
-            <button className="delete-photo-btn" onClick={handleDeletePhoto}> Usuń Zdjęcie</button>
+            <button className="delete-photo-btn" onClick={() => setShowDeletePhotoConfirm(true)}> Usuń Zdjęcie</button>
         )}
         {isThisDevice(photo.deviceId) && (
-            <textarea className="update-description-input" placeholder="Dodaj opis..." onChange={(e) => handleEditDescription(e.target.value)}></textarea>
+            <>
+            <textarea
+                className="update-description-input"
+                placeholder="Dodaj opis..."
+                value={descInput}
+                onChange={e => setDescInput(e.target.value)}
+            />
+            <button className="add-reaction-btn" onClick={() => setShowEditConfirm(true)}>Zapisz opis</button>
+            </>
         )}
 
         {/* Sekcja reakcji pod zdjęciem/filmem */}
@@ -207,7 +225,7 @@ const PhotoDetailPage: React.FC = () => {
                         <div>{comment.text}</div>
                         {(isThisDevice(comment.deviceId) || isAdmin()) && (
                         <button
-                            onClick={() => handleDeleteComment(comment.id)}
+                            onClick={() => setCommentToDelete(comment.id)}
                             className="delete-btn"
                             title="Usuń komentarz"
                         >
@@ -229,6 +247,27 @@ const PhotoDetailPage: React.FC = () => {
               className="comment-input"
           />
         </section>
+        {showDeletePhotoConfirm && (
+            <ConfirmModal
+                message="Czy na pewno usunąć zdjęcie?"
+                onConfirm={async () => { await handleDeletePhoto(); setShowDeletePhotoConfirm(false); }}
+                onCancel={() => setShowDeletePhotoConfirm(false)}
+            />
+        )}
+        {commentToDelete !== null && (
+            <ConfirmModal
+                message="Czy na pewno usunąć komentarz?"
+                onConfirm={async () => { await handleDeleteComment(commentToDelete); setCommentToDelete(null); }}
+                onCancel={() => setCommentToDelete(null)}
+            />
+        )}
+        {showEditConfirm && (
+            <ConfirmModal
+                message="Czy na pewno zaktualizować opis?"
+                onConfirm={async () => { await handleEditDescription(descInput); setShowEditConfirm(false); }}
+                onCancel={() => setShowEditConfirm(false)}
+            />
+        )}
       </main>
   );
 };
