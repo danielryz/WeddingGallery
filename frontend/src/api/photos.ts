@@ -48,10 +48,15 @@ export const getPhoto = async (id: number): Promise<PhotoResponse> => {
   return res.data
 }
 
-export const savePhoto = async (file: File, description?: string): Promise<void> => {
+export const savePhoto = async (
+  file: File,
+  description?: string,
+  isVisibleForGuest = true,
+): Promise<void> => {
   const form = new FormData()
   form.append('file', file)
   if (description) form.append('description', description)
+  form.append('isVisibleForGuest', String(isVisibleForGuest))
   await axiosInstance.post('/api/photos', form)
 }
 
