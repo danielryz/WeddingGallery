@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {getPhoto, updateDescription, updateVisibility} from '../api/photos';
 import { getReactionCounts, addReaction } from '../api/reactions';
@@ -7,7 +7,7 @@ import type {PhotoResponse} from '../types/photo';
 import type {CommentResponse} from '../types/comment';
 import './PhotoDetailPage.css';
 import {isAdmin, isThisDevice} from "../utils/authUtils.ts";
-import AlertStack from "../components/alert/AlertStack.tsx"
+import { useAlerts } from "../components/alert/useAlerts"
 
 const EMOJI_MAP: Record<string, string> = {
   HEART: '❤️', LAUGH: '😂', WOW: '😮', SAD: '😢',
@@ -22,19 +22,7 @@ const PhotoDetailPage: React.FC = () => {
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [newComment, setNewComment] = useState('');
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-  const [alerts, setAlerts] = useState<
-      { id: number; message: string; type: "success" | "error" }[]
-  >([]);
-  const nextId = useRef(0);
-
-  const showAlert = (message: string, type: "success" | "error") => {
-    const id = nextId.current++;
-    setAlerts((prev) => [...prev, { id, message, type }]);
-  };
-
-  const removeAlert = (id: number) => {
-    setAlerts((prev) => prev.filter((a) => a.id !== id));
-  };
+  const showAlert = useAlerts();
 
   useEffect(() => {
     if (!id) return;
@@ -98,7 +86,7 @@ const PhotoDetailPage: React.FC = () => {
       await deleteComment(commentId);
       setComments(comments.filter(c => c.id !== commentId));
       showAlert('Komentarz usunięty', 'success');
-    } catch (err: any) {
+  } catch (err: unknown) {
       if (err.response?.status === 403) {
         showAlert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.', 'error');
       } else {
@@ -112,7 +100,7 @@ const PhotoDetailPage: React.FC = () => {
       await updateVisibility(Number(id), {visible: false});
       window.location.href = '/gallery';
       showAlert('Zdjęcie usunięte', 'success');
-    }catch (err:any) {
+  }catch (err: unknown) {
       if (err.response?.status === 403){
         showAlert('Nie możesz usunąć tego zdjęcia - brak Autoryzacji.', 'error');
       } else {
@@ -125,7 +113,7 @@ const PhotoDetailPage: React.FC = () => {
     try {
       await  updateDescription(Number(id), {description: text});
       showAlert('Opis zaktualizowany', 'success');
-    }catch (err:any) {
+    }catch (err: unknown) {
       if (err.response?.status === 403){
         showAlert('Nie możesz zmienić tego opisu - brak Autoryzacji.', 'error');
       } else {
@@ -241,7 +229,6 @@ const PhotoDetailPage: React.FC = () => {
               className="comment-input"
           />
         </section>
-        <AlertStack alerts={alerts} onRemove={removeAlert} />
       </main>
   );
 };

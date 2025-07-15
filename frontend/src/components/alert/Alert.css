@@ -27,6 +27,17 @@
     color: #000000;
 }
 
+.alert-info {
+    background-color: #2c78ff;
+    color: #ffffff;
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .alert-buttons button.alert-close {
     background: transparent;
     border: none;

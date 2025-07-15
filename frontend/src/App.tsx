@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
@@ -8,7 +8,7 @@ import ChatPage from './pages/ChatPage';
 import UploadPage from './pages/UploadPage';
 import { login } from './api/auth';
 import AdminPanelPage from "./pages/AdminPanelPage.tsx";
-import AlertStack from "./components/alert/AlertStack.tsx"
+import { useAlerts } from './components/alert/useAlerts'
 
 function App() {
   const [isAuth, setIsAuth] = useState(() => {
@@ -22,19 +22,7 @@ function App() {
     }
     return true;
   });
-  const [alerts, setAlerts] = useState<
-      { id: number; message: string; type: "success" | "error" }[]
-  >([]);
-  const nextId = useRef(0);
-
-  const showAlert = (message: string, type: "success" | "error") => {
-    const id = nextId.current++;
-    setAlerts((prev) => [...prev, { id, message, type }]);
-  };
-
-  const removeAlert = (id: number) => {
-    setAlerts((prev) => prev.filter((a) => a.id !== id));
-  };
+  const showAlert = useAlerts();
 
   useEffect(() => {
     if (isAuth) {
@@ -87,8 +75,6 @@ function App() {
           <Route path="/admin/download-panel/" element={<AdminPanelPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-
-        <AlertStack alerts={alerts} onRemove={removeAlert} />
       </>
   );
 }

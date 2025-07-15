@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {downloadArchive, downloadArchiveWithDescription} from "../api/photos.ts";
-import AlertStack from "../components/alert/AlertStack.tsx"
+import { useAlerts } from "../components/alert/useAlerts"
 
 export const AdminPanelPage: React.FC = () => {
     const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
@@ -9,19 +9,7 @@ export const AdminPanelPage: React.FC = () => {
     const [downloadUrl2, setDownloadUrl2] = useState<string | null>(null);
     const [loading2, setLoading2] = useState(false);
 
-    const [alerts, setAlerts] = useState<
-        { id: number; message: string; type: "success" | "error" }[]
-    >([]);
-    const nextId = useRef(0);
-
-    const showAlert = (message: string, type: "success" | "error") => {
-        const id = nextId.current++;
-        setAlerts((prev) => [...prev, { id, message, type }]);
-    };
-
-    const removeAlert = (id: number) => {
-        setAlerts((prev) => prev.filter((a) => a.id !== id));
-    };
+    const showAlert = useAlerts();
 
     useEffect(() => {
         return () => {
@@ -41,7 +29,7 @@ export const AdminPanelPage: React.FC = () => {
             const url = URL.createObjectURL(new Blob([blob], { type: 'application/zip' }));
             setDownloadUrl(url);
             showAlert('Link wygenerowany poprawnie.', 'success');
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(e);
             showAlert('Nie udało się pobrać archiwum.', 'error');
         } finally {
@@ -56,7 +44,7 @@ export const AdminPanelPage: React.FC = () => {
             const url = URL.createObjectURL(new Blob([blob], { type: 'application/zip' }));
             setDownloadUrl2(url);
             showAlert('Link wygenerowany poprawnie.', 'success');
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(e);
             showAlert('Nie udało się pobrać archiwum z opisami.', 'error');
         } finally {
@@ -121,7 +109,6 @@ export const AdminPanelPage: React.FC = () => {
                     </a>
                 </p>
             )}
-            <AlertStack alerts={alerts} onRemove={removeAlert} />
         </div>
     );
 };
