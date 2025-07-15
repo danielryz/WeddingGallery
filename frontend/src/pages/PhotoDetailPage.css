@@ -198,6 +198,41 @@
     border-color: var(--gold-bright);
 }
 
+.photo-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.edit-desc-form {
+    margin-top: 8px;
+}
+
+.update-description-input {
+    width: 100%;
+    border: 1px solid var(--grey-border);
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 14px;
+    resize: vertical;
+    min-height: 40px;
+}
+
+.edit-desc-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.edit-hint {
+    text-align: center;
+    margin-top: 4px;
+    color: var(--brown);
+    font-size: 14px;
+}
+
 .loading-text {
     text-align: center;
     color: var(--brown);

@@ -9,6 +9,13 @@
     margin: 0 auto;
 }
 
+.upload-info {
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--brown);
+    font-size: 14px;
+}
+
 .dropzone {
     border: 2px dashed var(--gold-bright);
     border-radius: 4px;

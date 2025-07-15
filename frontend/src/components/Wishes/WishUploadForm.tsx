@@ -48,6 +48,10 @@ const WishUploadForm: React.FC = () => {
 
   return (
     <div className="wish-upload-container">
+      <p className="wish-info">
+        Tutaj możesz dodać jedno zdjęcie lub film z życzeniami dla nowożeńców.
+        Dodaj opis i wyślij!
+      </p>
       <div {...getRootProps()} className="wish-dropzone">
         <input {...getInputProps()} />
         <p>Przeciągnij plik lub kliknij</p>
