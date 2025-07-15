@@ -126,6 +126,8 @@ public class PhotoService {
         );
 
         Specification<Photo> spec = PhotoSpecifications.isVisible(true);
+        spec = spec.and(PhotoSpecifications.isVisibleForGuest(true));
+        spec = spec.and(PhotoSpecifications.isWish(false));
         if (extensions != null) {
             spec = spec.and(PhotoSpecifications.withExtensions(extensions));
         }

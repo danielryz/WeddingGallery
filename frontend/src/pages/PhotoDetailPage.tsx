@@ -126,7 +126,7 @@ const PhotoDetailPage: React.FC = () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const e = err as any;
       if (e.response?.status === 403){
-        showAlert('Nie możesz zmienić tego opisu - brak Autoryzacji.', 'error');
+        showAlert('Nie możesz zmienić tego opisu - brak Autoryzacji.', 'info');
       } else {
         showAlert('Błąd edycji opisu: ' + err, 'error');
       }
@@ -187,7 +187,7 @@ const PhotoDetailPage: React.FC = () => {
           <div className="photo-info">
             <span className="photo-deviceName">{photo.deviceName}</span>
             <span className="photo-description">{photo.description}</span>
-            {!photo.isVisibleForGuest && (
+            {photo.isVisibleForGuest && (
                 <span className="photo-visibility">Ukryte dla gości</span>
             )}
             {photo.isWish && (
