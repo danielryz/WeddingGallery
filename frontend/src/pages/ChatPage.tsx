@@ -11,10 +11,12 @@ import {
 import type { ChatMessageResponse, ChatReactionCountResponse } from '../types/chat';
 import './ChatPage.css';
 import { useAlerts } from "../components/alert/useAlerts"
+import ReactionSelector from '../components/Reactions/ReactionSelector';
+import useLongPressReaction from '../hooks/useLongPressReaction';
 
 function ChatMessage({ message }: { message: ChatMessageResponse }) {
   const [reactions, setReactions] = useState<ChatReactionCountResponse[]>([]);
-  const [showPicker, setShowPicker] = useState(false);
+  const { show: showPicker, handlers, close } = useLongPressReaction();
   const pickerRef = useRef<HTMLDivElement>(null);
   const localDeviceId = Number(localStorage.getItem('deviceId'));
   const isOwn = message.deviceId === localDeviceId;
@@ -29,7 +31,7 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
   useEffect(() => {
     const onClickOutside = (e: Event) => {
       if (showPicker && pickerRef.current && !pickerRef.current.contains(e.target as Node)) {
-        setShowPicker(false);
+        close();
       }
     };
     document.addEventListener('mousedown', onClickOutside);
@@ -38,7 +40,7 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
       document.removeEventListener('mousedown', onClickOutside);
       document.removeEventListener('touchstart', onClickOutside);
     };
-  }, [showPicker]);
+  }, [showPicker, close]);
 
   const handleReactionSelect = async (emoji: string) => {
     try {
@@ -47,22 +49,16 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
     } catch (err) {
       showAlert('Błąd dodawania reakcji: ' + err, 'error');
     } finally {
-      setShowPicker(false);
+      close();
     }
   };
 
-  const handleBubbleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowPicker(true);
-  };
-
-  const EMOJIS = ['❤️', '😂', '😮', '😢', '😡', '👍', '👎'];
 
   return (
       <div className={`chat-message ${isOwn ? 'own' : ''}`}>
         <div
             className={`chat-bubble ${isOwn ? 'own' : 'other'}`}
-            onClick={handleBubbleClick}
+            {...handlers}
         >
           {!isOwn && <div className="chat-sender-name">{message.deviceName}</div>}
           <div>{message.text}</div>
@@ -70,11 +66,10 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
 
         {showPicker && (
             <div ref={pickerRef} className="emoji-picker">
-              {EMOJIS.map(emoji => (
-                  <button key={emoji} onClick={() => handleReactionSelect(emoji)}>
-                    {emoji}
-                  </button>
-              ))}
+              <ReactionSelector
+                onClose={close}
+                addReactionFn={handleReactionSelect}
+              />
             </div>
         )}
 

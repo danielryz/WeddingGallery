@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {getPhoto, updateDescription, updateVisibility} from '../api/photos';
-import { getReactionCounts, addReaction } from '../api/reactions';
+import { getReactionCounts } from '../api/reactions';
 import { getComments, addComment, deleteComment } from '../api/comments';
 import type {PhotoResponse} from '../types/photo';
 import type {CommentResponse} from '../types/comment';
@@ -9,6 +9,8 @@ import './PhotoDetailPage.css';
 import {isAdmin, isThisDevice} from "../utils/authUtils.ts";
 import { useAlerts } from "../components/alert/useAlerts"
 import ConfirmModal from "../components/Confirm/ConfirmModal";
+import useLongPressReaction from '../hooks/useLongPressReaction';
+import ReactionSelector from '../components/Reactions/ReactionSelector';
 
 const EMOJI_MAP: Record<string, string> = {
   HEART: '❤️', LAUGH: '😂', WOW: '😮', SAD: '😢',
@@ -19,7 +21,7 @@ const PhotoDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [photo, setPhoto] = useState<PhotoResponse | null>(null);
   const [reactions, setReactions] = useState<Record<string, number>>({});
-  const [showPicker, setShowPicker] = useState(false);
+  const { show: showPicker, handlers, close } = useLongPressReaction();
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [newComment, setNewComment] = useState('');
   const [showDeletePhotoConfirm, setShowDeletePhotoConfirm] = useState(false);
@@ -59,17 +61,13 @@ const PhotoDetailPage: React.FC = () => {
     return <p className="loading-text">Ładowanie...</p>;
   }
 
-  const handleAddReaction = async (emoji: string) => {
-    const typeEntry = Object.entries(EMOJI_MAP).find(([, e]) => e === emoji);
-    if (!typeEntry) return;
-    const type = typeEntry[0];
-    await addReaction(Number(id), { type });
+  const refreshReactions = async () => {
     const counts = await getReactionCounts(Number(id));
     const mapped = Object.fromEntries(
         counts.filter(r => EMOJI_MAP[r.type]).map(r => [EMOJI_MAP[r.type], r.count])
     );
     setReactions(mapped);
-    setShowPicker(false);
+    close();
   };
 
   const handleSendComment = async () => {
@@ -135,6 +133,33 @@ const PhotoDetailPage: React.FC = () => {
     }
   }
 
+  const CommentItem: React.FC<{ comment: CommentResponse }> = ({ comment }) => {
+    const { show: showCommentPicker, handlers: commentHandlers, close: closeComment } = useLongPressReaction();
+    return (
+      <li className="comment-item">
+        <div className="comment-avatar">
+          {comment.deviceName.charAt(0).toUpperCase()}
+        </div>
+        <div className="comment-bubble" {...commentHandlers}>
+          <div className="comment-author">{comment.deviceName}</div>
+          <div>{comment.text}</div>
+          {(isThisDevice(comment.deviceId) || isAdmin()) && (
+            <button
+              onClick={() => setCommentToDelete(comment.id)}
+              className="delete-btn"
+              title="Usuń komentarz"
+            >
+              🗑️
+            </button>
+          )}
+          {showCommentPicker && (
+            <ReactionSelector onClose={closeComment} addReactionFn={async () => {}} />
+          )}
+        </div>
+      </li>
+    );
+  };
+
 
 
 
@@ -144,7 +169,7 @@ const PhotoDetailPage: React.FC = () => {
 
         {/* Podgląd zdjęcia lub filmu */}
         <div className="photo-frame">
-          <div className="media-container">
+          <div className="media-container" {...handlers}>
             {photo.isVideo ? (
                 <video
                     src={`${API_URL}/photos/${photo.fileName}`}
@@ -189,27 +214,15 @@ const PhotoDetailPage: React.FC = () => {
               </div>
           ))}
         </div>
-        <div className="reaction-picker-container">
-          {showPicker ? (
-              <div className="emoji-palette">
-                {Object.values(EMOJI_MAP).map(emoji => (
-                    <button
-                        key={emoji}
-                        onClick={() => handleAddReaction(emoji)}
-                    >
-                      {emoji}
-                    </button>
-                ))}
-              </div>
-          ) : (
-              <button
-                  onClick={() => setShowPicker(true)}
-                  className="btn btn-primary"
-              >
-                Dodaj reakcję
-              </button>
-          )}
-        </div>
+        {showPicker && (
+          <div className="reaction-picker-container">
+            <ReactionSelector
+              photoId={Number(id)}
+              onSelect={refreshReactions}
+              onClose={close}
+            />
+          </div>
+        )}
 
         {/* Sekcja komentarzy */}
         <section className="comments-section">
@@ -219,26 +232,7 @@ const PhotoDetailPage: React.FC = () => {
           ) : (
               <ul className="comment-list">
                 {comments.map(comment => (
-                    <li key={comment.id} className="comment-item">
-                      {/* Avatar z inicjałem */}
-                      <div className="comment-avatar">
-                        {comment.deviceName.charAt(0).toUpperCase()}
-                      </div>
-                      {/* Treść komentarza */}
-                      <div className="comment-bubble">
-                        <div className="comment-author">{comment.deviceName}</div>
-                        <div>{comment.text}</div>
-                        {(isThisDevice(comment.deviceId) || isAdmin()) && (
-                        <button
-                            onClick={() => setCommentToDelete(comment.id)}
-                            className="delete-btn"
-                            title="Usuń komentarz"
-                        >
-                          🗑️
-                        </button>
-                        )}
-                      </div>
-                    </li>
+                  <CommentItem key={comment.id} comment={comment} />
                 ))}
               </ul>
           )}
