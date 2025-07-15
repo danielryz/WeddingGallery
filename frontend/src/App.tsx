@@ -6,6 +6,7 @@ import GalleryPage from './pages/GalleryPage';
 import PhotoDetailPage from './pages/PhotoDetailPage';
 import ChatPage from './pages/ChatPage';
 import UploadPage from './pages/UploadPage';
+import WishesPage from './pages/WishesPage';
 import { login } from './api/auth';
 import AdminPanelPage from "./pages/AdminPanelPage.tsx";
 import { useAlerts } from './components/alert/useAlerts'
@@ -71,6 +72,7 @@ function App() {
           <Route path="/gallery" element={<GalleryPage />} />
           <Route path="/photo/:id" element={<PhotoDetailPage />} />
           <Route path="/upload" element={<UploadPage />} />
+          <Route path="/wishes" element={<WishesPage />} />
           <Route path="/chat" element={<ChatPage />} />
           <Route path="/admin/download-panel/" element={<AdminPanelPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
