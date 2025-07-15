@@ -21,6 +21,14 @@ public class PhotoSpecifications {
     return (root, query, cb) -> cb.equal(root.get("visible"), visible);
   }
 
+  public static Specification<Photo> isWish(boolean wish) {
+    return (root, query, cb) -> cb.equal(root.get("isWish"), wish);
+  }
+
+  public static Specification<Photo> isVisibleForGuest(boolean visible) {
+    return (root, query, cb) -> cb.equal(root.get("isVisibleForGuest"), visible);
+  }
+
   public static Specification<Photo> withExtensions(Set<String> extensions) {
     return (root, query, cb) -> {
       if (extensions == null || extensions.isEmpty()) {

@@ -134,6 +134,33 @@ public class PhotoService {
                 .map(photo -> toResponse(photo, isVideo(photo.getFileName())));
     }
 
+    public Page<PhotoResponse> getWishes(Pageable pageable, Sort sort, HttpServletRequest request) {
+        Device device = deviceService.getRequestingDevice(request);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+
+        PageRequest pageRequest = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                sort
+        );
+
+        Specification<Photo> spec = PhotoSpecifications.isVisible(true)
+                .and(PhotoSpecifications.isWish(true));
+
+        if (!isAdmin) {
+            Specification<Photo> guestOrOwner = Specification
+                    .where(PhotoSpecifications.isVisibleForGuest(true))
+                    .or(PhotoSpecifications.withDeviceId(device.getId()));
+            spec = spec.and(guestOrOwner);
+        }
+
+        return photoRepository
+                .findAll(spec, pageRequest)
+                .map(photo -> toResponse(photo, isVideo(photo.getFileName())));
+    }
+
     @Transactional
     public PhotoResponse getPhoto(Long id) {
         Photo photo = photoRepository.findById(id)

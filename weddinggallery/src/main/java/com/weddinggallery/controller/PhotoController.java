@@ -66,6 +66,22 @@ public class PhotoController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/wishes")
+    @Operation(summary = "Get wishes")
+    public ResponseEntity<Page<PhotoResponse>> getWishes(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "uploadTime") String sortBy,
+            @RequestParam(defaultValue = "desc") String direction,
+            HttpServletRequest request
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Sort sort = SortUtil.from(sortBy, direction);
+        var result = photoService.getWishes(pageable, sort, request);
+        return ResponseEntity.ok(result);
+    }
+
     @GetMapping("/{id}")
     @Operation(summary = "Get photo by id")
     public ResponseEntity<PhotoResponse> getPhoto(
