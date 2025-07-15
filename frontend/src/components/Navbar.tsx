@@ -17,6 +17,9 @@ const Navbar: React.FC = () => {
                 <Link to="/gallery" className="nav-link" onClick={closeMenu}>
                     Galeria
                 </Link>
+                <Link to="/slider" className="nav-link" onClick={closeMenu}>
+                    Przeglądaj
+                </Link>
                 <Link to="/upload" className="nav-link" onClick={closeMenu}>
                     Dodaj zdjęcie/film
                 </Link>
