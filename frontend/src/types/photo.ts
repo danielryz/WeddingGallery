@@ -9,6 +9,8 @@ export interface PhotoResponse {
   deviceId: number;
   deviceName: string;
   visible: boolean;
+  isVisibleForGuest: boolean;
+  isWish: boolean;
   isVideo: boolean;
 }
 
