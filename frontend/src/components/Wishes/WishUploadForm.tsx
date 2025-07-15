@@ -10,6 +10,7 @@ const WishUploadForm: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [description, setDescription] = useState('');
   const [progress, setProgress] = useState(0);
+  const [visible, setVisible] = useState(true);
   const showAlert = useAlerts();
 
   const onDrop = useCallback((accepted: File[]) => {
@@ -31,7 +32,7 @@ const WishUploadForm: React.FC = () => {
   const handleUpload = async () => {
     if (!file) return;
     try {
-      await savePhoto(file, description, true, e => {
+      await savePhoto(file, description, visible, e => {
         setProgress(Math.round((e.loaded * 100) / (e.total || 1)));
       });
       showAlert('Wysłano!', 'success');
@@ -49,8 +50,8 @@ const WishUploadForm: React.FC = () => {
   return (
     <div className="wish-upload-container">
       <p className="wish-info">
-        Tutaj możesz dodać jedno zdjęcie lub film z życzeniami dla nowożeńców.
-        Dodaj opis i wyślij!
+        Twoje życzenia trafią do Młodej Pary. Dodaj zdjęcie lub film i podziel
+        się miłym słowem!
       </p>
       <div {...getRootProps()} className="wish-dropzone">
         <input {...getInputProps()} />
@@ -68,10 +69,18 @@ const WishUploadForm: React.FC = () => {
       )}
       <textarea
         className="wish-desc-input"
-        placeholder="Dodaj opis..."
+        placeholder="Twoje życzenia..."
         value={description}
         onChange={e => setDescription(e.target.value)}
       />
+      <label className="visible-checkbox">
+        <input
+          type="checkbox"
+          checked={visible}
+          onChange={e => setVisible(e.target.checked)}
+        />
+        Widoczne dla gości
+      </label>
       {file && (
         <>
           <button className="btn btn-primary upload-submit-btn" onClick={handleUpload}>
