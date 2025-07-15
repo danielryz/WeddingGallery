@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
 import GalleryPage from './pages/GalleryPage';
 import PhotoDetailPage from './pages/PhotoDetailPage';
+import SliderPage from './pages/SliderPage';
 import ChatPage from './pages/ChatPage';
 import UploadPage from './pages/UploadPage';
 import WishesPage from './pages/WishesPage';
@@ -70,6 +71,7 @@ function App() {
         <Routes>
           <Route path="/" element={<GalleryPage />} />
           <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/slider" element={<SliderPage />} />
           <Route path="/photo/:id" element={<PhotoDetailPage />} />
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/wishes" element={<WishesPage />} />

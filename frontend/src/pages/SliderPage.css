@@ -1,0 +1,94 @@
+.slider-page {
+  padding: 16px;
+  max-width: 448px;
+  margin: 0 auto;
+}
+
+.slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  color: var(--brown);
+  cursor: pointer;
+}
+
+.slide-content {
+  flex: 1;
+  text-align: center;
+}
+
+.slide-media {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.desc {
+  margin-top: 8px;
+  color: var(--brown);
+  font-size: 14px;
+}
+
+.more-btn {
+  margin-left: 8px;
+  color: var(--brown);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--brown);
+}
+
+.reactions-summary {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.reaction-item {
+  font-size: 20px;
+}
+
+.comments {
+  margin-top: 16px;
+}
+
+.comment-item + .comment-item {
+  margin-top: 8px;
+}
+
+.comment-author {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.comment-input {
+  width: 100%;
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--grey-border);
+  resize: none;
+}
