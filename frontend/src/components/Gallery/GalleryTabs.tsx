@@ -45,7 +45,9 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
                         src: `${API_URL}/photos/${item.fileName}`,
                         commentCount: item.commentCount,
                         reactionCount: item.reactionCount,
-                        reactions
+                        reactions,
+                        isVisibleForGuest: item.isVisibleForGuest,
+                        isWish: item.isWish
                     };
                 })
             );

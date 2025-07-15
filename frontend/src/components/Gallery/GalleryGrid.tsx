@@ -10,6 +10,8 @@ export interface GalleryItemData {
     commentCount: number;
     reactionCount: number;
     reactions: Record<string, number>;
+    isVisibleForGuest: boolean;
+    isWish: boolean;
 }
 
 interface GalleryGridProps {
