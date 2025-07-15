@@ -143,24 +143,26 @@ const PhotoDetailPage: React.FC = () => {
         <h1 className="photo-detail-title">Podgląd</h1>
 
         {/* Podgląd zdjęcia lub filmu */}
-        <div className="media-container">
-          {photo.isVideo ? (
-              <video
-                  src={`${API_URL}/photos/${photo.fileName}`}
-                  controls
-                  className="media"
-              />
-          ) : (
-              <img
-                  src={`${API_URL}/photos/${photo.fileName}`}
-                  alt="Photo"
-                  className="media"
-              />
-          )}
-        </div>
-        <div className="photo-info">
-        <span className="photo-deviceName">{photo.deviceName}</span>
-        <span className="photo-description">{photo.description}</span>
+        <div className="photo-frame">
+          <div className="media-container">
+            {photo.isVideo ? (
+                <video
+                    src={`${API_URL}/photos/${photo.fileName}`}
+                    controls
+                    className="media"
+                />
+            ) : (
+                <img
+                    src={`${API_URL}/photos/${photo.fileName}`}
+                    alt="Photo"
+                    className="media"
+                />
+            )}
+          </div>
+          <div className="photo-info">
+            <span className="photo-deviceName">{photo.deviceName}</span>
+            <span className="photo-description">{photo.description}</span>
+          </div>
         </div>
 
         {(isThisDevice(photo.deviceId) || isAdmin()) && (
