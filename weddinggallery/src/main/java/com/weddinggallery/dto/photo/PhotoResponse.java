@@ -21,7 +21,8 @@ public class PhotoResponse {
     private Long deviceId;
     private String deviceName;
     private boolean visible;
-
+    private boolean isVisibleForGuest;
+    private boolean isWish;
     @JsonProperty("isVideo")
     private boolean isVideo;
 }

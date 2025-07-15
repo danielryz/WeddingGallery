@@ -45,5 +45,13 @@ public class Photo {
     @Column(name = "visible", nullable = false)
     @Builder.Default
     private boolean visible = true;
+
+    @Column(name = "is_visible_for_guest", nullable = false)
+    @Builder.Default
+    private boolean isVisibleForGuest = true;
+
+    @Column(name = "is_wish", nullable = false)
+    @Builder.Default
+    private boolean isWish = false;
 }
 

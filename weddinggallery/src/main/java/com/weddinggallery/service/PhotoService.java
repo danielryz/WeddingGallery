@@ -140,7 +140,7 @@ public class PhotoService {
         return toResponse(photo, isVideo(photo.getFileName()));
     }
 
-    public void savePhoto(MultipartFile file, String description, HttpServletRequest request) throws IOException {
+    public void savePhoto(MultipartFile file, String description, HttpServletRequest request, Boolean isVisibleForGuest) throws IOException {
         // validate requesting device before queuing the upload
         deviceService.getRequestingDevice(request);
         String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
@@ -150,7 +150,7 @@ public class PhotoService {
         BufferedMultipartFile buffered = new BufferedMultipartFile(file);
         uploadQueueService.submitUpload(() -> {
             try {
-                savePhotoEntity(buffered, description, request);
+                savePhotoEntity(buffered, description, request, isVisibleForGuest, true);
             } catch (IOException e) {
                 log.error("Failed to store file", e);
             } finally {
@@ -184,7 +184,7 @@ public class PhotoService {
             String description = descriptions.size() > i ? descriptions.get(i) : null;
             uploadQueueService.submitUpload(() -> {
                 try {
-                    savePhotoEntity(buffered, description, request);
+                    savePhotoEntity(buffered, description, request, true, false);
                 } catch (IOException e) {
                     log.error("Failed to store file", e);
                 } finally {
@@ -319,7 +319,7 @@ public class PhotoService {
 
     }
 
-    private void savePhotoEntity(MultipartFile file, String description, HttpServletRequest request) throws IOException {
+    private void savePhotoEntity(MultipartFile file, String description, HttpServletRequest request, Boolean isVisbleForGuest, Boolean isWish) throws IOException {
         Device device = deviceService.getRequestingDevice(request);
         String original = file.getOriginalFilename();
         String ext = StringUtils.getFilenameExtension(original);
@@ -336,6 +336,8 @@ public class PhotoService {
                 .commentCount(0)
                 .reactionCount(0)
                 .uploadTime(LocalDateTime.now())
+                .isVisibleForGuset(isVisbleForGuest)
+                .isWish(isWish)
                 .build();
         photoRepository.save(photo);
     }
@@ -397,6 +399,8 @@ public class PhotoService {
                 photo.getDevice() != null ? photo.getDevice().getId() : null,
                 photo.getDevice() != null ? photo.getDevice().getName() : null,
                 photo.isVisible(),
+                photo.isVisibleForGuest(),
+                photo.isWish(),
                 isVideo
         );
     }

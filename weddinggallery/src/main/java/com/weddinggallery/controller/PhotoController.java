@@ -80,11 +80,12 @@ public class PhotoController {
     @Operation(summary = "Save a photo")
     public ResponseEntity<Void> savePhoto(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
-            @RequestPart("file") MultipartFile file,
-            @RequestPart(value = "description", required = false) String description,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "description", required = false) String description,
             HttpServletRequest request
+            @RequestParam(value - "isVisbleForGuest", requried = true) Boolean isVisibleForGuest
     ) throws java.io.IOException {
-        photoService.savePhoto(file, description, request);
+        photoService.savePhoto(file, description, request, isVisbleForGuest);
         return ResponseEntity.accepted().build();
     }
 
