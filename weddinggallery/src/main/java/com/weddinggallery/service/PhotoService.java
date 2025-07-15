@@ -140,7 +140,7 @@ public class PhotoService {
         return toResponse(photo, isVideo(photo.getFileName()));
     }
 
-    public void savePhoto(MultipartFile file, String description, HttpServletRequest request, Boolean isVisibleForGuest) throws IOException {
+    public void savePhoto(MultipartFile file, String description, Boolean isVisibleForGuest, HttpServletRequest request) throws IOException {
         // validate requesting device before queuing the upload
         deviceService.getRequestingDevice(request);
         String ext = StringUtils.getFilenameExtension(file.getOriginalFilename());
@@ -388,6 +388,9 @@ public class PhotoService {
     }
 
     private PhotoResponse toResponse(Photo photo, boolean isVideo) {
+        User uploader = photo.getUploader();
+        Device device = photo.getDevice();
+
         return new PhotoResponse(
                 photo.getId(),
                 photo.getFileName(),
@@ -395,9 +398,9 @@ public class PhotoService {
                 photo.getUploadTime(),
                 photo.getCommentCount(),
                 photo.getReactionCount(),
-                photo.getUploader() != null ? photo.getUploader().getUsername() : null,
-                photo.getDevice() != null ? photo.getDevice().getId() : null,
-                photo.getDevice() != null ? photo.getDevice().getName() : null,
+                uploader != null ? uploader.getUsername() : null,
+                device != null ? device.getId() : null,
+                device != null ? device.getName() : null,
                 photo.isVisible(),
                 photo.isVisibleForGuest(),
                 photo.isWish(),

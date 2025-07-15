@@ -82,10 +82,10 @@ public class PhotoController {
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "description", required = false) String description,
-            HttpServletRequest request,
-            @RequestParam(value - "isVisbleForGuest", requried = true) Boolean isVisibleForGuest
+            @RequestParam(value = "isVisbleForGuest", required = true) Boolean isVisibleForGuest,
+            HttpServletRequest request
     ) throws java.io.IOException {
-        photoService.savePhoto(file, description, request, isVisbleForGuest);
+        photoService.savePhoto(file, description, isVisbleForGuest, request);
         return ResponseEntity.accepted().build();
     }
 
