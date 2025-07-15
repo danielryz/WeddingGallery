@@ -1,4 +1,5 @@
-import { createContext, useContext, useRef, useState, ReactNode } from 'react';
+import { createContext, useContext, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import AlertStack from './AlertStack';
 
 export type AlertType = 'success' | 'error' | 'info';

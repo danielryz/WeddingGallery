@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { savePhotos } from '../../api/photos';
 import './UploadForm.css';
 import { useAlerts } from '../../components/alert/useAlerts'
+import ConfirmModal from '../Confirm/ConfirmModal';
 
 interface UploadItem {
     file: File;
@@ -17,6 +18,7 @@ const MAX_FILE_SIZE_MB = 2000;
 const UploadForm: React.FC = () => {
     const [files, setFiles] = useState<UploadItem[]>([]);
     const [progress, setProgress] = useState(0);
+    const [fileToRemove, setFileToRemove] = useState<number | null>(null);
     const navigate = useNavigate();
     const showAlert = useAlerts();
 
@@ -40,8 +42,11 @@ const UploadForm: React.FC = () => {
     const handleDesc = (i: number, desc: string) =>
         setFiles(prev => prev.map((it, j) => j === i ? { ...it, description: desc } : it));
 
-    const handleRemove = (i: number) =>
+    const removeFile = (i: number) =>
         setFiles(prev => prev.filter((_, j) => j !== i));
+
+    const handleRemove = (i: number) =>
+        setFileToRemove(i);
 
     const handleUpload = async () => {
         if (!files.length) return;
@@ -122,6 +127,13 @@ const UploadForm: React.FC = () => {
                         <p className="upload-progress">Gotowe!</p>
                     )}
                 </>
+            )}
+            {fileToRemove !== null && (
+                <ConfirmModal
+                    message="Czy na pewno usunąć plik?"
+                    onConfirm={() => { removeFile(fileToRemove); setFileToRemove(null); }}
+                    onCancel={() => setFileToRemove(null)}
+                />
             )}
         </div>
     );
