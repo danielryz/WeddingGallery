@@ -139,9 +139,21 @@
     }
 
     .emoji-picker {
-        max-width: 90%;
+        left: 50%;
+        transform: translateX(-50%);
+        max-width: none;
+        width: max-content;
         gap: 4px;
         padding: 6px 8px;
+    }
+
+    .emoji-picker .reaction-selector {
+        position: static;
+        bottom: auto;
+        left: auto;
+        transform: none;
+        margin-bottom: 0;
+        flex-wrap: wrap;
     }
 
     .emoji-picker button {
