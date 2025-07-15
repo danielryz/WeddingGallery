@@ -70,6 +70,7 @@ const UploadForm: React.FC = () => {
 
     return (
         <div className="upload-form-container">
+            <p className="upload-info">Możesz dodać maksymalnie {MAX_FILES} plików (każdy do {MAX_FILE_SIZE_MB}MB).</p>
             <div {...getRootProps()} className="dropzone">
                 <input {...getInputProps()} />
                 <p>Przeciągnij zdjęcia/filmy lub kliknij</p>

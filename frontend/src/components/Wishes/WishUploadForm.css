@@ -7,6 +7,13 @@
     margin: 0 auto 16px;
 }
 
+.wish-info {
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--brown);
+    font-size: 14px;
+}
+
 .wish-dropzone {
     border: 2px dashed var(--gold-bright);
     border-radius: 4px;

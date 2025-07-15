@@ -28,6 +28,7 @@ const PhotoDetailPage: React.FC = () => {
   const [commentToDelete, setCommentToDelete] = useState<number | null>(null);
   const [descInput, setDescInput] = useState('');
   const [showEditConfirm, setShowEditConfirm] = useState(false);
+  const [editingDesc, setEditingDesc] = useState(false);
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   const showAlert = useAlerts();
 
@@ -196,19 +197,31 @@ const PhotoDetailPage: React.FC = () => {
           </div>
         </div>
 
-        {(isThisDevice(photo.deviceId) || isAdmin()) && (
-            <button className="btn btn-danger" onClick={() => setShowDeletePhotoConfirm(true)}> Usuń Zdjęcie</button>
+        <div className="photo-actions">
+          {(isThisDevice(photo.deviceId) || isAdmin()) && (
+              <button className="btn btn-danger" onClick={() => setShowDeletePhotoConfirm(true)}>Usuń Zdjęcie</button>
+          )}
+          {isThisDevice(photo.deviceId) && !editingDesc && (
+              <button className="btn btn-primary edit-desc-btn" onClick={() => setEditingDesc(true)}>Edytuj opis</button>
+          )}
+        </div>
+        {isThisDevice(photo.deviceId) && !editingDesc && (
+            <p className="edit-hint">Kliknij "Edytuj opis", aby dodać opis do zdjęcia.</p>
         )}
-        {isThisDevice(photo.deviceId) && (
-            <>
-            <textarea
-                className="update-description-input"
-                placeholder="Dodaj opis..."
-                value={descInput}
-                onChange={e => setDescInput(e.target.value)}
-            />
-            <button className="btn btn-primary" onClick={() => setShowEditConfirm(true)}>Zapisz opis</button>
-            </>
+
+        {isThisDevice(photo.deviceId) && editingDesc && (
+            <div className="edit-desc-form">
+              <textarea
+                  className="update-description-input"
+                  placeholder="Dodaj opis..."
+                  value={descInput}
+                  onChange={e => setDescInput(e.target.value)}
+              />
+              <div className="edit-desc-actions">
+                <button className="btn" onClick={() => { setEditingDesc(false); setDescInput(photo.description || ''); }}>Anuluj</button>
+                <button className="btn btn-primary" onClick={() => setShowEditConfirm(true)}>Zapisz opis</button>
+              </div>
+            </div>
         )}
 
         {/* Sekcja reakcji pod zdjęciem/filmem */}
