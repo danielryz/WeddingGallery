@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React from 'react';
 import ReactionSelector from '../Reactions/ReactionSelector';
+import useLongPressReaction from '../../hooks/useLongPressReaction';
 import './GalleryItem.css';
 import {MessageSquare, Heart} from 'lucide-react';
 
@@ -17,19 +18,7 @@ interface GalleryItemProps {
 }
 
 const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
-    const [showReactions, setShowReactions] = useState(false);
-    const [reactionTimeout, setReactionTimeout] = useState<NodeJS.Timeout | null>(null);
-
-    const handleHoldStart = () => {
-        // Po ~400ms przytrzymania pokażemy panel reakcji
-        const timeout = setTimeout(() => setShowReactions(true), 400);
-        setReactionTimeout(timeout);
-    };
-
-    const handleHoldEnd = () => {
-        // Anuluj pokazanie panelu, jeśli puszczono przed upływem 400ms
-        if (reactionTimeout) clearTimeout(reactionTimeout);
-    };
+    const { show: showReactions, handlers, close } = useLongPressReaction();
 
     const renderMedia = () => {
         if (item.isVideo) {
@@ -61,11 +50,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
         <div className="gallery-item-background">
         <div
             className="gallery-item"
-            onMouseDown={handleHoldStart}
-            onMouseUp={handleHoldEnd}
-            onMouseLeave={handleHoldEnd}
-            onTouchStart={handleHoldStart}
-            onTouchEnd={handleHoldEnd}
+            {...handlers}
             onClick={() => onItemClick?.(item.id)}
         >
             {renderMedia()}
@@ -75,7 +60,7 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
                 <ReactionSelector
                     photoId={item.id}
                     onSelect={() => { /* reakcja zostanie dodana w ReactionSelector */ }}
-                    onClose={() => setShowReactions(false)}
+                    onClose={close}
                 />
             )}
 

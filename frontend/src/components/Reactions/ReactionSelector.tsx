@@ -13,9 +13,10 @@ import {
 } from 'lucide-react';
 
 interface Props {
-    photoId: number;
-    onSelect: (emoji: string) => void;
+    photoId?: number;
+    onSelect?: (emoji: string) => void;
     onClose: () => void;
+    addReactionFn?: (emoji: string) => Promise<void>;
 }
 
 // mapujemy unicode → typ dla API
@@ -40,12 +41,16 @@ const ICON_MAP: Record<string, React.FC<{ size?: number }>> = {
     '👎': ThumbsDown,
 };
 
-const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose }) => {
+const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReactionFn }) => {
     const handleSelect = async (emoji: string) => {
         const type = EMOJI_MAP[emoji];
         if (!type) return;
-        await addReaction(photoId, { type });
-        onSelect(emoji);
+        if (addReactionFn) {
+            await addReactionFn(emoji);
+        } else if (photoId !== undefined) {
+            await addReaction(photoId, { type });
+        }
+        onSelect?.(emoji);
         onClose();
     };
 
