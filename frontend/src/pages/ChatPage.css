@@ -118,7 +118,7 @@
     outline: none;
     border-color: var(--gold-bright);
 }
-@media screen and (max-width: 405px) {
+@media screen and (max-width: 480px) {
     .reaction-summary {
         flex-wrap: wrap;
         gap: 2px;
