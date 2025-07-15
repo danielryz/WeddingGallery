@@ -1,10 +1,10 @@
 // src/components/UploadForm.tsx
-import React, { useCallback, useState, useRef } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { savePhotos } from '../../api/photos';
 import './UploadForm.css';
-import AlertStack from '../../components/alert/AlertStack'
+import { useAlerts } from '../../components/alert/useAlerts'
 
 interface UploadItem {
     file: File;
@@ -18,19 +18,7 @@ const UploadForm: React.FC = () => {
     const [files, setFiles] = useState<UploadItem[]>([]);
     const [progress, setProgress] = useState(0);
     const navigate = useNavigate();
-    const [alerts, setAlerts] = useState<
-        { id: number; message: string; type: "success" | "error" }[]
-    >([]);
-    const nextId = useRef(0);
-
-    const showAlert = (message: string, type: "success" | "error") => {
-        const id = nextId.current++;
-        setAlerts((prev) => [...prev, { id, message, type }]);
-    };
-
-    const removeAlert = (id: number) => {
-        setAlerts((prev) => prev.filter((a) => a.id !== id));
-    };
+    const showAlert = useAlerts();
 
     const onDrop = useCallback((accepted: File[]) => {
         const valid = accepted.filter(f => f.size <= MAX_FILE_SIZE_MB * 1024 * 1024);
@@ -43,7 +31,7 @@ const UploadForm: React.FC = () => {
             showAlert(`Niektóre pliki przekroczyły ${MAX_FILE_SIZE_MB}MB i pominięto.`, 'error');
         }
         setFiles(prev => [...prev, ...newItems]);
-    }, [files]);
+    }, [files, showAlert]);
 
     const { getRootProps, getInputProps } = useDropzone({
         onDrop, accept: { 'image/*': [], 'video/*': [] }, multiple: true
@@ -135,7 +123,6 @@ const UploadForm: React.FC = () => {
                     )}
                 </>
             )}
-            <AlertStack alerts={alerts} onRemove={removeAlert} />
         </div>
     );
 };

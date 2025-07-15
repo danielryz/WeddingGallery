@@ -10,7 +10,7 @@ import {
 } from '../api/chat';
 import type { ChatMessageResponse, ChatReactionCountResponse } from '../types/chat';
 import './ChatPage.css';
-import AlertStack from "../components/alert/AlertStack.tsx"
+import { useAlerts } from "../components/alert/useAlerts"
 
 function ChatMessage({ message }: { message: ChatMessageResponse }) {
   const [reactions, setReactions] = useState<ChatReactionCountResponse[]>([]);
@@ -19,19 +19,7 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
   const localDeviceId = Number(localStorage.getItem('deviceId'));
   const isOwn = message.deviceId === localDeviceId;
 
-  const [alerts, setAlerts] = useState<
-      { id: number; message: string; type: "success" | "error" }[]
-  >([]);
-  const nextId = useRef(0);
-
-  const showAlert = (message: string, type: "success" | "error") => {
-    const id = nextId.current++;
-    setAlerts((prev) => [...prev, { id, message, type }]);
-  };
-
-  const removeAlert = (id: number) => {
-    setAlerts((prev) => prev.filter((a) => a.id !== id));
-  };
+  const showAlert = useAlerts();
 
   useEffect(() => {
     getChatReactionSummary(message.id).then(setReactions);
@@ -100,7 +88,6 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
               ))}
             </div>
         )}
-        <AlertStack alerts={alerts} onRemove={removeAlert} />
       </div>
   );
 }
@@ -119,19 +106,7 @@ const ChatPage: React.FC = () => {
   const sizePerPage = 100;
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-  const [alerts, setAlerts] = useState<
-      { id: number; message: string; type: "success" | "error" }[]
-  >([]);
-  const nextId = useRef(0);
-
-  const showAlert = (message: string, type: "success" | "error") => {
-    const id = nextId.current++;
-    setAlerts((prev) => [...prev, { id, message, type }]);
-  };
-
-  const removeAlert = (id: number) => {
-    setAlerts((prev) => prev.filter((a) => a.id !== id));
-  };
+  const showAlert = useAlerts();
   // 1) Pobierz pierwszą stronę
   useEffect(() => {
     (async () => {
@@ -143,7 +118,7 @@ const ChatPage: React.FC = () => {
         showAlert('Błąd pobierania historii: ' + err, 'error');
       }
     })();
-  }, []);
+  }, [sizePerPage, showAlert]);
 
   // 2) Infinite scroll: doładowanie starszych z utrzymaniem scrolla
   const onScroll = async (e: UIEvent<HTMLDivElement>) => {
@@ -201,7 +176,7 @@ const ChatPage: React.FC = () => {
     return () => {
       subRef.current?.unsubscribe();
     };
-  }, []);
+  }, [API_URL, showAlert]);
 
   // 5) Scroll do dołu po nowej wiadomości (tylko gdy nie prepend)
   useEffect(() => {
@@ -241,7 +216,6 @@ const ChatPage: React.FC = () => {
             Wyślij
           </button>
         </div>
-        <AlertStack alerts={alerts} onRemove={removeAlert} />
       </main>
   );
 };
