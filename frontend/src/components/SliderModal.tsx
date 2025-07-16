@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import ReactDOM from 'react-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPhotos } from '../api/photos';
@@ -20,20 +20,21 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [index, setIndex] = useState(0);
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+  const fetchItems = useCallback(async () => {
+    const res = await getPhotos(0, 100, 'uploadTime', 'desc');
+    const mapped = res.content.map<MediaItem>(p => ({
+      id: p.id,
+      isVideo: p.isVideo ?? (p as { video?: boolean }).video ?? false,
+      src: `${API_URL}/photos/${p.fileName}`,
+    }));
+    setItems(mapped);
+    const idx = mapped.findIndex(p => p.id === startId);
+    setIndex(idx >= 0 ? idx : 0);
+  }, [API_URL, startId]);
+
   useEffect(() => {
-    const fetchItems = async () => {
-      const res = await getPhotos(0, 100, 'uploadTime', 'desc');
-      const mapped = res.content.map<MediaItem>(p => ({
-        id: p.id,
-        isVideo: p.isVideo ?? (p as { video?: boolean }).video ?? false,
-        src: `${API_URL}/photos/${p.fileName}`,
-      }));
-      setItems(mapped);
-      const idx = mapped.findIndex(p => p.id === startId);
-      setIndex(idx >= 0 ? idx : 0);
-    };
     fetchItems();
-  }, [startId, API_URL]);
+  }, [fetchItems]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {

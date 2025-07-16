@@ -1,8 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import GalleryGrid, {type GalleryItemData } from './GalleryGrid';
 import { getPhotos } from '../../api/photos';
 import { getReactionCounts } from '../../api/reactions';
 import './GalleryTabs.css';
+
+const EMOJI_MAP: Record<string, string> = {
+    HEART: '❤️',
+    LAUGH: '😂',
+    WOW: '😮',
+    SAD: '😢',
+    ANGRY: '😡',
+    LIKE: '👍',
+    DISLIKE: '👎',
+};
 
 type MediaType = 'image' | 'video';
 
@@ -16,12 +26,8 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
     const [loading, setLoading] = useState(false);
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-    const EMOJI_MAP: Record<string, string> = {
-        HEART: '❤️', LAUGH: '😂', WOW: '😮', SAD: '😢',
-        ANGRY: '😡', LIKE: '👍', DISLIKE: '👎',
-    };
 
-    const fetchItems = async (type: MediaType) => {
+    const fetchItems = useCallback(async (type: MediaType) => {
         setLoading(true);
         try {
             const res = await getPhotos(0, 40, 'uploadTime', 'desc', type);
@@ -56,11 +62,11 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
             console.error('Błąd pobierania galerii:', err);
         }
         setLoading(false);
-    };
+    }, [API_URL]);
 
     useEffect(() => {
         fetchItems(activeTab);
-    }, [activeTab]);
+    }, [activeTab, fetchItems]);
 
     return (
         <div className="gallery-tabs">
