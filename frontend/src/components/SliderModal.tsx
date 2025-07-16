@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPhotos } from '../api/photos';
@@ -18,6 +18,8 @@ interface MediaItem {
 const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [index, setIndex] = useState(0);
+  const [heartKey, setHeartKey] = useState<number>(0);
+  const lastTapRef = useRef<number>(0);
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
   const fetchItems = useCallback(async () => {
@@ -55,17 +57,34 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const next = () => setIndex(i => (i === items.length - 1 ? 0 : i + 1));
   const current = items[index];
 
+  const showHeart = () => {
+    setHeartKey(Date.now());
+  };
+
+  const handleTap = () => {
+    const now = Date.now();
+    if (now - lastTapRef.current < 300) {
+      showHeart();
+    }
+    lastTapRef.current = now;
+  };
+
   const modal = (
     <div className="slider-modal-backdrop" onClick={onClose}>
       <div className="slider-modal" onClick={e => e.stopPropagation()}>
         <button className="nav-btn left" onClick={prev} aria-label="Poprzednie">
           <ChevronLeft size={32} />
         </button>
-        {current.isVideo ? (
-          <video src={current.src} controls className="slider-media" />
-        ) : (
-          <img src={current.src} className="slider-media" />
-        )}
+        <div className="media-wrapper" onClick={handleTap} onDoubleClick={showHeart}>
+          {current.isVideo ? (
+            <video src={current.src} controls className="slider-media" />
+          ) : (
+            <img src={current.src} className="slider-media" />
+          )}
+          {heartKey > 0 && (
+            <span key={heartKey} className="double-tap-heart">❤️</span>
+          )}
+        </div>
         <button className="nav-btn right" onClick={next} aria-label="Następne">
           <ChevronRight size={32} />
         </button>
