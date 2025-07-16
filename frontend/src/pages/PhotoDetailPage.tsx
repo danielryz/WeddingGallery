@@ -188,7 +188,7 @@ const PhotoDetailPage: React.FC = () => {
           <div className="photo-info">
             <span className="photo-deviceName">{photo.deviceName}</span>
             <span className="photo-description">{photo.description}</span>
-            {photo.isVisibleForGuest && (
+            {!photo.isVisibleForGuest && (
                 <span className="photo-visibility">Ukryte dla gości</span>
             )}
             {photo.isWish && (
