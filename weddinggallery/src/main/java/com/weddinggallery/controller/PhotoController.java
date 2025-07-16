@@ -87,9 +87,10 @@ public class PhotoController {
     @Operation(summary = "Get photo by id")
     public ResponseEntity<PhotoResponse> getPhoto(
             @RequestHeader(value = "X-client-Id", required = false) String clientId,
-            @PathVariable Long id
+            @PathVariable Long id,
+            HttpServletRequest request
     ) {
-        PhotoResponse response = photoService.getPhoto(id);
+        PhotoResponse response = photoService.getPhoto(id, request);
         return ResponseEntity.ok(response);
     }
 

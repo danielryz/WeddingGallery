@@ -164,9 +164,22 @@ public class PhotoService {
     }
 
     @Transactional
-    public PhotoResponse getPhoto(Long id) {
+    public PhotoResponse getPhoto(Long id, HttpServletRequest request) {
         Photo photo = photoRepository.findById(id)
                 .orElseThrow(() -> new AccessDeniedException("Photo not found"));
+
+        if (!photo.isVisible()) {
+            Device device = deviceService.getRequestingDevice(request);
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isAdmin = auth.getAuthorities().stream()
+                    .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+            boolean isOwner = photo.getDevice() != null && photo.getDevice().getId().equals(device.getId());
+
+            if (!isAdmin && !isOwner) {
+                throw new AccessDeniedException("Not authorized to view this photo");
+            }
+        }
+
         return toResponse(photo, isVideo(photo.getFileName()));
     }
 
