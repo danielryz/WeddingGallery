@@ -282,6 +282,24 @@ public class PhotoService {
         photoRepository.save(photo);
     }
 
+    @Transactional
+    public void updatePhotoGuestVisibility(Long id, boolean isVisibleForGuest, HttpServletRequest request){
+        Device device = deviceService.getRequestingDevice(request);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority()));
+
+        Photo photo = photoRepository.findById(id)
+                .orElseThrow(() -> new AccessDeniedException("Photo not found"));
+
+        if(!isAdmin && (photo.getDevice() == null || !photo.getDevice().getId().equals(device.getId()))){
+            throw new AccessDeniedException("Not authorized to update this photo");
+        }
+
+        photo.setVisibleForGuest(isVisibleForGuest);
+        photoRepository.save(photo);
+    }
+
     public void streamAllPhotosZip(HttpServletResponse response) throws IOException {
         List<Photo> photos = photoRepository.findAll();
         response.setContentType("application/zip");

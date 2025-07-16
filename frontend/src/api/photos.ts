@@ -4,6 +4,7 @@ import type {
   PhotoResponse,
   PhotoDescriptionUpdateRequest,
   PhotoVisibilityUpdateRequest,
+  PhotoGuestVisibilityUpdateRequest,
 } from '../types/photo'
 import type { Page } from '../types/page'
 
@@ -125,4 +126,12 @@ export const updateVisibility = async (
 ): Promise<string> => {
   await axiosInstance.put<PhotoResponse>(`/api/photos/${id}/visibility`, data)
   return "Zdjęcie zostało usunięte."
+}
+
+export const updateGuestVisibility = async (
+  id: number,
+  data: PhotoGuestVisibilityUpdateRequest,
+): Promise<string> => {
+  await axiosInstance.put<PhotoResponse>(`/api/photos/${id}/guest-visibility`, data)
+  return "Widoczność dla gości zaktualizowana."
 }
