@@ -1,24 +1,19 @@
-import React, { useState } from 'react';
+import React from 'react';
 import GalleryTabs from '../components/Gallery/GalleryTabs';
-import SliderModal from '../components/SliderModal';
+import { useNavigate } from 'react-router-dom';
 import './GalleryPage.css';
 
 const GalleryPage: React.FC = () => {
-    const [openId, setOpenId] = useState<number | null>(null);
+    const navigate = useNavigate();
 
     const handleItemClick = (id: number) => {
-        setOpenId(id);
+        navigate(`/photo/${id}`);
     };
-
-    const closeModal = () => setOpenId(null);
 
     return (
         <main className="gallery-page">
             <h1 className="gallery-title">Nasza Galeria Ślubna</h1>
             <GalleryTabs onItemClick={handleItemClick} />
-            {openId !== null && (
-                <SliderModal startId={openId} onClose={closeModal} />
-            )}
         </main>
     );
 };
