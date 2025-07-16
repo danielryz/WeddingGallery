@@ -10,7 +10,7 @@ const WishUploadForm: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [description, setDescription] = useState('');
   const [progress, setProgress] = useState(0);
-  const [visible, setVisible] = useState(true);
+  const [visibleForGuest, setVisibleForGuest] = useState(true);
   const showAlert = useAlerts();
 
   const onDrop = useCallback((accepted: File[]) => {
@@ -32,7 +32,7 @@ const WishUploadForm: React.FC = () => {
   const handleUpload = async () => {
     if (!file) return;
     try {
-      await savePhoto(file, description, visible, e => {
+      await savePhoto(file, description, visibleForGuest, e => {
         setProgress(Math.round((e.loaded * 100) / (e.total || 1)));
       });
       showAlert('Wysłano!', 'success');
@@ -76,8 +76,8 @@ const WishUploadForm: React.FC = () => {
       <label className="visible-checkbox">
         <input
           type="checkbox"
-          checked={visible}
-          onChange={e => setVisible(e.target.checked)}
+          checked={visibleForGuest}
+          onChange={e => setVisibleForGuest(e.target.checked)}
         />
         Widoczne dla gości
       </label>
