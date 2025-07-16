@@ -242,3 +242,12 @@
     color: var(--brown);
     margin-top: 24px;
 }
+
+.visible-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    color: var(--brown);
+    font-size: 14px;
+}

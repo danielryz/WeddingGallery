@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import {getPhoto, updateDescription, updateVisibility} from '../api/photos';
+import {getPhoto, updateDescription, updateVisibility, updateGuestVisibility} from '../api/photos';
 import { getReactionCounts } from '../api/reactions';
 import { getComments, addComment, deleteComment } from '../api/comments';
 import type {PhotoResponse} from '../types/photo';
@@ -147,6 +147,16 @@ const PhotoDetailPage: React.FC = () => {
     }
   }
 
+  const handleGuestVisibility = async (visible: boolean) => {
+    try {
+      await updateGuestVisibility(Number(id), { isVisibleForGuest: visible });
+      setPhoto(prev => prev ? { ...prev, isVisibleForGuest: visible } : prev);
+      showAlert('Widoczność zaktualizowana', 'success');
+    } catch (err: unknown) {
+      showAlert('Błąd zmiany widoczności: ' + err, 'error');
+    }
+  }
+
   const CommentItem: React.FC<{ comment: CommentResponse }> = ({ comment }) => {
     const { show: showCommentPicker, handlers: commentHandlers, close: closeComment } = useLongPressReaction();
     return (
@@ -204,11 +214,21 @@ const PhotoDetailPage: React.FC = () => {
             {!photo.isVisibleForGuest && (
                 <span className="photo-visibility">Ukryte dla gości</span>
             )}
-            {photo.isWish && (
-                <span className="photo-wish">🎁 Życzenia</span>
-            )}
-          </div>
+          {photo.isWish && (
+              <span className="photo-wish">🎁 Życzenia</span>
+          )}
         </div>
+        {(isThisDevice(photo.deviceId) || isAdmin()) && (
+            <label className="visible-checkbox">
+              <input
+                type="checkbox"
+                checked={photo.isVisibleForGuest}
+                onChange={e => handleGuestVisibility(e.target.checked)}
+              />
+              Widoczne dla gości
+            </label>
+        )}
+      </div>
 
         <div className="photo-actions">
           {(isThisDevice(photo.deviceId) || isAdmin()) && (
