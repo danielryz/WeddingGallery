@@ -29,3 +29,16 @@
     line-height: 1;
 }
 
+@media (max-width: 480px) {
+    .reaction-selector {
+        flex-wrap: wrap;
+        max-width: calc(100vw - 32px);
+        gap: 6px;
+        padding: 6px 8px;
+    }
+
+    .reaction-selector .reaction-emoji {
+        font-size: 20px;
+    }
+}
+

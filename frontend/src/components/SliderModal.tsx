@@ -2,6 +2,11 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { getPhotos } from '../api/photos';
+import { addReaction } from '../api/reactions';
+import { getComments, addComment } from '../api/comments';
+import type { CommentResponse } from '../types/comment';
+import ReactionSelector from './Reactions/ReactionSelector';
+import useLongPressReaction from '../hooks/useLongPressReaction';
 import './SliderModal.css';
 
 interface SliderModalProps {
@@ -20,6 +25,9 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [index, setIndex] = useState(0);
   const [heartKey, setHeartKey] = useState<number>(0);
   const lastTapRef = useRef<number>(0);
+  const { show: showPicker, handlers, close } = useLongPressReaction();
+  const [comments, setComments] = useState<CommentResponse[]>([]);
+  const [newComment, setNewComment] = useState('');
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
   const fetchItems = useCallback(async () => {
@@ -37,6 +45,17 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   useEffect(() => {
     fetchItems();
   }, [fetchItems]);
+
+  const loadComments = useCallback(async (photoId: number) => {
+    const res = await getComments(photoId, 0, 50);
+    setComments(res.content);
+  }, []);
+
+  useEffect(() => {
+    if (items.length > 0) {
+      loadComments(items[index].id);
+    }
+  }, [index, items, loadComments]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -57,8 +76,13 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const next = () => setIndex(i => (i === items.length - 1 ? 0 : i + 1));
   const current = items[index];
 
-  const showHeart = () => {
+  const showHeart = async () => {
     setHeartKey(Date.now());
+    try {
+      await addReaction(items[index].id, { type: 'HEART' });
+    } catch (err) {
+      console.error('Error adding reaction:', err);
+    }
   };
 
   const handleTap = () => {
@@ -69,13 +93,29 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     lastTapRef.current = now;
   };
 
+  const handleSendComment = async () => {
+    if (!newComment.trim()) return;
+    try {
+      await addComment(items[index].id, { text: newComment.trim() });
+      setNewComment('');
+      await loadComments(items[index].id);
+    } catch (err) {
+      console.error('Error adding comment:', err);
+    }
+  };
+
   const modal = (
     <div className="slider-modal-backdrop" onClick={onClose}>
       <div className="slider-modal" onClick={e => e.stopPropagation()}>
         <button className="nav-btn left" onClick={prev} aria-label="Poprzednie">
           <ChevronLeft size={32} />
         </button>
-        <div className="media-wrapper" onClick={handleTap} onDoubleClick={showHeart}>
+        <div
+          className="media-wrapper"
+          {...handlers}
+          onClick={handleTap}
+          onDoubleClick={showHeart}
+        >
           {current.isVideo ? (
             <video src={current.src} controls className="slider-media" />
           ) : (
@@ -83,6 +123,9 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
           )}
           {heartKey > 0 && (
             <span key={heartKey} className="double-tap-heart">❤️</span>
+          )}
+          {showPicker && (
+            <ReactionSelector photoId={items[index].id} onSelect={close} onClose={close} />
           )}
         </div>
         <button className="nav-btn right" onClick={next} aria-label="Następne">
@@ -98,6 +141,40 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
             />
           ))}
         </div>
+
+        <section className="comments-section">
+          <h2 className="comments-title">Komentarze</h2>
+          {comments.length === 0 ? (
+            <p className="no-comments-msg">Brak komentarzy</p>
+          ) : (
+            <ul className="comment-list">
+              {comments.map(c => (
+                <li key={c.id} className="comment-item">
+                  <div className="comment-avatar">
+                    {c.deviceName.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="comment-bubble">
+                    <div className="comment-author">{c.deviceName}</div>
+                    <div>{c.text}</div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+          <textarea
+            value={newComment}
+            onChange={e => setNewComment(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSendComment();
+              }
+            }}
+            placeholder="Dodaj komentarz…"
+            rows={2}
+            className="comment-input"
+          />
+        </section>
       </div>
     </div>
   );
