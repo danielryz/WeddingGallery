@@ -92,3 +92,67 @@
   border: 1px solid var(--grey-border);
   resize: none;
 }
+
+@media (max-width: 768px) {
+  .slider-page {
+    padding: 0;
+    max-width: none;
+    width: 100%;
+    min-height: 100vh;
+  }
+
+  .slider {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+  }
+
+  .nav-btn.left {
+    left: 4px;
+  }
+
+  .nav-btn.right {
+    right: 4px;
+  }
+
+  .slide-content {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .slide-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+  }
+
+  .desc,
+  .actions,
+  .reactions-summary {
+    position: relative;
+    z-index: 1;
+  }
+
+  .desc {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.7);
+    font-size: 16px;
+  }
+}
