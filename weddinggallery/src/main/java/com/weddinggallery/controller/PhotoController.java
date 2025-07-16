@@ -4,6 +4,7 @@ import com.weddinggallery.dto.photo.PhotoResponse;
 import com.weddinggallery.service.PhotoService;
 import com.weddinggallery.dto.photo.PhotoDescriptionUpdateRequest;
 import com.weddinggallery.dto.photo.PhotoVisibilityUpdateRequest;
+import com.weddinggallery.dto.photo.PhotoGuestVisibilityUpdateRequest;
 import com.weddinggallery.util.SortUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -176,6 +177,18 @@ public class PhotoController {
     ) {
         photoService.updatePhotoVisibility(id, updateRequest.isVisible(), request);
         return ResponseEntity.ok("Visibility updated successfully.");
+    }
+
+    @PutMapping("/{id}/guest-visibility")
+    @Operation(summary = "Update photo guest visibility")
+    public ResponseEntity<String> updateGuestVisibility(
+            @RequestHeader(value = "X-client-Id", required = false) String clientId,
+            @PathVariable Long id,
+            @RequestBody PhotoGuestVisibilityUpdateRequest updateRequest,
+            HttpServletRequest request
+    ) {
+        photoService.updatePhotoGuestVisibility(id, updateRequest.isVisibleForGuest(), request);
+        return ResponseEntity.ok("Guest visibility updated successfully.");
     }
 
 

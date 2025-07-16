@@ -21,3 +21,7 @@ export interface PhotoDescriptionUpdateRequest {
 export interface PhotoVisibilityUpdateRequest {
   visible: boolean;
 }
+
+export interface PhotoGuestVisibilityUpdateRequest {
+  isVisibleForGuest: boolean;
+}
