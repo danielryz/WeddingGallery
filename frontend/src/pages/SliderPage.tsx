@@ -89,7 +89,7 @@ const SliderPage: React.FC = () => {
           {photo.isVideo ? (
             <video src={`${API_URL}/photos/${photo.fileName}`} controls className="slide-media" />
           ) : (
-            <img src={`${API_URL}/photos/${photo.fileName}`} className="slide-media" />
+            <img src={`${API_URL}/photos/${photo.fileName}`} className="slide-media" alt="Photo" />
           )}
           <div className="desc">
             <span>{truncated}</span>
