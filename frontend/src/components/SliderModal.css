@@ -13,6 +13,7 @@
   max-width: 95vw;
   max-height: 95vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
 }
@@ -44,16 +45,15 @@
 }
 
 .thumbnail-strip {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   gap: 4px;
   overflow-x: auto;
   padding: 8px;
+  margin-top: 8px;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(6px);
+  width: 100%;
+  justify-content: center;
 }
 
 .thumbnail {

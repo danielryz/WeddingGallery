@@ -62,6 +62,19 @@ const PhotoDetailPage: React.FC = () => {
     return <p className="loading-text">Ładowanie...</p>;
   }
 
+  const canView =
+    isAdmin() ||
+    isThisDevice(photo.deviceId) ||
+    (photo.isVisibleForGuest && !photo.isWish);
+
+  if (!canView) {
+    return (
+      <main className="photo-detail">
+        <p className="no-access-msg">Ta treść jest niedostępna.</p>
+      </main>
+    );
+  }
+
   const refreshReactions = async () => {
     const counts = await getReactionCounts(Number(id));
     const mapped = Object.fromEntries(
