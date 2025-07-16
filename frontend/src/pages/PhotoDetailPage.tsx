@@ -205,7 +205,7 @@ const PhotoDetailPage: React.FC = () => {
                 <span className="photo-visibility">Ukryte dla gości</span>
             )}
             {photo.isWish && (
-                <span className="photo-wish">🎁</span>
+                <span className="photo-wish">🎁 Życzenia</span>
             )}
           </div>
         </div>
