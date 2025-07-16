@@ -236,3 +236,9 @@
     color: var(--brown);
     margin-top: 24px;
 }
+
+.no-access-msg {
+    text-align: center;
+    color: var(--brown);
+    margin-top: 24px;
+}
