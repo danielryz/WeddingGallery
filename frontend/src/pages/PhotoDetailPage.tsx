@@ -229,6 +229,70 @@ const PhotoDetailPage: React.FC = () => {
           )}
         </div>
 
+        {/* summary of reactions */}
+        <ReactionSummary reactions={reactions} className="center" />
+
+        {/* reaction picker for the photo */}
+        {showPicker && (
+            <ReactionSelector
+                triggerRef={pickerTriggerRef}
+                photoId={Number(id)}
+                onSelect={refreshReactions}
+                onClose={close}
+            />
+        )}
+
+        <div className="photo-actions">
+          {(isThisDevice(photo.deviceId) || isAdmin()) && (
+              <button
+                  className="btn btn-danger btn-small"
+                  onClick={() => setShowDeletePhotoConfirm(true)}
+              >
+                Usuń Zdjęcie
+              </button>
+          )}
+          {isThisDevice(photo.deviceId) && !editingDesc && (
+              <button
+                  className="btn btn-primary btn-small edit-desc-btn"
+                  onClick={() => setEditingDesc(true)}
+              >
+                Edytuj opis
+              </button>
+          )}
+        </div>
+
+        {isThisDevice(photo.deviceId) && !editingDesc && (
+            <p className="edit-hint">Kliknij "Edytuj opis", aby dodać opis do zdjęcia.</p>
+        )}
+
+        {isThisDevice(photo.deviceId) && editingDesc && (
+            <div className="edit-desc-form">
+          <textarea
+              className="update-description-input"
+              placeholder="Dodaj opis..."
+              value={descInput}
+              onChange={e => setDescInput(e.target.value)}
+          />
+              <div className="edit-desc-actions">
+                <button
+                    className="btn btn-small"
+                    onClick={() => {
+                      setEditingDesc(false);
+                      setDescInput(photo.description || '');
+                    }}
+                >
+                  Anuluj
+                </button>
+                <button
+                    className="btn btn-primary btn-small"
+                    onClick={() => setShowEditConfirm(true)}
+                >
+                  Zapisz opis
+                </button>
+              </div>
+            </div>
+        )}
+
         <section className="pd-comments-section">
           <h2 className="pd-comments-title">Komentarze</h2>
           {comments.length === 0 ? (
@@ -253,71 +317,6 @@ const PhotoDetailPage: React.FC = () => {
             />
           )}
         </section>
-
-        <div className="photo-actions">
-          {(isThisDevice(photo.deviceId) || isAdmin()) && (
-              <button
-                  className="btn btn-danger"
-                  onClick={() => setShowDeletePhotoConfirm(true)}
-              >
-                Usuń Zdjęcie
-              </button>
-          )}
-          {isThisDevice(photo.deviceId) && !editingDesc && (
-              <button
-                  className="btn btn-primary edit-desc-btn"
-                  onClick={() => setEditingDesc(true)}
-              >
-                Edytuj opis
-              </button>
-          )}
-        </div>
-
-        {isThisDevice(photo.deviceId) && !editingDesc && (
-            <p className="edit-hint">Kliknij "Edytuj opis", aby dodać opis do zdjęcia.</p>
-        )}
-
-        {isThisDevice(photo.deviceId) && editingDesc && (
-            <div className="edit-desc-form">
-          <textarea
-              className="update-description-input"
-              placeholder="Dodaj opis..."
-              value={descInput}
-              onChange={e => setDescInput(e.target.value)}
-          />
-              <div className="edit-desc-actions">
-                <button
-                    className="btn"
-                    onClick={() => {
-                      setEditingDesc(false);
-                      setDescInput(photo.description || '');
-                    }}
-                >
-                  Anuluj
-                </button>
-                <button
-                    className="btn btn-primary"
-                    onClick={() => setShowEditConfirm(true)}
-                >
-                  Zapisz opis
-                </button>
-              </div>
-            </div>
-        )}
-
-
-        {/* podsumowanie reakcji */}
-        <ReactionSummary reactions={reactions} className="center" />
-
-        {/* główny picker reakcji */}
-        {showPicker && (
-            <ReactionSelector
-                triggerRef={pickerTriggerRef}
-                photoId={Number(id)}
-                onSelect={refreshReactions}
-                onClose={close}
-            />
-        )}
 
         {/* confirm modale */}
         {showDeletePhotoConfirm && (
