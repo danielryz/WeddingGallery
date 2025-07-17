@@ -293,6 +293,9 @@ const PhotoDetailPage: React.FC = () => {
             </div>
         )}
 
+        {photo.isWish ? (
+            <p className="pd-comment-disabled-msg">Komentowanie wyłączone dla życzeń</p>
+        ) : (
         <section className="pd-comments-section">
           <h2 className="pd-comments-title">Komentarze</h2>
           {comments.length === 0 ? (
@@ -304,9 +307,7 @@ const PhotoDetailPage: React.FC = () => {
                 ))}
               </ul>
           )}
-          {photo.isWish ? (
-            <p className="pd-comment-disabled-msg">Komentowanie wyłączone dla życzeń</p>
-          ) : (
+
             <textarea
                 value={newComment}
                 onChange={e => setNewComment(e.target.value)}
@@ -315,9 +316,9 @@ const PhotoDetailPage: React.FC = () => {
                 rows={2}
                 className="pd-comment-input"
             />
-          )}
-        </section>
 
+        </section>
+        )}
         {/* confirm modale */}
         {showDeletePhotoConfirm && (
             <ConfirmModal
