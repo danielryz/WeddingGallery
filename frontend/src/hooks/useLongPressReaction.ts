@@ -24,6 +24,7 @@ export function useLongPressReaction(options?: Options) {
   };
 
   const close = () => setShow(false);
+  const open = () => setShow(true);
 
   const handlers = {
     onMouseDown: start,
@@ -33,6 +34,6 @@ export function useLongPressReaction(options?: Options) {
     onTouchEnd: clear,
   } as const;
 
-  return { show, handlers, close };
+  return { show, handlers, close, open };
 }
 export default useLongPressReaction;

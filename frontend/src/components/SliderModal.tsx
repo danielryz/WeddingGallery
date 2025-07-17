@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MessageSquare, Heart } from 'lucide-react';
 import { getPhotos } from '../api/photos';
-import { addReaction } from '../api/reactions';
+import { addReaction, getReactionCounts } from '../api/reactions';
 import { getComments, addComment } from '../api/comments';
 import type { CommentResponse } from '../types/comment';
 import ReactionSelector from './Reactions/ReactionSelector';
@@ -20,13 +20,25 @@ interface MediaItem {
   src: string;
 }
 
+const EMOJI_MAP: Record<string, string> = {
+  HEART: '❤️',
+  LAUGH: '😂',
+  WOW: '😮',
+  SAD: '😢',
+  ANGRY: '😡',
+  LIKE: '👍',
+  DISLIKE: '👎',
+};
+
 const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [items, setItems] = useState<MediaItem[]>([]);
   const [index, setIndex] = useState(0);
   const [heartKey, setHeartKey] = useState<number>(0);
   const lastTapRef = useRef<number>(0);
-  const { show: showPicker, handlers, close } = useLongPressReaction();
+  const { show: showPicker, handlers, close, open } = useLongPressReaction();
   const [comments, setComments] = useState<CommentResponse[]>([]);
+  const [reactions, setReactions] = useState<Record<string, number>>({});
+  const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -51,11 +63,24 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     setComments(res.content);
   }, []);
 
+  const loadReactions = useCallback(async (photoId: number) => {
+    try {
+      const counts = await getReactionCounts(photoId);
+      const mapped = Object.fromEntries(
+        counts.filter(r => EMOJI_MAP[r.type]).map(r => [EMOJI_MAP[r.type], r.count])
+      );
+      setReactions(mapped);
+    } catch (err) {
+      console.error('Error loading reactions:', err);
+    }
+  }, []);
+
   useEffect(() => {
     if (items.length > 0) {
       loadComments(items[index].id);
+      loadReactions(items[index].id);
     }
-  }, [index, items, loadComments]);
+  }, [index, items, loadComments, loadReactions]);
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -80,6 +105,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     setHeartKey(Date.now());
     try {
       await addReaction(items[index].id, { type: 'HEART' });
+      await loadReactions(items[index].id);
     } catch (err) {
       console.error('Error adding reaction:', err);
     }
@@ -114,6 +140,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
           className="media-wrapper"
           {...handlers}
           onClick={handleTap}
+          onTouchEnd={handleTap}
           onDoubleClick={showHeart}
         >
           {current.isVideo ? (
@@ -125,8 +152,22 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
             <span key={heartKey} className="double-tap-heart">❤️</span>
           )}
           {showPicker && (
-            <ReactionSelector photoId={items[index].id} onSelect={close} onClose={close} />
+            <ReactionSelector
+              photoId={items[index].id}
+              onSelect={() => loadReactions(items[index].id)}
+              onClose={close}
+            />
           )}
+          <div className="action-bar">
+            <div className="action-item" onClick={() => setShowComments(s => !s)}>
+              <MessageSquare size={20} />
+              <span>{comments.length}</span>
+            </div>
+            <div className="action-item" onClick={() => open()}>
+              <Heart size={20} />
+              <span>{Object.values(reactions).reduce((a, b) => a + b, 0)}</span>
+            </div>
+          </div>
         </div>
         <button className="nav-btn right" onClick={next} aria-label="Następne">
           <ChevronRight size={32} />
@@ -142,7 +183,8 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
           ))}
         </div>
 
-        <section className="comments-section">
+        {showComments && (
+          <section className="comments-section">
           <h2 className="comments-title">Komentarze</h2>
           {comments.length === 0 ? (
             <p className="no-comments-msg">Brak komentarzy</p>
@@ -174,7 +216,8 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
             rows={2}
             className="comment-input"
           />
-        </section>
+          </section>
+        )}
       </div>
     </div>
   );
