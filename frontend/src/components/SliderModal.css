@@ -137,8 +137,11 @@
   animation: heart-fade 0.8s forwards;
 }
 
+/* When comments are open, keep the media size stable so the layout
+   doesn't jump. The comments overlay will simply cover the bottom part
+   of the image without shrinking it. */
 .media-wrapper.slider-comments-open .slider-media {
-  max-height: 60vh;
+  max-height: 90vh;
 }
 
 .slider-comments-section {

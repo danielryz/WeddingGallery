@@ -125,7 +125,10 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   }, []);
 
   useEffect(() => {
+    // reset transient UI state when navigating to a different item
     setHeartKey(0);
+    setShowComments(false);
+    setShowThumbnails(true);
   }, [index]);
 
   if (items.length === 0) return null;
