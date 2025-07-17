@@ -43,6 +43,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [showNav, setShowNav] = useState(true);
+  const [showThumbnails, setShowThumbnails] = useState(true);
   const touchStartX = useRef<number | null>(null);
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
@@ -102,8 +103,12 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const navTimer = useRef<NodeJS.Timeout | null>(null);
   const resetNavTimer = () => {
     setShowNav(true);
+    setShowThumbnails(true);
     if (navTimer.current) clearTimeout(navTimer.current);
-    navTimer.current = setTimeout(() => setShowNav(false), 3000);
+    navTimer.current = setTimeout(() => {
+      setShowNav(false);
+      setShowThumbnails(false);
+    }, 3000);
   };
 
   useEffect(() => {
@@ -157,6 +162,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     setTimeout(() => {
       if (lastTapRef.current === now) {
         lastTapRef.current = 0;
+        setShowThumbnails(false);
       }
     }, 300);
   };
@@ -208,7 +214,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
         </button>
         <div
             ref={mediaWrapperRef}
-          className="media-wrapper"
+          className={`media-wrapper${showComments ? ' comments-open' : ''}`}
           onMouseDown={handlers.onMouseDown}
           onMouseUp={handlers.onMouseUp}
           onMouseLeave={handlers.onMouseLeave}
@@ -237,7 +243,9 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
               className="action-item"
               onClick={e => {
                 e.stopPropagation();
-                setShowComments(s => !s);
+                const next = !showComments;
+                setShowComments(next);
+                setShowThumbnails(!next);
               }}
             >
               <MessageSquare size={20} />
@@ -262,7 +270,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
         >
           <ChevronRight size={32} />
         </button>
-        <div className="thumbnail-strip">
+        <div className={`thumbnail-strip${showThumbnails ? '' : ' hidden'}`}>
           {items.map((p, i) => (
             <img
               key={p.id}
