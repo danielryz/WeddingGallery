@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, {useEffect, useState, useCallback, useRef} from 'react';
 import ReactDOM from 'react-dom';
 import { ChevronLeft, ChevronRight, MessageSquare, Heart } from 'lucide-react';
 import { getPhotos } from '../api/photos';
@@ -36,6 +36,8 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [heartKey, setHeartKey] = useState<number>(0);
   const lastTapRef = useRef<number>(0);
   const { show: showPicker, handlers, close, open } = useLongPressReaction();
+  // ref do media-wrapper, pod który portalujemy ReactionSelector
+  const mediaWrapperRef = useRef<HTMLDivElement | null>(null);
   const [comments, setComments] = useState<CommentResponse[]>([]);
   const [reactions, setReactions] = useState<Record<string, number>>({});
   const [showComments, setShowComments] = useState(false);
@@ -162,11 +164,11 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     resetNavTimer();
-    handlers.onTouchStart?.(e);
+    handlers.onTouchStart?.();
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    handlers.onTouchEnd?.(e);
+    handlers.onTouchEnd?.();
     const endX = e.changedTouches[0].clientX;
     if (touchStartX.current !== null) {
       const delta = endX - touchStartX.current;
@@ -205,6 +207,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
           <ChevronLeft size={32} />
         </button>
         <div
+            ref={mediaWrapperRef}
           className="media-wrapper"
           onMouseDown={handlers.onMouseDown}
           onMouseUp={handlers.onMouseUp}
@@ -221,13 +224,14 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
           {heartKey > 0 && (
             <span key={heartKey} className="double-tap-heart">❤️</span>
           )}
-          {showPicker && (
-            <ReactionSelector
-              photoId={items[index].id}
-              onSelect={() => loadReactions(items[index].id)}
-              onClose={close}
+          {showPicker && mediaWrapperRef.current && (
+              <ReactionSelector
+            triggerRef={mediaWrapperRef}
+            photoId={items[index].id}
+            onSelect={() => loadReactions(items[index].id)}
+            onClose={close}
             />
-          )}
+            )}
           <div className="action-bar">
             <div
               className="action-item"

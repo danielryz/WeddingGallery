@@ -1,9 +1,9 @@
-import React from 'react';
+// src/components/GalleryItem/GalleryItem.tsx
+import React, { useRef } from 'react';
 import ReactionSelector from '../Reactions/ReactionSelector';
 import useLongPressReaction from '../../hooks/useLongPressReaction';
 import './GalleryItem.css';
-import {MessageSquare, Heart} from 'lucide-react';
-
+import { MessageSquare, Heart } from 'lucide-react';
 
 interface GalleryItemProps {
     item: {
@@ -22,6 +22,8 @@ interface GalleryItemProps {
 const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
     const { show: showReactions, handlers, close } = useLongPressReaction();
 
+    const triggerRef = useRef<HTMLDivElement | null>(null);
+
     const renderMedia = () => {
         if (item.isVideo) {
             return (
@@ -39,54 +41,47 @@ const GalleryItem: React.FC<GalleryItemProps> = ({ item, onItemClick }) => {
                 </div>
             );
         }
-        return (
-            <img
-                src={item.src}
-                alt="media"
-                className="gallery-media"
-            />
-        );
+        return <img src={item.src} alt="media" className="gallery-media" />;
     };
 
     return (
         <div className="gallery-item-background">
-        <div
-            className="gallery-item"
-            {...handlers}
-            onClick={() => {
-                if (showReactions) return;
-                onItemClick?.(item.id);
-            }}
-        >
-            {renderMedia()}
+            <div
+                className="gallery-item"
+                ref={triggerRef}          // ⇐ teraz zgadza się typ: Ref<HTMLDivElement>
+                {...handlers}
+                onClick={() => {
+                    if (showReactions) return;
+                    onItemClick?.(item.id);
+                }}
+            >
+                {renderMedia()}
 
-            {/* Panel wyboru reakcji (po długim przytrzymaniu) */}
-            {showReactions && (
-                <ReactionSelector
-                    photoId={item.id}
-                    onSelect={() => { /* reakcja zostanie dodana w ReactionSelector */ }}
-                    onClose={close}
-                />
-            )}
+                {showReactions && (
+                    <ReactionSelector
+                        triggerRef={triggerRef}
+                        photoId={item.id}
+                        onSelect={() => {}}
+                        onClose={close}
+                    />
+                )}
 
-            {/* Licznik komentarzy – lewy dolny róg */}
-            <div className="info-bar comment-bar">
-                <div className="info-item">
-                    <MessageSquare size={16} />
-                    <span>{item.commentCount}</span>
+                <div className="info-bar comment-bar">
+                    <div className="info-item">
+                        <MessageSquare size={16} />
+                        <span>{item.commentCount}</span>
+                    </div>
                 </div>
-            </div>
 
-            {/* Ikony reakcji – prawy dolny róg (widoczne tylko jeśli są reakcje) */}
-            {Object.entries(item.reactions).length > 0 && (
-                <div className="info-bar reactions-bar">
+                {Object.entries(item.reactions).length > 0 && (
+                    <div className="info-bar reactions-bar">
                         <div className="info-item">
                             <Heart size={16} />
                             <span>{item.reactionCount}</span>
                         </div>
-                </div>
-            )}
-        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

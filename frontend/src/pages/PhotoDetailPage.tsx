@@ -1,21 +1,31 @@
-import React, { useEffect, useState } from 'react';
+// src/pages/PhotoDetailPage.tsx
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import {getPhoto, updateDescription, updateVisibility, updateGuestVisibility} from '../api/photos';
+import {
+  getPhoto,
+  updateDescription,
+  updateVisibility,
+  updateGuestVisibility
+} from '../api/photos';
 import { getReactionCounts } from '../api/reactions';
 import { getComments, addComment, deleteComment } from '../api/comments';
-import type {PhotoResponse} from '../types/photo';
-import type {CommentResponse} from '../types/comment';
+import type { PhotoResponse } from '../types/photo';
+import type { CommentResponse } from '../types/comment';
 import './PhotoDetailPage.css';
-import {isAdmin, isThisDevice} from "../utils/authUtils.ts";
-import { useAlerts } from "../components/alert/useAlerts"
-import ConfirmModal from "../components/Confirm/ConfirmModal";
+import { isAdmin, isThisDevice } from '../utils/authUtils';
+import { useAlerts } from '../components/alert/useAlerts';
+import ConfirmModal from '../components/Confirm/ConfirmModal';
 import useLongPressReaction from '../hooks/useLongPressReaction';
 import ReactionSelector from '../components/Reactions/ReactionSelector';
 import ReactionSummary from '../components/Reactions/ReactionSummary';
-
 const EMOJI_MAP: Record<string, string> = {
-  HEART: '❤️', LAUGH: '😂', WOW: '😮', SAD: '😢',
-  ANGRY: '😡', LIKE: '👍', DISLIKE: '👎',
+  HEART: '❤️',
+  LAUGH: '😂',
+  WOW: '😮',
+  SAD: '😢',
+  ANGRY: '😡',
+  LIKE: '👍',
+  DISLIKE: '👎',
 };
 
 const PhotoDetailPage: React.FC = () => {
@@ -33,30 +43,26 @@ const PhotoDetailPage: React.FC = () => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
   const showAlert = useAlerts();
 
+  // ref dla głównego pickera reakcji
+  const pickerTriggerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!id) return;
-    const loadPhoto = async () => {
+    (async () => {
       const res = await getPhoto(Number(id));
       setPhoto({
         ...res,
-        isVideo: res.isVideo ?? (res as { video?: boolean }).video ?? false,
+        isVideo: res.isVideo ?? (res as any).video ?? false,
       });
       setDescInput(res.description || '');
-    };
-    const loadReactions = async () => {
       const counts = await getReactionCounts(Number(id));
       const mapped = Object.fromEntries(
           counts.filter(r => EMOJI_MAP[r.type]).map(r => [EMOJI_MAP[r.type], r.count])
       );
       setReactions(mapped);
-    };
-    const loadComments = async () => {
-      const res = await getComments(Number(id), 0, 50);
-      setComments(res.content);
-    };
-    loadPhoto();
-    loadReactions();
-    loadComments();
+      const comm = await getComments(Number(id), 0, 50);
+      setComments(comm.content);
+    })();
   }, [id]);
 
   if (!photo) {
@@ -64,15 +70,15 @@ const PhotoDetailPage: React.FC = () => {
   }
 
   const canView =
-    isAdmin() ||
-    isThisDevice(photo.deviceId) ||
-    (photo.isVisibleForGuest && !photo.isWish);
+      isAdmin() ||
+      isThisDevice(photo.deviceId) ||
+      (photo.isVisibleForGuest && !photo.isWish);
 
   if (!canView) {
     return (
-      <main className="photo-detail">
-        <p className="no-access-msg">Ta treść jest niedostępna.</p>
-      </main>
+        <main className="photo-detail">
+          <p className="no-access-msg">Ta treść jest niedostępna.</p>
+        </main>
     );
   }
 
@@ -105,96 +111,87 @@ const PhotoDetailPage: React.FC = () => {
       await deleteComment(commentId);
       setComments(comments.filter(c => c.id !== commentId));
       showAlert('Komentarz usunięty', 'success');
-  } catch (err: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const e = err as any;
-      if (e.response?.status === 403) {
+    } catch (err: any) {
+      if (err.response?.status === 403) {
         showAlert('Nie możesz usunąć tego komentarza – nie należy do Ciebie.', 'error');
       } else {
-        showAlert('Bład usuwania komentarza: ' + err, 'error');
+        showAlert('Błąd usuwania komentarza: ' + err, 'error');
       }
     }
   };
 
   const handleDeletePhoto = async () => {
-    try{
-      await updateVisibility(Number(id), {visible: false});
-      window.location.href = '/gallery';
+    try {
+      await updateVisibility(Number(id), { visible: false });
       showAlert('Zdjęcie usunięte', 'success');
-  }catch (err: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const e = err as any;
-      if (e.response?.status === 403){
-        showAlert('Nie możesz usunąć tego zdjęcia - brak Autoryzacji.', 'error');
+      window.location.href = '/gallery';
+    } catch (err: any) {
+      if (err.response?.status === 403) {
+        showAlert('Nie możesz usunąć tego zdjęcia - brak autoryzacji.', 'error');
       } else {
         showAlert('Błąd usuwania zdjęcia: ' + err, 'error');
       }
     }
-  }
+  };
 
   const handleEditDescription = async (text: string) => {
     try {
-      await  updateDescription(Number(id), {description: text});
+      await updateDescription(Number(id), { description: text });
       showAlert('Opis zaktualizowany', 'success');
       setPhoto(prev => prev ? { ...prev, description: text } : prev);
-    }catch (err: unknown) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const e = err as any;
-      if (e.response?.status === 403){
-        showAlert('Nie możesz zmienić tego opisu - brak Autoryzacji.', 'info');
+    } catch (err: any) {
+      if (err.response?.status === 403) {
+        showAlert('Nie możesz zmienić tego opisu - brak autoryzacji.', 'info');
       } else {
         showAlert('Błąd edycji opisu: ' + err, 'error');
       }
     }
-  }
+  };
 
   const handleGuestVisibility = async (visible: boolean) => {
     try {
       await updateGuestVisibility(Number(id), { isVisibleForGuest: visible });
       setPhoto(prev => prev ? { ...prev, isVisibleForGuest: visible } : prev);
       showAlert('Widoczność zaktualizowana', 'success');
-    } catch (err: unknown) {
+    } catch (err: any) {
       showAlert('Błąd zmiany widoczności: ' + err, 'error');
     }
-  }
-
-  const CommentItem: React.FC<{ comment: CommentResponse }> = ({ comment }) => {
-    const { show: showCommentPicker, handlers: commentHandlers, close: closeComment } = useLongPressReaction();
-    return (
-      <li className="comment-item">
-        <div className="comment-avatar">
-          {comment.deviceName.charAt(0).toUpperCase()}
-        </div>
-        <div className="comment-bubble" {...commentHandlers}>
-          <div className="comment-author">{comment.deviceName}</div>
-          <div>{comment.text}</div>
-          {(isThisDevice(comment.deviceId) || isAdmin()) && (
-            <button
-              onClick={() => setCommentToDelete(comment.id)}
-              className="delete-btn"
-              title="Usuń komentarz"
-            >
-              🗑️
-            </button>
-          )}
-          {showCommentPicker && (
-            <ReactionSelector onClose={closeComment} addReactionFn={async () => {}} />
-          )}
-        </div>
-      </li>
-    );
   };
 
+  // Komponent pojedynczego komentarza z własnym pickerem
+  const CommentItem: React.FC<{ comment: CommentResponse }> = ({ comment }) => {
+    const commentTriggerRef = useRef<HTMLDivElement>(null);
 
-
+    return (
+        <li className="comment-item">
+          <div className="comment-avatar">
+            {comment.deviceName.charAt(0).toUpperCase()}
+          </div>
+          {/* ref i handlers dla komentarza */}
+          <div className="comment-bubble" ref={commentTriggerRef}>
+            <div className="comment-author">{comment.deviceName}</div>
+            <div>{comment.text}</div>
+            {(isThisDevice(comment.deviceId) || isAdmin()) && (
+                <button
+                    onClick={() => setCommentToDelete(comment.id)}
+                    className="delete-btn"
+                    title="Usuń komentarz"
+                >
+                  🗑️
+                </button>
+            )}
+          </div>
+        </li>
+    );
+  };
 
   return (
       <main className="photo-detail">
         <h1 className="photo-detail-title">Podgląd</h1>
 
-        {/* Podgląd zdjęcia lub filmu */}
         <div className="photo-frame">
-          <div className="media-container" {...handlers}>
+          {/* media-container z ref i handlers */}
+          <div className="media-container" ref={pickerTriggerRef} {...handlers}>
             {photo.isVideo ? (
                 <video
                     src={`${API_URL}/photos/${photo.fileName}`}
@@ -215,74 +212,98 @@ const PhotoDetailPage: React.FC = () => {
             {!photo.isVisibleForGuest && (
                 <span className="photo-visibility">Ukryte dla gości</span>
             )}
-          {photo.isWish && (
-              <span className="photo-wish">🎁 Życzenia</span>
+            {photo.isWish && (
+                <span className="photo-wish">🎁 Życzenia</span>
+            )}
+          </div>
+          {(isThisDevice(photo.deviceId) || isAdmin()) && (
+              <label className="visible-checkbox">
+                <input
+                    type="checkbox"
+                    checked={photo.isVisibleForGuest}
+                    onChange={e => handleGuestVisibility(e.target.checked)}
+                />
+                Widoczne dla gości
+              </label>
           )}
         </div>
-        {(isThisDevice(photo.deviceId) || isAdmin()) && (
-            <label className="visible-checkbox">
-              <input
-                type="checkbox"
-                checked={photo.isVisibleForGuest}
-                onChange={e => handleGuestVisibility(e.target.checked)}
-              />
-              Widoczne dla gości
-            </label>
-        )}
-      </div>
 
         <div className="photo-actions">
           {(isThisDevice(photo.deviceId) || isAdmin()) && (
-              <button className="btn btn-danger" onClick={() => setShowDeletePhotoConfirm(true)}>Usuń Zdjęcie</button>
+              <button
+                  className="btn btn-danger"
+                  onClick={() => setShowDeletePhotoConfirm(true)}
+              >
+                Usuń Zdjęcie
+              </button>
           )}
           {isThisDevice(photo.deviceId) && !editingDesc && (
-              <button className="btn btn-primary edit-desc-btn" onClick={() => setEditingDesc(true)}>Edytuj opis</button>
+              <button
+                  className="btn btn-primary edit-desc-btn"
+                  onClick={() => setEditingDesc(true)}
+              >
+                Edytuj opis
+              </button>
           )}
         </div>
+
         {isThisDevice(photo.deviceId) && !editingDesc && (
             <p className="edit-hint">Kliknij "Edytuj opis", aby dodać opis do zdjęcia.</p>
         )}
 
         {isThisDevice(photo.deviceId) && editingDesc && (
             <div className="edit-desc-form">
-              <textarea
-                  className="update-description-input"
-                  placeholder="Dodaj opis..."
-                  value={descInput}
-                  onChange={e => setDescInput(e.target.value)}
-              />
+          <textarea
+              className="update-description-input"
+              placeholder="Dodaj opis..."
+              value={descInput}
+              onChange={e => setDescInput(e.target.value)}
+          />
               <div className="edit-desc-actions">
-                <button className="btn" onClick={() => { setEditingDesc(false); setDescInput(photo.description || ''); }}>Anuluj</button>
-                <button className="btn btn-primary" onClick={() => setShowEditConfirm(true)}>Zapisz opis</button>
+                <button
+                    className="btn"
+                    onClick={() => {
+                      setEditingDesc(false);
+                      setDescInput(photo.description || '');
+                    }}
+                >
+                  Anuluj
+                </button>
+                <button
+                    className="btn btn-primary"
+                    onClick={() => setShowEditConfirm(true)}
+                >
+                  Zapisz opis
+                </button>
               </div>
             </div>
         )}
 
-        {/* Sekcja reakcji pod zdjęciem/filmem */}
+        {/* podsumowanie reakcji */}
         <ReactionSummary reactions={reactions} className="center" />
+
+        {/* główny picker reakcji */}
         {showPicker && (
-          <div className="reaction-picker-container">
             <ReactionSelector
-              photoId={Number(id)}
-              onSelect={refreshReactions}
-              onClose={close}
+                triggerRef={pickerTriggerRef}
+                photoId={Number(id)}
+                onSelect={refreshReactions}
+                onClose={close}
             />
-          </div>
         )}
 
-        {/* Sekcja komentarzy */}
+        {/* komentarze */}
         <section className="comments-section">
           <h2 className="comments-title">Komentarze</h2>
           {comments.length === 0 ? (
               <p className="no-comments-msg">Brak komentarzy</p>
           ) : (
               <ul className="comment-list">
-                {comments.map(comment => (
-                  <CommentItem key={comment.id} comment={comment} />
+                {comments.map(c => (
+                    <CommentItem key={c.id} comment={c} />
                 ))}
               </ul>
           )}
-          {/* Formularz dodawania nowego komentarza */}
           <textarea
               value={newComment}
               onChange={e => setNewComment(e.target.value)}
@@ -292,24 +313,35 @@ const PhotoDetailPage: React.FC = () => {
               className="comment-input"
           />
         </section>
+
+        {/* confirm modale */}
         {showDeletePhotoConfirm && (
             <ConfirmModal
                 message="Czy na pewno usunąć zdjęcie?"
-                onConfirm={async () => { await handleDeletePhoto(); setShowDeletePhotoConfirm(false); }}
+                onConfirm={async () => {
+                  await handleDeletePhoto();
+                  setShowDeletePhotoConfirm(false);
+                }}
                 onCancel={() => setShowDeletePhotoConfirm(false)}
             />
         )}
         {commentToDelete !== null && (
             <ConfirmModal
                 message="Czy na pewno usunąć komentarz?"
-                onConfirm={async () => { await handleDeleteComment(commentToDelete); setCommentToDelete(null); }}
+                onConfirm={async () => {
+                  await handleDeleteComment(commentToDelete);
+                  setCommentToDelete(null);
+                }}
                 onCancel={() => setCommentToDelete(null)}
             />
         )}
         {showEditConfirm && (
             <ConfirmModal
                 message="Czy na pewno zaktualizować opis?"
-                onConfirm={async () => { await handleEditDescription(descInput); setShowEditConfirm(false); }}
+                onConfirm={async () => {
+                  await handleEditDescription(descInput);
+                  setShowEditConfirm(false);
+                }}
                 onCancel={() => setShowEditConfirm(false)}
             />
         )}

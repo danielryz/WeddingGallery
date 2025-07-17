@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "@stomp/stompjs": "^7.1.1",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@types/react-router-dom": "^5.3.3",

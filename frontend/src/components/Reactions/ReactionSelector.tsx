@@ -1,5 +1,7 @@
 // src/components/Reactions/ReactionSelector.tsx
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState, type ReactElement } from 'react';
+import { createPortal } from 'react-dom';
+import { createPopper, type Instance } from '@popperjs/core';
 import { addReaction } from '../../api/reactions';
 import './ReactionSelector.css';
 
@@ -8,9 +10,9 @@ interface Props {
     onSelect?: (emoji: string) => void;
     onClose: () => void;
     addReactionFn?: (emoji: string) => Promise<void>;
+    triggerRef: React.RefObject<HTMLDivElement | null>;
 }
 
-// mapujemy unicode → typ dla API
 const EMOJI_MAP: Record<string, string> = {
     '❤️': 'HEART',
     '😂': 'LAUGH',
@@ -21,7 +23,6 @@ const EMOJI_MAP: Record<string, string> = {
     '👎': 'DISLIKE',
 };
 
-// Labels used for screen readers
 const EMOJI_LABELS: Record<string, string> = {
     '❤️': 'Heart',
     '😂': 'Laugh',
@@ -32,9 +33,16 @@ const EMOJI_LABELS: Record<string, string> = {
     '👎': 'Dislike',
 };
 
-
-const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReactionFn }) => {
+const ReactionSelector: React.FC<Props> = ({
+                                               photoId,
+                                               onSelect,
+                                               onClose,
+                                               addReactionFn,
+                                               triggerRef,
+                                           }) => {
+    const [popperEl, setPopperEl] = useState<HTMLDivElement | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
+    const popperInstance = useRef<Instance | null>(null);
 
     useEffect(() => {
         const handleClick = (e: MouseEvent | TouchEvent) => {
@@ -62,8 +70,35 @@ const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReac
         onClose();
     };
 
-    return (
-        <div className="reaction-selector" ref={containerRef}>
+    useEffect(() => {
+        if (triggerRef.current && popperEl) {
+            popperInstance.current = createPopper(
+                triggerRef.current,
+                popperEl,
+                {
+                    placement: 'bottom-start',
+                    modifiers: [
+                        { name: 'flip', options: { fallbackPlacements: ['bottom-end', 'top-start'] } } as any,
+                        { name: 'preventOverflow', options: { padding: 8 } } as any,
+                    ],
+                }
+            );
+        }
+        return () => {
+            popperInstance.current?.destroy();
+            popperInstance.current = null;
+        };
+    }, [triggerRef, popperEl]);
+
+    return createPortal(
+        <div
+            ref={node => {
+                setPopperEl(node);
+                containerRef.current = node;
+            }}
+            className="reaction-selector"
+            role="menu"
+        >
             {Object.keys(EMOJI_MAP).map(emoji => (
                 <button
                     key={emoji}
@@ -77,8 +112,9 @@ const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReac
                     <span className="sr-only">{`${EMOJI_LABELS[emoji]} reaction`}</span>
                 </button>
             ))}
-        </div>
-    );
+        </div>,
+        document.body
+    ) as ReactElement;
 };
 
 export default ReactionSelector;
