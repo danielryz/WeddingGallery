@@ -112,6 +112,10 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   };
 
   const handleTap = () => {
+    if (showPicker) {
+      lastTapRef.current = 0;
+      return;
+    }
     const now = Date.now();
     if (now - lastTapRef.current < 300) {
       showHeart();
