@@ -126,6 +126,10 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
 
   if (items.length === 0) return null;
 
+  useEffect(() => {
+    setHeartKey(0);
+  }, [index]);
+
   const prev = () => {
     resetNavTimer();
     setIndex(i => (i === 0 ? items.length - 1 : i - 1));

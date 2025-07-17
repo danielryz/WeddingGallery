@@ -229,6 +229,31 @@ const PhotoDetailPage: React.FC = () => {
           )}
         </div>
 
+        <section className="pd-comments-section">
+          <h2 className="pd-comments-title">Komentarze</h2>
+          {comments.length === 0 ? (
+              <p className="pd-no-comments-msg">Brak komentarzy</p>
+          ) : (
+              <ul className="pd-comment-list">
+                {comments.map(c => (
+                    <CommentItem key={c.id} comment={c} />
+                ))}
+              </ul>
+          )}
+          {photo.isWish ? (
+            <p className="pd-comment-disabled-msg">Komentowanie wyłączone dla życzeń</p>
+          ) : (
+            <textarea
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                onKeyDown={handleSendCommentEnter}
+                placeholder="Dodaj komentarz…"
+                rows={2}
+                className="pd-comment-input"
+            />
+          )}
+        </section>
+
         <div className="photo-actions">
           {(isThisDevice(photo.deviceId) || isAdmin()) && (
               <button
@@ -280,29 +305,6 @@ const PhotoDetailPage: React.FC = () => {
             </div>
         )}
 
-        {/* komentarze */}
-        {!photo.isWish && (
-        <section className="pd-comments-section">
-          <h2 className="pd-comments-title">Komentarze</h2>
-          {comments.length === 0 ? (
-              <p className="pd-no-comments-msg">Brak komentarzy</p>
-          ) : (
-              <ul className="pd-comment-list">
-                {comments.map(c => (
-                    <CommentItem key={c.id} comment={c} />
-                ))}
-              </ul>
-          )}
-          <textarea
-              value={newComment}
-              onChange={e => setNewComment(e.target.value)}
-              onKeyDown={handleSendCommentEnter}
-              placeholder="Dodaj komentarz…"
-              rows={2}
-              className="pd-comment-input"
-          />
-        </section>
-        )}
 
         {/* podsumowanie reakcji */}
         <ReactionSummary reactions={reactions} className="center" />
