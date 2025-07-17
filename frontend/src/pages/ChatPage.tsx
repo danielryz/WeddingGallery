@@ -19,6 +19,7 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
   const [reactions, setReactions] = useState<ChatReactionCountResponse[]>([]);
   const { show: showPicker, handlers, close } = useLongPressReaction();
   const pickerRef = useRef<HTMLDivElement>(null);
+  const bubbleRef = useRef<HTMLDivElement>(null);
   const localDeviceId = Number(localStorage.getItem('deviceId'));
   const isOwn = message.deviceId === localDeviceId;
 
@@ -60,6 +61,7 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
         <div
             className={`chat-bubble ${isOwn ? 'own' : 'other'}`}
             {...handlers}
+            ref={bubbleRef}
         >
           {!isOwn && <div className="chat-sender-name">{message.deviceName}</div>}
           <div>{message.text}</div>
@@ -68,6 +70,7 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
         {showPicker && (
             <div ref={pickerRef} className="emoji-picker">
               <ReactionSelector
+                triggerRef={bubbleRef}
                 onClose={close}
                 addReactionFn={handleReactionSelect}
               />
