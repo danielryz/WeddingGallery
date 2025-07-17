@@ -135,7 +135,11 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const current = items[index];
 
   const showHeart = async () => {
-    setHeartKey(Date.now());
+    const key = Date.now();
+    setHeartKey(key);
+    setTimeout(() => {
+      setHeartKey(k => (k === key ? 0 : k));
+    }, 800);
     try {
       await addReaction(items[index].id, { type: 'HEART' });
       await loadReactions(items[index].id);

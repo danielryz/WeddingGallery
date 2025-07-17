@@ -144,6 +144,7 @@
     font-size: 14px;
     flex: 1;
     position: relative;
+    word-break: break-word;
 }
 
 .comment-author {
@@ -179,6 +180,18 @@
 .comment-input:focus {
     outline: none;
     border-color: var(--gold-bright);
+}
+
+.comment-input:disabled {
+    background-color: var(--grey-background);
+    color: var(--gray);
+}
+
+.comment-disabled-msg {
+    text-align: center;
+    color: var(--gray);
+    font-size: 14px;
+    margin-top: 4px;
 }
 
 .photo-actions {

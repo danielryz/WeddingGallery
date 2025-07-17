@@ -92,6 +92,7 @@ const PhotoDetailPage: React.FC = () => {
   };
 
   const handleSendComment = async () => {
+    if (photo?.isWish) return;
     if (!newComment.trim()) return;
     await addComment(Number(id), { text: newComment.trim() });
     setNewComment('');
@@ -311,7 +312,11 @@ const PhotoDetailPage: React.FC = () => {
               placeholder="Dodaj komentarz…"
               rows={2}
               className="comment-input"
+              disabled={photo.isWish}
           />
+          {photo.isWish && (
+              <p className="comment-disabled-msg">Komentowanie życzeń jest wyłączone</p>
+          )}
         </section>
 
         {/* confirm modale */}
