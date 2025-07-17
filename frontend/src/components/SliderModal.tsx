@@ -209,7 +209,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
           {current.isVideo ? (
             <video src={current.src} controls className="slider-media" />
           ) : (
-            <img src={current.src} className="slider-media" />
+            <img src={current.src} className="slider-media" alt="Photo" />
           )}
           {heartKey > 0 && (
             <span key={heartKey} className="double-tap-heart">❤️</span>
@@ -246,6 +246,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
               src={p.src}
               className={`thumbnail ${i === index ? 'active' : ''}`}
               onClick={() => setIndex(i)}
+              alt="Photo"
             />
           ))}
         </div>
