@@ -164,18 +164,18 @@ const PhotoDetailPage: React.FC = () => {
     const commentTriggerRef = useRef<HTMLDivElement>(null);
 
     return (
-        <li className="comment-item">
-          <div className="comment-avatar">
+        <li className="pd-comment-item">
+          <div className="pd-comment-avatar">
             {comment.deviceName.charAt(0).toUpperCase()}
           </div>
           {/* ref i handlers dla komentarza */}
-          <div className="comment-bubble" ref={commentTriggerRef}>
-            <div className="comment-author">{comment.deviceName}</div>
+          <div className="pd-comment-bubble" ref={commentTriggerRef}>
+            <div className="pd-comment-author">{comment.deviceName}</div>
             <div>{comment.text}</div>
             {(isThisDevice(comment.deviceId) || isAdmin()) && (
                 <button
                     onClick={() => setCommentToDelete(comment.id)}
-                    className="delete-btn"
+                    className="pd-delete-btn"
                     title="Usuń komentarz"
                 >
                   🗑️
@@ -217,7 +217,7 @@ const PhotoDetailPage: React.FC = () => {
                 <span className="photo-wish">🎁 Życzenia</span>
             )}
           </div>
-          {(isThisDevice(photo.deviceId) || isAdmin()) && (
+          {(photo.isWish && (isThisDevice(photo.deviceId) || isAdmin())) && (
               <label className="visible-checkbox">
                 <input
                     type="checkbox"
@@ -280,6 +280,30 @@ const PhotoDetailPage: React.FC = () => {
             </div>
         )}
 
+        {/* komentarze */}
+        {!photo.isWish && (
+        <section className="pd-comments-section">
+          <h2 className="pd-comments-title">Komentarze</h2>
+          {comments.length === 0 ? (
+              <p className="pd-no-comments-msg">Brak komentarzy</p>
+          ) : (
+              <ul className="pd-comment-list">
+                {comments.map(c => (
+                    <CommentItem key={c.id} comment={c} />
+                ))}
+              </ul>
+          )}
+          <textarea
+              value={newComment}
+              onChange={e => setNewComment(e.target.value)}
+              onKeyDown={handleSendCommentEnter}
+              placeholder="Dodaj komentarz…"
+              rows={2}
+              className="pd-comment-input"
+          />
+        </section>
+        )}
+
         {/* podsumowanie reakcji */}
         <ReactionSummary reactions={reactions} className="center" />
 
@@ -292,32 +316,6 @@ const PhotoDetailPage: React.FC = () => {
                 onClose={close}
             />
         )}
-
-        {/* komentarze */}
-        <section className="comments-section">
-          <h2 className="comments-title">Komentarze</h2>
-          {comments.length === 0 ? (
-              <p className="no-comments-msg">Brak komentarzy</p>
-          ) : (
-              <ul className="comment-list">
-                {comments.map(c => (
-                    <CommentItem key={c.id} comment={c} />
-                ))}
-              </ul>
-          )}
-          <textarea
-              value={newComment}
-              onChange={e => setNewComment(e.target.value)}
-              onKeyDown={handleSendCommentEnter}
-              placeholder="Dodaj komentarz…"
-              rows={2}
-              className="comment-input"
-              disabled={photo.isWish}
-          />
-          {photo.isWish && (
-              <p className="comment-disabled-msg">Komentowanie życzeń jest wyłączone</p>
-          )}
-        </section>
 
         {/* confirm modale */}
         {showDeletePhotoConfirm && (

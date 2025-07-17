@@ -59,6 +59,31 @@
   opacity: 0;
 }
 
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: var(--white);
+  padding: 4px 8px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.comments-close-btn {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--cream-light);
+  font-size: 20px;
+  cursor: pointer;
+}
+
 .thumbnail-strip {
   display: flex;
   gap: 4px;
@@ -110,11 +135,11 @@
   animation: heart-fade 0.8s forwards;
 }
 
-.media-wrapper.comments-open .slider-media {
+.media-wrapper.slider-comments-open .slider-media {
   max-height: 60vh;
 }
 
-.comments-section {
+.slider-comments-section {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -127,7 +152,7 @@
   overflow-y: auto;
 }
 
-.comments-title {
+.slider-comments-title {
   font-size: 14px;
   font-weight: 600;
   color: var(--cream-light);
@@ -135,28 +160,28 @@
   text-align: center;
 }
 
-.no-comments-msg {
+.slider-no-comments-msg {
   color: var(--cream-light);
   text-align: center;
 }
 
-.comment-list {
+.slider-comment-list {
   list-style: none;
   padding-left: 0;
   max-height: 30vh;
   overflow-y: auto;
 }
 
-.comment-list .comment-item + .comment-item {
+.slider-comment-list .slider-comment-item + .slider-comment-item {
   margin-top: 8px;
 }
 
-.comment-item {
+.slider-comment-item {
   display: flex;
   align-items: flex-start;
 }
 
-.comment-avatar {
+.slider-comment-avatar {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
@@ -170,7 +195,7 @@
   margin-right: 8px;
 }
 
-.comment-bubble {
+.slider-comment-bubble {
   background-color: var(--white);
   padding: 8px;
   border-radius: 12px;
@@ -179,12 +204,12 @@
   flex: 1;
 }
 
-.comment-author {
+.slider-comment-author {
   color: var(--brown);
   font-weight: 500;
 }
 
-.comment-input {
+.slider-comment-input {
   width: 100%;
   border: 1px solid var(--grey-border);
   border-radius: 6px;
@@ -194,7 +219,7 @@
   resize: none;
 }
 
-.comment-input:focus {
+.slider-comment-input:focus {
   outline: none;
   border-color: var(--gold-bright);
 }

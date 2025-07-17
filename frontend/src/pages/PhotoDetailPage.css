@@ -92,37 +92,37 @@
 }
 
 
-.comments-section {
+.pd-comments-section {
     margin-top: 24px;
 }
 
-.comments-title {
+.pd-comments-title {
     font-size: 14px;
     font-weight: 600;
     color: var(--brown);
     margin-bottom: 8px;
 }
 
-.no-comments-msg {
+.pd-no-comments-msg {
     font-size: 14px;
     color: var(--gray);
 }
 
-.comment-list {
+.pd-comment-list {
     list-style: none;
     padding-left: 0;
 }
 
-.comment-list .comment-item + .comment-item {
+.pd-comment-list .pd-comment-item + .pd-comment-item {
     margin-top: 8px;
 }
 
-.comment-item {
+.pd-comment-item {
     display: flex;
     align-items: flex-start;
 }
 
-.comment-avatar {
+.pd-comment-avatar {
     flex-shrink: 0;
     width: 32px;
     height: 32px;
@@ -136,7 +136,7 @@
     margin-right: 8px;
 }
 
-.comment-bubble {
+.pd-comment-bubble {
     background-color: var(--white);
     padding: 8px;
     border-radius: 12px;
@@ -147,12 +147,12 @@
     word-break: break-word;
 }
 
-.comment-author {
+.pd-comment-author {
     color: var(--brown);
     font-weight: 500;
 }
 
-.delete-btn {
+.pd-delete-btn {
     position: absolute;
     top: 4px;
     right: 4px;
@@ -163,11 +163,11 @@
     cursor: pointer;
 }
 
-.delete-btn:hover {
+.pd-delete-btn:hover {
     color: var(--danger);
 }
 
-.comment-input {
+.pd-comment-input {
     width: 100%;
     border: 1px solid var(--grey-border);
     border-radius: 6px;
@@ -177,17 +177,17 @@
     resize: none;
 }
 
-.comment-input:focus {
+.pd-comment-input:focus {
     outline: none;
     border-color: var(--gold-bright);
 }
 
-.comment-input:disabled {
+.pd-comment-input:disabled {
     background-color: var(--grey-background);
     color: var(--gray);
 }
 
-.comment-disabled-msg {
+.pd-comment-disabled-msg {
     text-align: center;
     color: var(--gray);
     font-size: 14px;
