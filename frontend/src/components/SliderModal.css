@@ -32,6 +32,7 @@
   max-height: 90vh;
   object-fit: contain;
   border-radius: 8px;
+  transition: max-height 0.3s;
 }
 
 .nav-btn {
@@ -70,6 +71,10 @@
   justify-content: center;
 }
 
+.thumbnail-strip.hidden {
+  display: none;
+}
+
 .thumbnail {
   width: 60px;
   height: 60px;
@@ -105,10 +110,20 @@
   animation: heart-fade 0.8s forwards;
 }
 
+.media-wrapper.comments-open .slider-media {
+  max-height: 60vh;
+}
+
 .comments-section {
-  margin-top: 12px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   max-height: 40vh;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  padding: 12px 8px;
   overflow-y: auto;
 }
 
