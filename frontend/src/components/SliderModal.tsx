@@ -18,6 +18,7 @@ interface MediaItem {
   id: number;
   isVideo: boolean;
   src: string;
+  isWish: boolean;
 }
 
 const EMOJI_MAP: Record<string, string> = {
@@ -35,6 +36,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [index, setIndex] = useState(0);
   const [heartKey, setHeartKey] = useState<number>(0);
   const lastTapRef = useRef<number>(0);
+  const touchHandledRef = useRef(false);
   const { show: showPicker, handlers, close, open } = useLongPressReaction();
   // ref do media-wrapper, pod który portalujemy ReactionSelector
   const mediaWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -53,6 +55,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
       id: p.id,
       isVideo: p.isVideo ?? (p as { video?: boolean }).video ?? false,
       src: `${API_URL}/photos/${p.fileName}`,
+      isWish: p.isWish,
     }));
     setItems(mapped);
     const idx = mapped.findIndex(p => p.id === startId);
@@ -122,6 +125,13 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     };
   }, []);
 
+  useEffect(() => {
+    // reset transient UI state when navigating to a different item
+    setHeartKey(0);
+    setShowComments(false);
+    setShowThumbnails(true);
+  }, [index]);
+
   if (items.length === 0) return null;
 
   const prev = () => {
@@ -135,7 +145,11 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const current = items[index];
 
   const showHeart = async () => {
-    setHeartKey(Date.now());
+    const key = Date.now();
+    setHeartKey(key);
+    setTimeout(() => {
+      setHeartKey(k => (k === key ? 0 : k));
+    }, 800);
     try {
       await addReaction(items[index].id, { type: 'HEART' });
       await loadReactions(items[index].id);
@@ -144,7 +158,8 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     }
   };
 
-  const handleTap = () => {
+  const handleTap = (fromTouch = false) => {
+    if (!fromTouch && touchHandledRef.current) return;
     if (showPicker) {
       lastTapRef.current = 0;
       return;
@@ -168,6 +183,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    touchHandledRef.current = true;
     touchStartX.current = e.touches[0].clientX;
     resetNavTimer();
     handlers.onTouchStart?.();
@@ -187,7 +203,10 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
       }
     }
     touchStartX.current = null;
-    handleTap();
+    handleTap(true);
+    setTimeout(() => {
+      touchHandledRef.current = false;
+    }, 350);
   };
 
 
@@ -205,6 +224,9 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const modal = (
     <div className="slider-modal-backdrop" onClick={onClose}>
       <div className="slider-modal" onClick={e => e.stopPropagation()}>
+        <button className="close-btn" onClick={onClose} aria-label="Zamknij">
+          ✕
+        </button>
         <button
           className={`nav-btn left${showNav ? '' : ' hidden'}`}
           onClick={prev}
@@ -214,11 +236,11 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
         </button>
         <div
             ref={mediaWrapperRef}
-          className={`media-wrapper${showComments ? ' comments-open' : ''}`}
+          className={`media-wrapper${showComments ? ' slider-comments-open' : ''}`}
           onMouseDown={handlers.onMouseDown}
           onMouseUp={handlers.onMouseUp}
           onMouseLeave={handlers.onMouseLeave}
-          onClick={handleTap}
+          onClick={() => handleTap()}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
@@ -239,6 +261,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
             />
             )}
           <div className="action-bar">
+            {!current.isWish && (
             <div
               className="action-item"
               onClick={e => {
@@ -251,6 +274,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
               <MessageSquare size={20} />
               <span>{comments.length}</span>
             </div>
+            )}
             <div
               className="action-item"
               onClick={e => {
@@ -282,20 +306,25 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
           ))}
         </div>
 
-        {showComments && (
-          <section className="comments-section">
-          <h2 className="comments-title">Komentarze</h2>
+        {showComments && !current.isWish && (
+          <section className="slider-comments-section">
+          <button
+            className="comments-close-btn"
+            onClick={() => { setShowComments(false); setShowThumbnails(true); }}
+            aria-label="Zamknij komentarze"
+          >✕</button>
+          <h2 className="slider-comments-title">Komentarze</h2>
           {comments.length === 0 ? (
-            <p className="no-comments-msg">Brak komentarzy</p>
+            <p className="slider-no-comments-msg">Brak komentarzy</p>
           ) : (
-            <ul className="comment-list">
+            <ul className="slider-comment-list">
               {comments.map(c => (
-                <li key={c.id} className="comment-item">
-                  <div className="comment-avatar">
+                <li key={c.id} className="slider-comment-item">
+                  <div className="slider-comment-avatar">
                     {c.deviceName.charAt(0).toUpperCase()}
                   </div>
-                  <div className="comment-bubble">
-                    <div className="comment-author">{c.deviceName}</div>
+                  <div className="slider-comment-bubble">
+                    <div className="slider-comment-author">{c.deviceName}</div>
                     <div>{c.text}</div>
                   </div>
                 </li>
@@ -313,7 +342,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
             }}
             placeholder="Dodaj komentarz…"
             rows={2}
-            className="comment-input"
+            className="slider-comment-input"
           />
           </section>
         )}

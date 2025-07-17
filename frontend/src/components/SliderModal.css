@@ -59,6 +59,33 @@
   opacity: 0;
 }
 
+.close-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  color: var(--white);
+  padding: 4px 8px;
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.comments-close-btn {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--cream-light);
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 2;
+}
+
 .thumbnail-strip {
   display: flex;
   gap: 4px;
@@ -110,24 +137,27 @@
   animation: heart-fade 0.8s forwards;
 }
 
-.media-wrapper.comments-open .slider-media {
-  max-height: 60vh;
+/* When comments are open, keep the media size stable so the layout
+   doesn't jump. The comments overlay will simply cover the bottom part
+   of the image without shrinking it. */
+.media-wrapper.slider-comments-open .slider-media {
+  max-height: 90vh;
 }
 
-.comments-section {
+.slider-comments-section {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  width: 100%;
   max-height: 40vh;
   background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(6px);
   padding: 12px 8px;
   overflow-y: auto;
+  box-sizing: border-box;
 }
 
-.comments-title {
+.slider-comments-title {
   font-size: 14px;
   font-weight: 600;
   color: var(--cream-light);
@@ -135,28 +165,29 @@
   text-align: center;
 }
 
-.no-comments-msg {
+.slider-no-comments-msg {
   color: var(--cream-light);
   text-align: center;
 }
 
-.comment-list {
+.slider-comment-list {
   list-style: none;
   padding-left: 0;
-  max-height: 150px;
+  max-height: 40vh;
   overflow-y: auto;
 }
 
-.comment-list .comment-item + .comment-item {
+.slider-comment-list .slider-comment-item + .slider-comment-item {
   margin-top: 8px;
 }
 
-.comment-item {
+.slider-comment-item {
   display: flex;
   align-items: flex-start;
+  width: 100%;
 }
 
-.comment-avatar {
+.slider-comment-avatar {
   flex-shrink: 0;
   width: 32px;
   height: 32px;
@@ -170,22 +201,25 @@
   margin-right: 8px;
 }
 
-.comment-bubble {
+.slider-comment-bubble {
   background-color: var(--white);
   padding: 8px;
   border-radius: 12px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   font-size: 14px;
   flex: 1;
+  width: 100%;
+  word-break: break-word;
 }
 
-.comment-author {
+.slider-comment-author {
   color: var(--brown);
   font-weight: 500;
 }
 
-.comment-input {
+.slider-comment-input {
   width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--grey-border);
   border-radius: 6px;
   padding: 8px;
@@ -194,7 +228,7 @@
   resize: none;
 }
 
-.comment-input:focus {
+.slider-comment-input:focus {
   outline: none;
   border-color: var(--gold-bright);
 }
@@ -218,4 +252,10 @@
   align-items: center;
   gap: 4px;
   cursor: pointer;
+}
+
+@media (max-width: 480px) {
+  .slider-comment-bubble {
+    font-size: 12px;
+  }
 }
