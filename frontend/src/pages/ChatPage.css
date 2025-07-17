@@ -84,21 +84,6 @@
     transform: scale(1.2);
 }
 
-.reaction-summary {
-    margin-top: 4px;
-    font-size: 12px;
-    display: flex;
-    color: var(--brown);
-}
-.reaction-summary.own {
-    justify-content: flex-end;
-}
-
-.reaction-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
 
 .chat-input-area {
     display: flex;
@@ -119,24 +104,6 @@
     border-color: var(--gold-bright);
 }
 @media screen and (max-width: 480px) {
-    .reaction-summary {
-        flex-wrap: wrap;
-        gap: 2px;
-        padding: 0 4px;
-        box-sizing: border-box;
-        width: 100%;
-    }
-
-    .reaction-item {
-        font-size: 10px;
-        padding: 1px 3px;
-        border-radius: 10px;
-        background: rgba(0,0,0,0.05);
-    }
-
-    .reaction-item > span:first-child {
-        margin-right: 1px;
-    }
 
     .emoji-picker {
         left: 50%;

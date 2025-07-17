@@ -12,6 +12,7 @@ import type { ChatMessageResponse, ChatReactionCountResponse } from '../types/ch
 import './ChatPage.css';
 import { useAlerts } from "../components/alert/useAlerts"
 import ReactionSelector from '../components/Reactions/ReactionSelector';
+import ReactionSummary from '../components/Reactions/ReactionSummary';
 import useLongPressReaction from '../hooks/useLongPressReaction';
 
 function ChatMessage({ message }: { message: ChatMessageResponse }) {
@@ -73,16 +74,10 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
             </div>
         )}
 
-        {reactions.length > 0 && (
-            <div className={`reaction-summary ${isOwn ? 'own' : ''}`}>
-              {reactions.map(r => (
-                  <span key={r.emoji} className="reaction-item">
-              <span>{r.emoji}</span>
-              <span>{r.count}</span>
-            </span>
-              ))}
-            </div>
-        )}
+        <ReactionSummary
+            reactions={Object.fromEntries(reactions.map(r => [r.emoji, r.count]))}
+            className={isOwn ? 'own' : undefined}
+        />
       </div>
   );
 }
