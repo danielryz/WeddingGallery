@@ -36,6 +36,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [index, setIndex] = useState(0);
   const [heartKey, setHeartKey] = useState<number>(0);
   const lastTapRef = useRef<number>(0);
+  const touchHandledRef = useRef(false);
   const { show: showPicker, handlers, close, open } = useLongPressReaction();
   // ref do media-wrapper, pod który portalujemy ReactionSelector
   const mediaWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -157,7 +158,8 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     }
   };
 
-  const handleTap = () => {
+  const handleTap = (fromTouch = false) => {
+    if (!fromTouch && touchHandledRef.current) return;
     if (showPicker) {
       lastTapRef.current = 0;
       return;
@@ -181,6 +183,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
+    touchHandledRef.current = true;
     touchStartX.current = e.touches[0].clientX;
     resetNavTimer();
     handlers.onTouchStart?.();
@@ -200,7 +203,10 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
       }
     }
     touchStartX.current = null;
-    handleTap();
+    handleTap(true);
+    setTimeout(() => {
+      touchHandledRef.current = false;
+    }, 0);
   };
 
 
@@ -234,7 +240,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
           onMouseDown={handlers.onMouseDown}
           onMouseUp={handlers.onMouseUp}
           onMouseLeave={handlers.onMouseLeave}
-          onClick={handleTap}
+          onClick={() => handleTap()}
           onTouchStart={handleTouchStart}
           onTouchEnd={handleTouchEnd}
         >
