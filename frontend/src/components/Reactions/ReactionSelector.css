@@ -31,10 +31,12 @@
 
 @media (max-width: 480px) {
     .reaction-selector {
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         max-width: calc(100vw - 32px);
         gap: 6px;
         padding: 6px 8px;
+        overflow-x: auto;
+        white-space: nowrap;
     }
 
     .reaction-selector .reaction-emoji {
