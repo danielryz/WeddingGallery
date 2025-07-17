@@ -137,29 +137,18 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     }
   };
 
-  const handleTap = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleTap = () => {
     if (showPicker) {
       lastTapRef.current = 0;
       return;
     }
+
     const now = Date.now();
-    let clientX: number | undefined;
-    if ('clientX' in e) {
-      clientX = e.clientX;
-    } else if ('changedTouches' in e) {
-      clientX = e.changedTouches[0].clientX;
-    }
 
     if (now - lastTapRef.current < 300) {
       showHeart();
-    } else if (clientX !== undefined) {
-      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-      if (clientX - rect.left > rect.width / 2) {
-        next();
-      } else {
-        prev();
-      }
     }
+
     lastTapRef.current = now;
   };
 
@@ -183,7 +172,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
       }
     }
     touchStartX.current = null;
-    handleTap(e);
+    handleTap();
   };
 
 
