@@ -147,9 +147,16 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
 
     if (now - lastTapRef.current < 300) {
       showHeart();
+      lastTapRef.current = 0;
+      return;
     }
 
     lastTapRef.current = now;
+    setTimeout(() => {
+      if (lastTapRef.current === now) {
+        lastTapRef.current = 0;
+      }
+    }, 300);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -222,11 +229,23 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
             />
           )}
           <div className="action-bar">
-            <div className="action-item" onClick={() => setShowComments(s => !s)}>
+            <div
+              className="action-item"
+              onClick={e => {
+                e.stopPropagation();
+                setShowComments(s => !s);
+              }}
+            >
               <MessageSquare size={20} />
               <span>{comments.length}</span>
             </div>
-            <div className="action-item" onClick={() => open()}>
+            <div
+              className="action-item"
+              onClick={e => {
+                e.stopPropagation();
+                open();
+              }}
+            >
               <Heart size={20} />
               <span>{Object.values(reactions).reduce((a, b) => a + b, 0)}</span>
             </div>
