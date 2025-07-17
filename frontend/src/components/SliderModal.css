@@ -41,14 +41,19 @@
   color: var(--white);
   padding: 8px;
   cursor: pointer;
+  transition: opacity 0.3s;
 }
 
 .nav-btn.left {
-  left: -40px;
+  left: 8px;
 }
 
 .nav-btn.right {
-  right: -40px;
+  right: 8px;
+}
+
+.nav-btn.hidden {
+  opacity: 0;
 }
 
 .thumbnail-strip {
