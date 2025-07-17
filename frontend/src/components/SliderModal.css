@@ -216,6 +216,7 @@
 
 .slider-comment-input {
   width: 100%;
+  box-sizing: border-box;
   border: 1px solid var(--grey-border);
   border-radius: 6px;
   padding: 8px;
