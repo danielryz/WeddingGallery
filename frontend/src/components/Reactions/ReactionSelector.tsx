@@ -21,6 +21,17 @@ const EMOJI_MAP: Record<string, string> = {
     '👎': 'DISLIKE',
 };
 
+// Labels used for screen readers
+const EMOJI_LABELS: Record<string, string> = {
+    '❤️': 'Heart',
+    '😂': 'Laugh',
+    '😮': 'Wow',
+    '😢': 'Sad',
+    '😡': 'Angry',
+    '👍': 'Like',
+    '👎': 'Dislike',
+};
+
 
 const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReactionFn }) => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -56,13 +67,14 @@ const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReac
             {Object.keys(EMOJI_MAP).map(emoji => (
                 <button
                     key={emoji}
-                    aria-label={`Reakcja ${emoji}`}
+                    aria-label={`${EMOJI_LABELS[emoji]} reaction`}
                     onClick={e => {
                         e.stopPropagation();
                         handleSelect(emoji);
                     }}
                 >
-                    <span className="reaction-emoji">{emoji}</span>
+                    <span aria-hidden="true" className="reaction-emoji">{emoji}</span>
+                    <span className="sr-only">{`${EMOJI_LABELS[emoji]} reaction`}</span>
                 </button>
             ))}
         </div>
