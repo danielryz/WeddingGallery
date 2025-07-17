@@ -24,3 +24,9 @@
   background-color: var(--danger);
   color: var(--white);
 }
+
+/* Smaller button variant */
+.btn-small {
+  padding: 4px 8px;
+  font-size: 14px;
+}

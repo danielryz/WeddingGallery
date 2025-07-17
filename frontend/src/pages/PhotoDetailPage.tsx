@@ -229,35 +229,23 @@ const PhotoDetailPage: React.FC = () => {
           )}
         </div>
 
-        <section className="pd-comments-section">
-          <h2 className="pd-comments-title">Komentarze</h2>
-          {comments.length === 0 ? (
-              <p className="pd-no-comments-msg">Brak komentarzy</p>
-          ) : (
-              <ul className="pd-comment-list">
-                {comments.map(c => (
-                    <CommentItem key={c.id} comment={c} />
-                ))}
-              </ul>
-          )}
-          {photo.isWish ? (
-            <p className="pd-comment-disabled-msg">Komentowanie wyłączone dla życzeń</p>
-          ) : (
-            <textarea
-                value={newComment}
-                onChange={e => setNewComment(e.target.value)}
-                onKeyDown={handleSendCommentEnter}
-                placeholder="Dodaj komentarz…"
-                rows={2}
-                className="pd-comment-input"
+        {/* summary of reactions */}
+        <ReactionSummary reactions={reactions} className="center" />
+
+        {/* reaction picker for the photo */}
+        {showPicker && (
+            <ReactionSelector
+                triggerRef={pickerTriggerRef}
+                photoId={Number(id)}
+                onSelect={refreshReactions}
+                onClose={close}
             />
-          )}
-        </section>
+        )}
 
         <div className="photo-actions">
           {(isThisDevice(photo.deviceId) || isAdmin()) && (
               <button
-                  className="btn btn-danger"
+                  className="btn btn-danger btn-small"
                   onClick={() => setShowDeletePhotoConfirm(true)}
               >
                 Usuń Zdjęcie
@@ -265,7 +253,7 @@ const PhotoDetailPage: React.FC = () => {
           )}
           {isThisDevice(photo.deviceId) && !editingDesc && (
               <button
-                  className="btn btn-primary edit-desc-btn"
+                  className="btn btn-primary btn-small edit-desc-btn"
                   onClick={() => setEditingDesc(true)}
               >
                 Edytuj opis
@@ -287,7 +275,7 @@ const PhotoDetailPage: React.FC = () => {
           />
               <div className="edit-desc-actions">
                 <button
-                    className="btn"
+                    className="btn btn-small"
                     onClick={() => {
                       setEditingDesc(false);
                       setDescInput(photo.description || '');
@@ -296,7 +284,7 @@ const PhotoDetailPage: React.FC = () => {
                   Anuluj
                 </button>
                 <button
-                    className="btn btn-primary"
+                    className="btn btn-primary btn-small"
                     onClick={() => setShowEditConfirm(true)}
                 >
                   Zapisz opis
@@ -305,20 +293,32 @@ const PhotoDetailPage: React.FC = () => {
             </div>
         )}
 
+        {photo.isWish ? (
+            <p className="pd-comment-disabled-msg">Komentowanie wyłączone dla życzeń</p>
+        ) : (
+        <section className="pd-comments-section">
+          <h2 className="pd-comments-title">Komentarze</h2>
+          {comments.length === 0 ? (
+              <p className="pd-no-comments-msg">Brak komentarzy</p>
+          ) : (
+              <ul className="pd-comment-list">
+                {comments.map(c => (
+                    <CommentItem key={c.id} comment={c} />
+                ))}
+              </ul>
+          )}
 
-        {/* podsumowanie reakcji */}
-        <ReactionSummary reactions={reactions} className="center" />
-
-        {/* główny picker reakcji */}
-        {showPicker && (
-            <ReactionSelector
-                triggerRef={pickerTriggerRef}
-                photoId={Number(id)}
-                onSelect={refreshReactions}
-                onClose={close}
+            <textarea
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                onKeyDown={handleSendCommentEnter}
+                placeholder="Dodaj komentarz…"
+                rows={2}
+                className="pd-comment-input"
             />
-        )}
 
+        </section>
+        )}
         {/* confirm modale */}
         {showDeletePhotoConfirm && (
             <ConfirmModal
