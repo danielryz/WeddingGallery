@@ -11,6 +11,7 @@ import { useAlerts } from "../components/alert/useAlerts"
 import ConfirmModal from "../components/Confirm/ConfirmModal";
 import useLongPressReaction from '../hooks/useLongPressReaction';
 import ReactionSelector from '../components/Reactions/ReactionSelector';
+import ReactionSummary from '../components/Reactions/ReactionSummary';
 
 const EMOJI_MAP: Record<string, string> = {
   HEART: '❤️', LAUGH: '😂', WOW: '😮', SAD: '😢',
@@ -258,14 +259,7 @@ const PhotoDetailPage: React.FC = () => {
         )}
 
         {/* Sekcja reakcji pod zdjęciem/filmem */}
-        <div className="reactions-container">
-          {Object.entries(reactions).map(([emoji, count]) => (
-              <div key={emoji} className="reaction">
-                <span>{emoji}</span>
-                <span className="reaction-count">{count}</span>
-              </div>
-          ))}
-        </div>
+        <ReactionSummary reactions={reactions} className="center" />
         {showPicker && (
           <div className="reaction-picker-container">
             <ReactionSelector

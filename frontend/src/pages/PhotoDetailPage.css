@@ -58,25 +58,10 @@
     margin-top: 4px;
 }
 
-.reactions-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 8px;
+.reaction-summary.center {
     margin-bottom: 12px;
-    color: var(--brown);
 }
 
-.reaction {
-    font-size: 20px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.reaction-count {
-    font-size: 14px;
-}
 
 .reaction-picker-container {
     position: relative;
