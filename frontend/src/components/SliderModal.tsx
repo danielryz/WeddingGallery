@@ -206,7 +206,7 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     handleTap(true);
     setTimeout(() => {
       touchHandledRef.current = false;
-    }, 0);
+    }, 350);
   };
 
 
