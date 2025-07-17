@@ -1,5 +1,5 @@
 // src/components/Reactions/ReactionSelector.tsx
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { addReaction } from '../../api/reactions';
 import './ReactionSelector.css';
 
@@ -23,6 +23,22 @@ const EMOJI_MAP: Record<string, string> = {
 
 
 const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReactionFn }) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClick = (e: MouseEvent | TouchEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                onClose();
+            }
+        };
+        document.addEventListener('mousedown', handleClick);
+        document.addEventListener('touchstart', handleClick);
+        return () => {
+            document.removeEventListener('mousedown', handleClick);
+            document.removeEventListener('touchstart', handleClick);
+        };
+    }, [onClose]);
+
     const handleSelect = async (emoji: string) => {
         const type = EMOJI_MAP[emoji];
         if (!type) return;
@@ -36,7 +52,7 @@ const ReactionSelector: React.FC<Props> = ({ photoId, onSelect, onClose, addReac
     };
 
     return (
-        <div className="reaction-selector">
+        <div className="reaction-selector" ref={containerRef}>
             {Object.keys(EMOJI_MAP).map(emoji => (
                 <button
                     key={emoji}

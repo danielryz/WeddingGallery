@@ -40,6 +40,8 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const [reactions, setReactions] = useState<Record<string, number>>({});
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
+  const [showNav, setShowNav] = useState(true);
+  const touchStartX = useRef<number | null>(null);
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
   const fetchItems = useCallback(async () => {
@@ -95,10 +97,34 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     };
   }, [onClose]);
 
+  const navTimer = useRef<NodeJS.Timeout | null>(null);
+  const resetNavTimer = () => {
+    setShowNav(true);
+    if (navTimer.current) clearTimeout(navTimer.current);
+    navTimer.current = setTimeout(() => setShowNav(false), 3000);
+  };
+
+  useEffect(() => {
+    resetNavTimer();
+    const showHandler = () => resetNavTimer();
+    document.addEventListener('mousemove', showHandler);
+    document.addEventListener('touchstart', showHandler);
+    return () => {
+      document.removeEventListener('mousemove', showHandler);
+      document.removeEventListener('touchstart', showHandler);
+    };
+  }, []);
+
   if (items.length === 0) return null;
 
-  const prev = () => setIndex(i => (i === 0 ? items.length - 1 : i - 1));
-  const next = () => setIndex(i => (i === items.length - 1 ? 0 : i + 1));
+  const prev = () => {
+    resetNavTimer();
+    setIndex(i => (i === 0 ? items.length - 1 : i - 1));
+  };
+  const next = () => {
+    resetNavTimer();
+    setIndex(i => (i === items.length - 1 ? 0 : i + 1));
+  };
   const current = items[index];
 
   const showHeart = async () => {
@@ -111,17 +137,55 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
     }
   };
 
-  const handleTap = () => {
+  const handleTap = (e: React.MouseEvent | React.TouchEvent) => {
     if (showPicker) {
       lastTapRef.current = 0;
       return;
     }
     const now = Date.now();
+    let clientX: number | undefined;
+    if ('clientX' in e) {
+      clientX = e.clientX;
+    } else if ('changedTouches' in e) {
+      clientX = e.changedTouches[0].clientX;
+    }
+
     if (now - lastTapRef.current < 300) {
       showHeart();
+    } else if (clientX !== undefined) {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      if (clientX - rect.left > rect.width / 2) {
+        next();
+      } else {
+        prev();
+      }
     }
     lastTapRef.current = now;
   };
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    resetNavTimer();
+    handlers.onTouchStart?.(e);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    handlers.onTouchEnd?.(e);
+    const endX = e.changedTouches[0].clientX;
+    if (touchStartX.current !== null) {
+      const delta = endX - touchStartX.current;
+      if (Math.abs(delta) > 50) {
+        if (delta > 0) {
+          prev();
+        } else {
+          next();
+        }
+      }
+    }
+    touchStartX.current = null;
+    handleTap(e);
+  };
+
 
   const handleSendComment = async () => {
     if (!newComment.trim()) return;
@@ -137,15 +201,21 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
   const modal = (
     <div className="slider-modal-backdrop" onClick={onClose}>
       <div className="slider-modal" onClick={e => e.stopPropagation()}>
-        <button className="nav-btn left" onClick={prev} aria-label="Poprzednie">
+        <button
+          className={`nav-btn left${showNav ? '' : ' hidden'}`}
+          onClick={prev}
+          aria-label="Poprzednie"
+        >
           <ChevronLeft size={32} />
         </button>
         <div
           className="media-wrapper"
-          {...handlers}
+          onMouseDown={handlers.onMouseDown}
+          onMouseUp={handlers.onMouseUp}
+          onMouseLeave={handlers.onMouseLeave}
           onClick={handleTap}
-          onTouchEnd={handleTap}
-          onDoubleClick={showHeart}
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
         >
           {current.isVideo ? (
             <video src={current.src} controls className="slider-media" />
@@ -173,7 +243,11 @@ const SliderModal: React.FC<SliderModalProps> = ({ startId, onClose }) => {
             </div>
           </div>
         </div>
-        <button className="nav-btn right" onClick={next} aria-label="Następne">
+        <button
+          className={`nav-btn right${showNav ? '' : ' hidden'}`}
+          onClick={next}
+          aria-label="Następne"
+        >
           <ChevronRight size={32} />
         </button>
         <div className="thumbnail-strip">
