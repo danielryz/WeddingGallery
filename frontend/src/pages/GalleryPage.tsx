@@ -1,6 +1,6 @@
 import React from 'react';
 import GalleryTabs from '../components/Gallery/GalleryTabs';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './GalleryPage.css';
 
 const GalleryPage: React.FC = () => {
@@ -13,7 +13,12 @@ const GalleryPage: React.FC = () => {
     return (
         <main className="gallery-page">
             <h1 className="gallery-title">Nasza Galeria Ślubna</h1>
-            <GalleryTabs onItemClick={handleItemClick} />
+            <GalleryTabs
+                onItemClick={handleItemClick}
+                headerExtra={(
+                    <Link to="/slider" className="browse-btn">Przeglądaj</Link>
+                )}
+            />
         </main>
     );
 };
