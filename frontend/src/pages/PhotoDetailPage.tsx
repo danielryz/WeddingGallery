@@ -293,7 +293,7 @@ const PhotoDetailPage: React.FC = () => {
             </div>
         )}
 
-        {photo.isWish ? (
+        {photo.isWish && ( !isAdmin() && !isThisDevice(photo.deviceId) ) ? (
             <p className="pd-comment-disabled-msg">Komentowanie wyłączone dla życzeń</p>
         ) : (
         <section className="pd-comments-section">

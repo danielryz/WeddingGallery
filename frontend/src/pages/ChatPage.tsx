@@ -67,7 +67,8 @@ function ChatMessage({ message }: { message: ChatMessageResponse }) {
           <div>{message.text}</div>
         </div>
 
-        {showPicker && (
+
+        {!isOwn && showPicker && (
             <div ref={pickerRef} className="emoji-picker">
               <ReactionSelector
                 triggerRef={bubbleRef}
