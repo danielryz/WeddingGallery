@@ -15,6 +15,7 @@
 
 /* Przyciski zakładek */
 .tab-button {
+    flex: 1 1 0;
     padding: 8px 16px;
     font: inherit;
     font-size: 1rem;
