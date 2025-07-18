@@ -18,9 +18,10 @@ type MediaType = 'image' | 'video';
 
 interface GalleryTabsProps {
     onItemClick?: (id: number) => void;
+    headerExtra?: React.ReactNode;
 }
 
-const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
+const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick, headerExtra }) => {
     const [activeTab, setActiveTab] = useState<MediaType>('image');
     const [items, setItems] = useState<GalleryItemData[]>([]);
     const [loading, setLoading] = useState(false);
@@ -84,6 +85,7 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick }) => {
                 >
                     Filmy
                 </button>
+                {headerExtra}
             </div>
 
             {/* Zawartość galerii */}
