@@ -6,8 +6,7 @@
 .tabs-header {
     display: flex;
     justify-content: center;
-    align-items: center;
-    gap: 8px;
+    position: relative;
     margin-bottom: 16px;
     background-color: var(--cream-light);        /* pastelowy kremowy */
     border-radius: 8px;           /* zaokrąglone krawędzie kontenera */
@@ -46,7 +45,10 @@
 }
 
 .header-extra {
-    margin-left: auto;
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .browse-btn {
