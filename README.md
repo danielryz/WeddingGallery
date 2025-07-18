@@ -78,6 +78,21 @@ If your environment requires a proxy to reach Maven Central, copy
 `.mvn/settings.xml.example` to `~/.m2/settings.xml` and update the host
 and port so Maven can download dependencies.
 
+## Docker setup
+
+Docker Compose can run the entire stack: PostgreSQL, backend and frontend.
+All configuration values are read from `.env.docker` which ships with sane
+defaults.
+
+```bash
+docker compose up --build
+```
+
+The frontend will be available at http://localhost:3000 and proxies API
+requests to the backend on port 8080. Configuration values are loaded from
+`.env.docker`; adjust this file to change database credentials or other
+settings.
+
 ## Frontend development
 
 The React frontend lives in the `frontend` directory. To work on it run:
