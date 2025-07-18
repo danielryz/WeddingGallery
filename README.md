@@ -81,14 +81,17 @@ and port so Maven can download dependencies.
 ## Docker setup
 
 Docker Compose can run the entire stack: PostgreSQL, backend and frontend.
+All configuration values are read from `.env.docker` which ships with sane
+defaults.
 
 ```bash
 docker compose up --build
 ```
 
 The frontend will be available at http://localhost:3000 and proxies API
-requests to the backend on port 8080. Default credentials are the same
-as in `.env.dev` but can be adjusted in `docker-compose.yml`.
+requests to the backend on port 8080. Configuration values are loaded from
+`.env.docker`; adjust this file to change database credentials or other
+settings.
 
 ## Frontend development
 
