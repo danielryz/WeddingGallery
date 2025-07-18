@@ -115,7 +115,6 @@ class PhotoServiceTest {
         when(photoRepository.findById(5L)).thenReturn(Optional.of(photo));
 
         HttpServletRequest req = mock(HttpServletRequest.class);
-        when(deviceService.getRequestingDevice(req)).thenReturn(device);
 
         var response = photoService.getPhoto(5L, req);
 
