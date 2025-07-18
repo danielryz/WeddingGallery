@@ -85,9 +85,7 @@ const GalleryTabs: React.FC<GalleryTabsProps> = ({ onItemClick, headerExtra }) =
                 >
                     Filmy
                 </button>
-                {headerExtra && (
-                    <div className="header-extra">{headerExtra}</div>
-                )}
+                {headerExtra}
             </div>
 
             {/* Zawartość galerii */}

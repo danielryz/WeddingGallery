@@ -16,7 +16,7 @@ const GalleryPage: React.FC = () => {
             <GalleryTabs
                 onItemClick={handleItemClick}
                 headerExtra={(
-                    <Link to="/slider" className="browse-btn">Przeglądaj</Link>
+                    <Link to="/slider" className="tab-button browse-btn">Przeglądaj</Link>
                 )}
             />
         </main>
